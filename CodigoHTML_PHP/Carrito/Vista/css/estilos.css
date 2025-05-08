@@ -1,0 +1,22 @@
+
+/* Elemento de compra */
+.cajaProd
+{
+    background-color: bisque;
+    border: 5px;
+    border-style: solid;
+    /* No se usar flex XD pero algo entendi */  
+    display: flex;
+    flex-direction: row;
+
+    padding: 20px;
+    margin: 23px;
+    gap: 40px;/* separacion entre items img, btn, txt  */
+    align-items: center; 
+    justify-content: center;
+
+}
+.cajaProd img
+{
+    height: 200px;
+}
