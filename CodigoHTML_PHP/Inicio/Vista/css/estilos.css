@@ -64,14 +64,19 @@ body {
   filter: brightness(1.4);
 }
 /*FECHAAAAAA*/
-#fechaHora {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding-right: 1rem;
-  font-size: 0.9rem;
-  color: #555;
+.head-container {
+  display: flex; 
+  padding-top: 3%;
+  margin-left: 38%;
+  width: 100%;
 }
+
+.inventario{
+  /* padding-left: 20%; */
+  align-items: center;
+  margin-left: 20%;
+}
+
 /*BUSCADOR*/
 .Buscador {
   margin-top: 30px;
@@ -115,35 +120,142 @@ body {
   background-color: #035AA6;
   color: white;
 }
-/*BotoN*/
-.botones-container {
+/*BOTONES basicos eliminar*/
+/*
+.botones-container {display: flex;justify-content: center; gap: 16px;padding: 40px 20px;}
+.boton-inicio {display: flex;flex-direction: column;align-items: center;justify-content: center;width: 370px;height: 370px;transition: transform 0.2s, box-shadow 0.2s;}
+.boton-inicio img {height: 360px;width: auto;}
+.boton-inicio img| {height: 360px;width: auto;}
+.boton-inicio:hov|er {transform: translateY(-4px);box-shadow: 0 4px 8px rgba(0,0,0,0.2);}
+*/
+
+/* Container de Circulos */
+.containerCirculos {
   display: flex;
-  justify-content: center; 
-  gap: 16px;
-  padding: 40px 20px;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 30px;
+  width: 55%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.boton-inicio {
+.circulo {
+  width: 25%;          
+  aspect-ratio: 1 / 1; 
+  border-radius: 50%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  width: 370px;
-  height: 370px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  
 }
-.boton-inicio img {
-  height: 360px;
-  width: auto;
+
+.msgGrande h1 {
+  font-size: 2.5vw; 
+  margin: 0;
+  color: #fff;
+  line-height: 1;
 }
-.boton-inicio img {
-  height: 360px;
-  width: auto;
+
+.msgPeque h3 {
+  font-size: 1.2vw;
+  margin-top: 5px;
+  color: #fff;
 }
-.boton-inicio:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+/*Botones de abajo de circulos*/
+.botones{
+  text-align: center;
+  /* display: flex; */
+  align-items: center; 
+  padding: 30px;
 }
+.botones button {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 2px solid #035AA6;
+  color: #035AA6;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.botones button:hover {
+  background-color: #035AA6;
+  color: white;
+}
+
+/* TABLA */
+table {
+  
+  margin: 0 auto 50px;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: center;
+  color: #034C8C;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(3, 76, 140, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+  cursor: default;
+}
+
+table:hover {
+  box-shadow: 0 10px 45px rgba(3, 76, 140, 0.2);
+}
+
+thead {
+  background: linear-gradient(135deg, #04BFAD, #035AA6);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  user-select: none;
+}
+
+th, td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #ABB4B2;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+td {
+  background-color: #F7F9FA;
+}
+
+tbody tr:hover td {
+  background-color: #e6f4f1;
+}
+
+/* Estilos para los/el modal */.modal {
+  position: fixed;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5); /* fondo oscuro */
+}
+
+.modal-contenido {
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  width: 30%;
+  border-radius: 10px;
+}
+
+.cerrar {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
