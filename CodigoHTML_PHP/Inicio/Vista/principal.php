@@ -4,15 +4,16 @@
   <meta charset="UTF-8">
   <title>Inicio</title>
   <link rel="stylesheet" href="css/estilos.css">
+  
 </head>
 <body>
-  <nav class="navbar">
-    <img src="img/logo.jpg" class="logo" alt="Logo">
-  </nav>
-
-  
-  
-
+  <!-- Llamar al navbar -->
+  <script src="../../NavBar/Vista/javaScript/script.js"></script>
+  <link rel="stylesheet" href="../../NavBar/Vista/css/estilos.css">
+  <?php 
+  require('../../NavBar/Vista/Principal.php');
+  ?>
+  <!-- Fin de la llamada de Navbar -->
 
   <div class="head-container">
     <center>
@@ -22,12 +23,6 @@
     <div  class="inventario">
       <div id="fecha"></div>
       <div id="hora"></div>
-      <!-- logo de inventarioa para boton -->
-      <div>
-        <a href="../../Inventario/Vista/principal.php">
-          <img src="img/inventarioIcono.png" style="height: 100px;">
-        </a>
-      </div>
     </div>
   </div>
 
@@ -108,5 +103,8 @@
 <!-- links de JS -->
 <script src="javaScript/fechaHora.js"></script>
 <script src="javaScript/abrirModal.js"></script>
+
+
+
 </body>
 </html>
