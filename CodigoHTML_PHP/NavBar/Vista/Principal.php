@@ -15,9 +15,8 @@
 
 <div class="overlay-menu" id="overlayMenu">
     <button class="close-btn" id="closeMenu">&times;</button> <div class="overlay-menu-list">
-        <a href="#"><i>Inicio</i></a>
+        <a href="../../Inicio/Vista/principal.php"><i>Inicio</i></a>
         <a href="../../Inventario/Vista/principal.php"><i>Inventario</i></a>
-        <a href="#"><i>Carrito</i></a>
     </div>
 </div>
 <script src="javaScript/script.js"></script> </body>

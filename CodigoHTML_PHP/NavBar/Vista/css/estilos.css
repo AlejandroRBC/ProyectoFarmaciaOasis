@@ -51,7 +51,7 @@
 
 /* creacion de la barrita de menu */
 .menu span {
-    color: white; /* Make the "menu" text visible */
+    color: white;
     font-weight: bold;
     cursor: pointer;
     padding: 5px 10px;
@@ -63,15 +63,15 @@
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Overlay Menu Styles */
+/* Overlay Menu */
 .overlay-menu {
     height: 100%; 
     width: 0; 
     position: fixed;
     z-index: 1000;
     top: 0;
-    left: 0;
-    background: linear-gradient(135deg, #04BFAD, #035aa6a4);
+    right: 0;
+    background: linear-gradient(135deg, #035aa6, #04bfaced);
     overflow-x: hidden; 
     transition: 0.5s; 
     display: flex; 

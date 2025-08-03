@@ -52,9 +52,7 @@
 <div class="botones">
   <button onclick="mostrarModal('modalBajos')">Productos por Acabarse</button>
   <button onclick="mostrarModal('modalVencer')">Productos por Vencer</button>
-  <br><br>
-  <button>Actualizar Información</button>
-  <button>Generar Reporte del Día</button>
+  
 </div>
 
 <!-- MODAL PARA PRODUCTOS BAJOS -->
