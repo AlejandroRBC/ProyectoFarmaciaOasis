@@ -167,12 +167,11 @@ button {
 ----------------------------------------------------- */
 /* Icono del carrito */
 .containerCarrito {
-  
   justify-content: flex-end;
   align-items: center;
   padding: 10px 20px;
   position: fixed;
-  top: 10%;
+  top: 5rem;
   right: 0;
   
 }
