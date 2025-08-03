@@ -1,3 +1,5 @@
+
+<?php require_once '../Controlador/actualizarTotal.php';?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -33,8 +35,9 @@
 
   <!-- Graficos Circulares -->
 <div class="containerCirculos">
-  <div class="circulo" style="background-color: #034C8C;" >
-    <span class="msgGrande"><h1>420 bs</h1></span>
+  
+  <div div class="circulo" style="background-color: #034C8C;">
+    <span class="msgGrande"><h1><?php echo number_format($totalHoy, 2); ?> bs</h1></span>
     <span class="msgPeque"><h3>total de Hoy</h3></span>
   </div>
   <div class="circulo" style="background-color: #04BFBF;">
