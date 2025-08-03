@@ -1,92 +1,4 @@
 /* ----------------------------------------------------
-  FUENTE GLOBAL
------------------------------------------------------ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-
-body {
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f6f8;
-  color: #034C8C;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  user-select: none;
-}
-
-
-/* ----------------------------------------------------
-  NAVBAR (barra de navegación superior)
------------------------------------------------------ */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 50px;
-  background: linear-gradient(135deg, #04BFAD, #035AA6);
-  box-shadow: 0 8px 30px rgba(3, 76, 140, 0.25);
-  backdrop-filter: blur(12px);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  cursor: default;
-  border-radius: 0 0 20px 20px;
-  transition: background 0.3s ease;
-}
-
-
-/* Logo dentro del navbar */
-.logo {
-  height: 45px;
-  border-radius: 12px;
-  background-color: #fff;
-  padding: 2px;
-  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.85);
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
-  cursor: pointer;
-}
-
-.logo:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px #04BFBF;
-}
-
-/* Icono del carrito */
-.cart-icon {
-  cursor: pointer;
-  background: none !important;
-  border: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  filter: drop-shadow(0 0 1.5px #035AA6);
-  position: relative;
-  display: inline-block;
-}
-
-.cart-icon img {
-  width: 40px;
-  height: auto;
-}
-
-.cart-icon:hover {
-  filter: none;
-  transform: none;
-}
-  
-.contador-carrito {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background-color:  #04BFAD;
-  color: white;
-  font-size: 12px;
-  padding: 1px 5px;
-  border-radius: 50%;
-  font-weight: bold;
-}
-
-
-/* ----------------------------------------------------
   TÍTULO "INVENTARIO"
 ----------------------------------------------------- */
 h1 {
@@ -239,11 +151,6 @@ button {
   user-select: none;
 }
 
-button:hover {
-  transform: translateY(-3px);
-  background: linear-gradient(135deg, #04D9C4, #0469C3);
-  box-shadow: 0 8px 26px rgba(3, 90, 166, 0.35);
-}
 
 /* Contenedor de botones */
 .botones {
@@ -258,19 +165,63 @@ button:hover {
 /* ----------------------------------------------------
   CARRITO DE COMPRAS
 ----------------------------------------------------- */
+/* Icono del carrito */
+.containerCarrito {
+  
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px 20px;
+  position: fixed;
+  top: 10%;
+  right: 0;
+  
+}
+
+.cart-icon {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.cart-icon img {
+  width: 42px;
+  height: auto;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.2));
+  transition: filter 0.3s ease;
+}
+
+.cart-icon:hover {
+  transform: scale(1.05);
+}
+
+/* Contador */
+.contador-carrito {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #04BFAD;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px black;
+}
+
+/* Panel lateral del carrito */
 .menu-carrito {
   position: fixed;
   top: 0;
-  right: -350px;
-  width: 350px;
+  right: -100%;
+  width: 340px;
   height: 100vh;
-  background: #fff;
-  box-shadow: -3px 0 8px rgba(0,0,0,0.1);
-  padding: 20px;
-  box-sizing: border-box;
-  transition: right 0.3s ease;
+  background: #ffffff;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+  padding: 25px;
+  transition: right 0.35s ease-in-out;
   overflow-y: auto;
-  border-radius: 10px 0 0 10px;
+  border-radius: 12px 0 0 12px;
   z-index: 1000;
 }
 
@@ -278,53 +229,53 @@ button:hover {
   right: 0;
 }
 
+/* Ítems del carrito */
 .carrito-item {
-  background: #f7fbfb;
-  border: 1px solid #cde3e3;
-  border-radius: 8px;
-  padding: 15px;
+  background: #f0fafa;
+  border: 1px solid #b2dcdc;
+  border-radius: 10px;
+  padding: 12px;
   margin-bottom: 15px;
-  
+  font-size: 0.95rem;
 }
+
 .menu-carrito h1 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  color: #024a87;
   margin-bottom: 20px;
-  color: #034C8C;
-  font-weight: 700;
-  user-select: none;
+  font-weight: bold;
 }
 
 .menu-carrito form {
   display: flex;
-  gap: 10px;
-  justify-content: flex-start;
   align-items: center;
-  margin-top: 20px;
-  height: 80px;
+  gap: 12px;
+  margin-top: 25px;
 }
 
 .menu-carrito form button {
-  padding: 7px 17px;
-  font-size: 0.85rem;
-  border-radius: 20px;
+  background-color: #04bfad;
+  border: none;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
-  .carrito-item p,
-  .carrito-item form {
-    margin: 2px 0;
-  }
 
-  .carrito-item hr {
-    margin: 8px 0;
-  }
+.menu-carrito form button:hover {
+  background-color: #039d93;
+}
 
-  .carrito-item {
-    padding: 10px;
-  }
+.carrito-item p,
+.carrito-item form {
+  margin: 4px 0;
+}
 
-  .carrito-item span {
-    font-size: 0.95rem;
-  }
+.carrito-item hr {
+  margin: 10px 0;
+}
 
 
 /* ----------------------------------------------------

@@ -86,8 +86,14 @@ $laboratorios = listarLaboratorios();
 </head>
 <body>
     <!-- NAVBAR: logo y botón del carrito que cuando se agrega un producto aparecera un contador-->
-    <nav class="navbar">
-        <img src="img/logo.jpg" class="logo" alt="Logo" />
+    <!-- Llamar al navbar -->
+        <script src="../../NavBar/Vista/javaScript/script.js"></script>
+        <link rel="stylesheet" href="../../NavBar/Vista/css/estilos.css">
+        <?php 
+        require('../../NavBar/Vista/Principal.php');
+        ?>
+    <!-- Fin de la llamada de Navbar -->
+    <div class="containerCarrito">
         <a class="cart-icon" onclick="mostrarCarrito()" title="Ver carrito">
             <img src="img/Carrito.png" alt="Carrito" class="icono" />
             <?php
@@ -99,8 +105,8 @@ $laboratorios = listarLaboratorios();
                 <span class="contador-carrito"><?= $total_items ?></span>
             <?php endif; ?>
         </a>
-    </nav>
-
+    </div>
+    
     <!-- INVENTARIO DE PRODUCTOS -->
     <main>
         <h1>INVENTARIO</h1>

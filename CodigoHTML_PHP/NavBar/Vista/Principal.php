@@ -14,7 +14,7 @@
 </nav>
 
 <div class="overlay-menu" id="overlayMenu">
-    <button class="close-btn" id="closeMenu">&times;</button> <div class="overlay-menu-list">
+    <button class="close-btn1" id="closeMenu">&times;</button> <div class="overlay-menu-list">
         <a href="../../Inicio/Vista/principal.php"><i>Inicio</i></a>
         <a href="../../Inventario/Vista/principal.php"><i>Inventario</i></a>
     </div>
