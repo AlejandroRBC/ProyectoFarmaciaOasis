@@ -1,4 +1,6 @@
-/* Google Fonts - Inter */
+/* ----------------------------------------------------
+  FUENTE GLOBAL
+----------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 body {
@@ -12,23 +14,28 @@ body {
   user-select: none;
 }
 
-/* NAVBAR */
+
+/* ----------------------------------------------------
+  NAVBAR (barra de navegación superior)
+----------------------------------------------------- */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 50px; 
-    background: linear-gradient(135deg, #04BFAD, #035AA6);
-    box-shadow: 0 8px 30px rgba(3, 76, 140, 0.25);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 999;
-    cursor: default;
-    border-radius: 0 0 20px 20px;
-    transition: background 0.3s ease;
-  }
-  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 50px;
+  background: linear-gradient(135deg, #04BFAD, #035AA6);
+  box-shadow: 0 8px 30px rgba(3, 76, 140, 0.25);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  cursor: default;
+  border-radius: 0 0 20px 20px;
+  transition: background 0.3s ease;
+}
+
+
+/* Logo dentro del navbar */
 .logo {
   height: 45px;
   border-radius: 12px;
@@ -44,26 +51,44 @@ body {
   box-shadow: 0 6px 20px #04BFBF;
 }
 
+/* Icono del carrito */
 .cart-icon {
-  display: flex;
-  align-items: center;
   cursor: pointer;
-  transition: transform 0.25s ease, filter 0.25s ease;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  filter: drop-shadow(0 0 1.5px #035AA6);
+  position: relative;
+  display: inline-block;
 }
 
 .cart-icon img {
-  width: 38px;
-  height: 38px;
-  filter: drop-shadow(0 0 5px #04BFAD);
-  transition: filter 0.25s ease;
+  width: 40px;
+  height: auto;
 }
 
 .cart-icon:hover {
-  transform: scale(1.15);
-  filter: brightness(1.4);
+  filter: none;
+  transform: none;
+}
+  
+.contador-carrito {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color:  #04BFAD;
+  color: white;
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 50%;
+  font-weight: bold;
 }
 
-/* TITULO "INVENTARIO" con degradado texto */
+
+/* ----------------------------------------------------
+  TÍTULO "INVENTARIO"
+----------------------------------------------------- */
 h1 {
   text-align: center;
   margin: 40px 0 25px;
@@ -80,7 +105,9 @@ h1 {
   cursor: default;
 }
 
-/* BUSCADOR */
+/* ----------------------------------------------------
+  BUSCADOR
+----------------------------------------------------- */
 .busqueda-container {
   display: flex;
   justify-content: center;
@@ -98,30 +125,19 @@ h1 {
   outline-color: #04BFBF;
   color: #034C8C;
   background-color: #fff;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   font-weight: 500;
-  cursor: text;
+  transition: all 0.4s ease;
 }
 
 .busqueda:focus {
   border-color: #04BFAD;
-  box-shadow: 0 0 0 4px rgba(4, 191, 173, 0.35);
+  box-shadow: 0 0 0 4px rgba(171, 180, 178, 0.3);
 }
 
-.lupa-icon {
-  width: 28px;
-  height: 28px;
-  cursor: pointer;
-  filter: brightness(0) saturate(100%) invert(31%) sepia(40%) saturate(3414%) hue-rotate(152deg) brightness(90%) contrast(89%);
-  transition: filter 0.3s ease;
-}
-
-.lupa-icon:hover {
-  filter: brightness(1.3);
-}
-
-/* TABLA */
+/* ----------------------------------------------------
+  TABLA DE INVENTARIO
+----------------------------------------------------- */
 table {
   width: 95%;
   margin: 0 auto 50px;
@@ -141,6 +157,7 @@ table:hover {
   box-shadow: 0 10px 45px rgba(3, 76, 140, 0.2);
 }
 
+/* Encabezado de tabla */
 thead {
   background: linear-gradient(135deg, #04BFAD, #035AA6);
   color: white;
@@ -149,10 +166,12 @@ thead {
   user-select: none;
 }
 
+/* Celdas de tabla */
 th, td {
   padding: 16px 20px;
   border-bottom: 1px solid #ABB4B2;
   font-weight: 500;
+  border-color: #ABB4B2;
   transition: background-color 0.3s ease;
 }
 
@@ -164,28 +183,47 @@ tbody tr:hover td {
   background-color: #e6f4f1;
 }
 
-/* ICONOS */
+/* ----------------------------------------------------
+  ICONOS
+----------------------------------------------------- */
 .icono {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: auto;
   cursor: pointer;
-  filter: drop-shadow(0 0 1.5px #035AA6);
-  transition: transform 0.25s ease, filter 0.25s ease;
+  user-select: none;
+  transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+  
 }
 
 .icono:hover {
-  transform: scale(1.3);
-  filter: drop-shadow(0 0 5px #04BFAD);
+  transform: translateY(-4px) scale(1.1);
+  filter: brightness(1.3);
 }
 
-/* ACCIONES */
-.acciones {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
+.icono-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.25s ease, filter 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 6px 10px rgba(0,0,0,0.2);
 }
 
-/* BOTONES */
+.icono-btn:hover {
+  transform: translateY(-4px) scale(1.1);
+  filter: brightness(1.3);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+
+
+
+
+/* ----------------------------------------------------
+  BOTONES GENERALES
+----------------------------------------------------- */
 button {
   background: linear-gradient(135deg, #04BFAD, #035AA6);
   color: white;
@@ -193,12 +231,12 @@ button {
   padding: 12px 26px;
   border-radius: 18px;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 700;
   font-size: 16px;
+  text-transform: uppercase;
+  transition: all 0.4s ease;
   box-shadow: 0 6px 20px rgba(3, 90, 166, 0.15);
   user-select: none;
-  text-transform: uppercase;
 }
 
 button:hover {
@@ -207,6 +245,7 @@ button:hover {
   box-shadow: 0 8px 26px rgba(3, 90, 166, 0.35);
 }
 
+/* Contenedor de botones */
 .botones {
   text-align: center;
   margin-bottom: 50px;
@@ -216,20 +255,113 @@ button:hover {
   margin: 0 16px;
 }
 
-
-th, td {
-  border-color: #ABB4B2; /* bordes tabla */
+/* ----------------------------------------------------
+  CARRITO DE COMPRAS
+----------------------------------------------------- */
+.menu-carrito {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 350px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -3px 0 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  box-sizing: border-box;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  border-radius: 10px 0 0 10px;
+  z-index: 1000;
 }
 
-.busqueda {
-  border-color: #ABB4B2; /* borde input */
+.menu-carrito.activo {
+  right: 0;
 }
 
-.busqueda:focus {
-  box-shadow: 0 0 0 4px rgba(171, 180, 178, 0.3);
+.carrito-item {
+  background: #f7fbfb;
+  border: 1px solid #cde3e3;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  
+}
+.menu-carrito h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #034C8C;
+  font-weight: 700;
+  user-select: none;
 }
 
-/* RESPONSIVE */
+.menu-carrito form {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 20px;
+  height: 80px;
+}
+
+.menu-carrito form button {
+  padding: 7px 17px;
+  font-size: 0.85rem;
+  border-radius: 20px;
+  cursor: pointer;
+}
+  .carrito-item p,
+  .carrito-item form {
+    margin: 2px 0;
+  }
+
+  .carrito-item hr {
+    margin: 8px 0;
+  }
+
+  .carrito-item {
+    padding: 10px;
+  }
+
+  .carrito-item span {
+    font-size: 0.95rem;
+  }
+
+
+/* ----------------------------------------------------
+  ESTILOS MODAL
+----------------------------------------------------- */
+
+.modal {
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-contenido {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  width: 40%;
+  border-radius: 8px;
+}
+
+.cerrar {
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+
+
+
+/* ----------------------------------------------------
+  RESPONSIVE (pantallas pequeñas)
+----------------------------------------------------- */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
@@ -249,117 +381,6 @@ th, td {
     margin: 12px 0;
     width: 90%;
   }
-}
-/* --- Estilos del Carrito de Compras --- */
+  
 
-.menu-carrito {
-  scrollbar-width: true;
-  position: fixed; 
-  top: 0;
-  /*para cambiar el tamaño del menu carrito se modifica por igula estos 2 valores*/
-  right: -450px; 
-  width: 450px;
-  height: 100%;
-  background-color: #fff;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-  z-index: 1000;
-  transition: right 0.3s ease-in-out; 
-  padding: 20px;
-  box-sizing: border-box;
-  overflow-y: auto;
 }
-/* Cuando está activo, se muestra en la pantalla */
-  .menu-carrito.activo {
-  right: 0; 
-}
-.menu-carrito h2 {
-  margin-top: 0;
-  color: #333;
-}
-
-.cerrar-carrito {
-  background: none;
-  border: none;
-  font-size: 1.5em;
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  cursor: pointer;
-  color: #555;
-}
-
-/* --- Estilos del Overlay --- */
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0); /* Transparente inicialmente */
-  z-index: 999; /* Detrás del menú del carrito */
-  visibility: hidden; /* Oculto inicialmente */
-  transition: background-color 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-
-.overlay.activo {
-  background-color: rgba(0, 0, 0, 0.5); /* Se vuelve opaco cuando está activo */
-  visibility: visible; /* Se hace visible */
-}
-/* --------Itemsa de Carrito-------- */
-.carrito-Item button{
-  margin-top: 20px;
-}
-.carrito-Item{
-  background-color: red;
-  border-radius: 13px;
-  padding: 12px;
-}
-
-.carrito-item {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px; /* Espacio entre items */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 5px; 
-  position: relative; /* Para posibles iconos de borrado */
-}
-
-.carrito-item h3 {
-  margin: 0 0 8px 0; /* Espacio debajo del nombre del producto */
-  color:  #04BFBF;
-  font-size: 1.1em;
-}
-
-.carrito-item p {
-  margin: 0;
-  font-size: 0.9em;
-  color: black;
-}
-
-.carrito-item p span {
-  font-weight: bold;
-  color: #034C8C;
-}
-
-.carrito-item .item-total {
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #04BFBF;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed #ddd; /* Separador */
-}
-
-.carrito-item .item-acciones {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px; 
-  margin-top: 10px;
-}
-
-

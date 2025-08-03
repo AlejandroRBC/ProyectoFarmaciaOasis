@@ -1,0 +1,337 @@
+<?php
+
+require_once '../Controlador/conexion.php'; // Incluye la conexión a la base de datos
+
+/**
+ * Obtiene el ID de la última factura abierta. Si no existe, crea una nueva.
+ * 
+ * @return int ID de la factura abierta
+ */
+function obtenerFacturaAbierta() {
+    global $conn;
+    $res = $conn->query("SELECT id_factura FROM FACTURA WHERE estado = 'ABIERTA' ORDER BY id_factura DESC LIMIT 1");
+    
+    if ($res && $res->num_rows > 0) {
+        $row = $res->fetch_assoc();
+        return $row['id_factura'];
+    } else {
+        $fecha = date('Y-m-d');
+        $conn->query("INSERT INTO FACTURA (fecha, total, estado) VALUES ('$fecha', 0, 'ABIERTA')");
+        return $conn->insert_id;
+    }
+}
+
+/**
+ * CRUD PRODUCTO
+ * 
+ * Este conjunto de funciones permite crear, leer (buscar), actualizar y eliminar productos
+ * en el sistema, incluyendo su nombre, precio, stock, fecha de expiración y laboratorio asociado.
+ */
+
+/**
+ * Agrega un nuevo producto a la base de datos.
+ */
+function agregarProducto($nom_prod, $precio, $stock, $fecha_expiracion, $id_laboratorio) {
+    global $conn;
+
+    $nom_prod = $conn->real_escape_string($nom_prod);
+    $precio = (float)$precio;
+    $stock = (int)$stock;
+    $fecha_expiracion = $conn->real_escape_string($fecha_expiracion);
+    $id_laboratorio = (int)$id_laboratorio;
+
+    $sql = "INSERT INTO PRODUCTO (nom_prod, precio, stock, fecha_expiracion, id_laboratorio)
+            VALUES ('$nom_prod', $precio, $stock, '$fecha_expiracion', $id_laboratorio)";
+
+    if ($conn->query($sql)) {
+        return ['success' => true, 'id_producto' => $conn->insert_id];
+    } else {
+        return ['error' => 'No se pudo agregar el producto.'];
+    }
+}
+/**
+ * Agrega un nuevo laboratorio a la base de datos.
+ */
+function agregarLaboratorio($nombre, $direccion) {
+    global $conn;
+
+    $nombre = $conn->real_escape_string($nombre);
+    $direccion = $conn->real_escape_string($direccion);
+
+    $sql = "INSERT INTO LABORATORIO (nombre, direccion) VALUES ('$nombre', '$direccion')";
+
+    if ($conn->query($sql)) {
+        return ['success' => true, 'id_laboratorio' => $conn->insert_id];
+    } else {
+        return ['error' => 'No se pudo agregar el laboratorio.'];
+    }
+}
+
+
+/**
+ * Modifica los datos de un producto existente.
+ */
+function modificarProducto($id_producto, $nom_prod, $precio, $stock, $fecha_expiracion, $id_laboratorio) {
+    global $conn;
+
+    $id_producto = (int)$id_producto;
+    $nom_prod = $conn->real_escape_string($nom_prod);
+    $precio = (float)$precio;
+    $stock = (int)$stock;
+    $fecha_expiracion = $conn->real_escape_string($fecha_expiracion);
+    $id_laboratorio = (int)$id_laboratorio;
+
+    $sql = "UPDATE PRODUCTO
+            SET nom_prod = '$nom_prod',
+                precio = $precio,
+                stock = $stock,
+                fecha_expiracion = '$fecha_expiracion',
+                id_laboratorio = $id_laboratorio
+            WHERE id_producto = $id_producto";
+
+    if ($conn->query($sql)) {
+        return ['success' => true];
+    } else {
+        return ['error' => 'No se pudo modificar el producto.'];
+    }
+}
+
+/**
+ * Elimina un producto de la base de datos por su ID.
+ */
+function eliminarProducto($id_producto) {
+    global $conn;
+    $id_producto = (int)$id_producto;
+
+    $sql = "DELETE FROM PRODUCTO WHERE id_producto = $id_producto";
+
+    if ($conn->query($sql)) {
+        return ['success' => true];
+    } else {
+        return ['error' => 'No se pudo eliminar el producto.'];
+    }
+}
+
+/**
+ * Busca productos que coincidan con el término ingresado.
+ */
+function buscarProductos($term) {
+    global $conn;
+    $term = $conn->real_escape_string($term);
+
+    $sql = "SELECT p.id_producto, p.nom_prod, p.precio, p.stock, p.fecha_expiracion,l.id_laboratorio, l.nombre AS laboratorio
+            FROM PRODUCTO p
+            JOIN LABORATORIO l ON p.id_laboratorio = l.id_laboratorio
+            WHERE p.nom_prod LIKE '$term%' OR p.id_producto LIKE '$term%'
+            ORDER BY p.nom_prod
+            LIMIT 20";
+
+    $res = $conn->query($sql);
+    $productos = [];
+
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $productos[] = $row;
+        }
+    }
+
+    return $productos;
+}
+
+function listarLaboratorios() {
+    global $conn; 
+    $sql = "SELECT id_laboratorio, nombre FROM laboratorio";
+    $resultado = mysqli_query($conn, $sql);
+
+    $laboratorios = [];
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $laboratorios[] = $fila;
+    }
+    return $laboratorios;
+}
+
+
+
+
+/**
+ * Agrega un producto al carrito (detalle de venta), creando la factura si es necesario.
+ * 
+ * @param int $id_producto ID del producto
+ * @param int $cantidad Cantidad a agregar (por defecto 1)
+ * @return array Resultado de la operación
+ */
+function agregarAlCarrito($id_producto, $cantidad = 1) {
+    global $conn;
+    $id_factura = obtenerFacturaAbierta();
+
+    // Verificar existencia del producto
+    $res = $conn->query("SELECT precio, stock FROM PRODUCTO WHERE id_producto = $id_producto");
+    if (!$res || $res->num_rows === 0) return ['error'=>'Producto no encontrado'];
+    $producto = $res->fetch_assoc();
+
+    $precio = (float)$producto['precio'];
+    $stock_actual = (int)$producto['stock'];
+
+    // Verificar si ya existe en el carrito
+    $res2 = $conn->query("SELECT id_detalle, cantidad FROM DETALLEVENTA WHERE id_factura = $id_factura AND id_producto = $id_producto");
+
+    if ($res2 && $res2->num_rows > 0) {
+        $detalle = $res2->fetch_assoc();
+        $cantidad_actual = (int)$detalle['cantidad'];
+        $nueva_cantidad = $cantidad_actual + $cantidad;
+        $diferencia = $nueva_cantidad - $cantidad_actual;
+
+        if ($stock_actual < $diferencia) return ['error'=>'Stock insuficiente para la cantidad solicitada'];
+
+        $subtotal = $nueva_cantidad * $precio;
+        $conn->query("UPDATE DETALLEVENTA SET cantidad = $nueva_cantidad, subtotal = $subtotal WHERE id_detalle = " . $detalle['id_detalle']);
+
+        // Actualizar stock solo por la diferencia
+        $nuevo_stock = $stock_actual - $diferencia;
+        $conn->query("UPDATE PRODUCTO SET stock = $nuevo_stock WHERE id_producto = $id_producto");
+    } else {
+        if ($stock_actual < $cantidad) return ['error'=>'Stock insuficiente para la cantidad solicitada'];
+
+        $subtotal = $cantidad * $precio;
+        $conn->query("INSERT INTO DETALLEVENTA (id_factura, id_producto, cantidad, subtotal) VALUES ($id_factura, $id_producto, $cantidad, $subtotal)");
+
+        $nuevo_stock = $stock_actual - $cantidad;
+        $conn->query("UPDATE PRODUCTO SET stock = $nuevo_stock WHERE id_producto = $id_producto");
+    }
+
+    return ['success'=>true, 'id_factura'=>$id_factura];
+}
+
+
+
+/**
+ * Obtiene los productos actuales del carrito (detalle de venta) para la factura abierta.
+ * 
+ * @return array Lista de productos en el carrito
+ */
+function obtenerCarrito() {
+    global $conn;
+    $id_factura = obtenerFacturaAbierta();
+
+    $sql = "SELECT d.id_detalle, p.nom_prod,  d.cantidad, d.subtotal
+            FROM DETALLEVENTA d
+            JOIN PRODUCTO p ON d.id_producto = p.id_producto
+            WHERE d.id_factura = $id_factura";
+
+    $result = $conn->query($sql);
+    $carrito = [];
+
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $carrito[] = $row;
+        }
+    }
+
+    return $carrito;
+}
+
+/**
+ * Elimina un producto específico del carrito y actualiza el stock.
+ * 
+ * @param int $id_detalle ID del detalle de venta a eliminar
+ * @return array Resultado de la operación
+ */
+function eliminarProductoCarrito($id_detalle) {
+    global $conn;
+
+    // Recuperar información del detalle
+    $res = $conn->query("SELECT id_factura, id_producto, cantidad FROM DETALLEVENTA WHERE id_detalle = $id_detalle");
+    if (!$res || $res->num_rows === 0) return ['error' => 'Detalle no encontrado'];
+    $row = $res->fetch_assoc();
+
+    $id_factura = $row['id_factura'];
+    $id_producto = $row['id_producto'];
+    $cantidad = (int)$row['cantidad'];
+
+    // Verificar estado de la factura
+    $resEstado = $conn->query("SELECT estado FROM FACTURA WHERE id_factura = $id_factura");
+    if (!$resEstado || $resEstado->num_rows === 0) return ['error' => 'Factura no encontrada'];
+    $estado = $resEstado->fetch_assoc()['estado'];
+
+    if ($estado !== 'ABIERTA') {
+        return ['error' => 'No se puede eliminar producto, la factura está cerrada'];
+    }
+
+    // Devolver cantidad al stock
+    $conn->query("UPDATE PRODUCTO SET stock = stock + $cantidad WHERE id_producto = $id_producto");
+
+    // Eliminar el producto del detalle
+    $conn->query("DELETE FROM DETALLEVENTA WHERE id_detalle = $id_detalle");
+
+    return ['success' => true];
+}
+
+
+
+/**
+ * Borra todos los productos del carrito y devuelve el stock a su estado original.
+ * 
+ * @return array Resultado de la operación
+ */
+function borrarTodoCarrito() {
+    global $conn;
+    $id_factura = obtenerFacturaAbierta();
+
+    // Recuperar los productos y cantidades
+    $res = $conn->query("SELECT id_producto, cantidad FROM DETALLEVENTA WHERE id_factura = $id_factura");
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $id_producto = $row['id_producto'];
+            $cantidad = (int)$row['cantidad'];
+            $conn->query("UPDATE PRODUCTO SET stock = stock + $cantidad WHERE id_producto = $id_producto");
+        }
+    }
+
+    // Eliminar todos los detalles de venta
+    $conn->query("DELETE FROM DETALLEVENTA WHERE id_factura = $id_factura");
+
+    return ['success' => true];
+}
+
+
+/**
+ * Actualiza la cantidad de un producto en el carrito y ajusta el stock.
+ * 
+ * @param int $id_detalle ID del detalle de venta
+ * @param int $cantidad Nueva cantidad deseada
+ * @return array Resultado de la operación
+ */
+function actualizarCantidad($id_detalle, $cantidad) {
+    global $conn;
+    if ($cantidad < 1) return ['error' => 'Cantidad inválida'];
+
+    // Obtener información actual del producto en el detalle
+    $res = $conn->query("SELECT d.id_producto, d.cantidad AS cantidad_actual, p.precio, p.stock 
+                         FROM DETALLEVENTA d 
+                         JOIN PRODUCTO p ON d.id_producto = p.id_producto 
+                         WHERE d.id_detalle = $id_detalle");
+
+    if (!$res || $res->num_rows == 0) return ['error' => 'Detalle no encontrado'];
+
+    $fila = $res->fetch_assoc();
+    $stock_actual = (int)$fila['stock'];
+    $cantidad_actual = (int)$fila['cantidad_actual'];
+    $id_producto = (int)$fila['id_producto'];
+
+    // Diferencia entre cantidad nueva y actual
+    $diferencia = $cantidad - $cantidad_actual;
+
+    // Validar stock si se quiere aumentar la cantidad
+    if ($diferencia > 0 && $stock_actual < $diferencia) {
+        return ['error' => 'Stock insuficiente'];
+    }
+
+    // Ajustar stock y actualizar detalle
+    $nuevo_stock = $stock_actual - $diferencia;
+    $conn->query("UPDATE PRODUCTO SET stock = $nuevo_stock WHERE id_producto = $id_producto");
+
+    $subtotal = $cantidad * $fila['precio'];
+    $conn->query("UPDATE DETALLEVENTA SET cantidad = $cantidad, subtotal = $subtotal WHERE id_detalle = $id_detalle");
+
+    return ['success' => true];
+}
