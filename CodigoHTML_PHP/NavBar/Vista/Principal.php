@@ -17,6 +17,7 @@
     <button class="close-btn1" id="closeMenu">&times;</button> <div class="overlay-menu-list">
         <a href="../../Inicio/Vista/principal.php"><i>Inicio</i></a>
         <a href="../../Inventario/Vista/principal.php"><i>Inventario</i></a>
+        <a href="../../Historial/Vista/principal.php"><i>Historial Ventas</i></a>
     </div>
 </div>
 <script src="javaScript/script.js"></script> </body>
