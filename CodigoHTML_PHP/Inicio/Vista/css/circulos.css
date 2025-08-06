@@ -1,0 +1,61 @@
+
+/* Container de Circulos */
+.containerCirculos {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+    width: 55%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .circulo {
+    width: 25%;          
+    aspect-ratio: 1 / 1; 
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    
+  }
+  
+  .msgGrande h1 {
+    font-size: 2.5vw; 
+    margin: 0;
+    color: #fff;
+    line-height: 1;
+  }
+  
+  .msgPeque h3 {
+    font-size: 1.2vw;
+    margin-top: 5px;
+    color: #fff;
+  }
+  
+  /*Botones de abajo de circulos*/
+  .botones{
+    text-align: center;
+    /* display: flex; */
+    align-items: center; 
+    padding: 30px;
+  }
+  .botones button {
+    padding: 8px 16px;
+    background-color: transparent;
+    border: 2px solid #035AA6;
+    color: #035AA6;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .botones button:hover {
+    background-color: #035AA6;
+    color: white;
+  }

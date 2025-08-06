@@ -1,4 +1,5 @@
 <?php
+// Obtener la fecha actual
 date_default_timezone_set('America/La_Paz');
 // Datos de conexión
 $host = "localhost";
@@ -13,6 +14,5 @@ $conn = new mysqli($host, $usuario, $contraseña, $base_datos);
 if ($conn->connect_error) {
     die(" Conexión fallida: " . $conn->connect_error);
 }
-
 
 ?>
