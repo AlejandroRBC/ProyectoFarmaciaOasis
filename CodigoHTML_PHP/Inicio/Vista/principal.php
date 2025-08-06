@@ -9,8 +9,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Inicio</title>
+  <link rel="stylesheet" href="css/buscador.css">
+  <link rel="stylesheet" href="css/circulos.css">
   <link rel="stylesheet" href="css/estilos.css">
-  
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/tablaProds.css">
 </head>
 <body>
   <!-- Llamar al navbar -->
@@ -21,16 +24,13 @@
   ?>
   <!-- Fin de la llamada de Navbar -->
 
-  <div class="head-container">
-    <center>
-    <img src="img/logo.jpg" class="logo" style="height: 130px;">
-    </center>
-    <!-- fecah y hora con JS -->
-    <div  class="inventario">
-      <div id="fecha"></div>
-      <div id="hora"></div>
-    </div>
+<div class="head-container">
+  <img src="img/logo.jpg" class="logo2" style="height: 130px;">
+  <div class="fecha-hora-container">
+    <div id="fecha"></div>
+    <div id="hora"></div>
   </div>
+</div>
 <!-- 
   PARA VER SI ESTO BUSCA EL PRODUCTO EN LA PAGINA INICIO, pero para futuro XD
   <div class="Buscador">
@@ -76,6 +76,7 @@
           <th>NOMBRE</th>
           <th>STOCK</th>
           <th>ESTADO</th>
+          <th>LABORATORIO</th>
         </tr>
       </thead>
       <tbody>
@@ -84,6 +85,7 @@
             <td><?= htmlspecialchars($producto['nom_prod']) ?></td>
             <td><?= $producto['stock'] ?></td>
             <td><?= $producto['stock'] <= 5 ? 'CRÍTICO' : 'BAJO' ?></td>
+            <td><?= $producto['nombre'] ?></td>
           </tr>
         <?php endforeach; ?>
         <?php if (empty($productos_bajos)): ?>
@@ -103,6 +105,7 @@
       <thead>
         <tr>
           <th>NOMBRE</th>
+          <th>LABORATORIO</th>
           <th>FECHA VENCIMIENTO</th>
           <th>DÍAS RESTANTES</th>
         </tr>
@@ -116,6 +119,7 @@
         ?>
           <tr class="<?= $clase_alerta ?>">
             <td><?= htmlspecialchars($producto['nom_prod']) ?></td>
+            <td><?= $producto['nombre'] ?></td>
             <td><?= date('d/m/Y', strtotime($producto['fecha_expiracion'])) ?></td>
             <td><?= $dias_restantes ?> días</td>
           </tr>
@@ -134,8 +138,5 @@
 <!-- links de JS -->
 <script src="javaScript/fechaHora.js"></script>
 <script src="javaScript/abrirModal.js"></script>
-
-
-
 </body>
 </html>

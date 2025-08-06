@@ -1,9 +1,17 @@
-function actualizarFechaHora() {
-  const fecha = new Date();
+function actualizarReloj() {
+  const ahora = new Date();
+  
+  // Formatear fecha
   const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('fecha').textContent = fecha.toLocaleDateString('es-ES', opcionesFecha);
-  document.getElementById('hora').textContent = fecha.toLocaleTimeString('es-ES');
+  document.getElementById('fecha').textContent = ahora.toLocaleDateString('es-ES', opcionesFecha);
+  
+  // Formatear hora
+  const horas = ahora.getHours().toString().padStart(2, '0');
+  const minutos = ahora.getMinutes().toString().padStart(2, '0');
+  const segundos = ahora.getSeconds().toString().padStart(2, '0');
+  document.getElementById('hora').textContent = `${horas}:${minutos}:${segundos}`;
 }
 
-setInterval(actualizarFechaHora, 1000);
-actualizarFechaHora();
+// Actualizar cada segundo
+actualizarReloj();
+setInterval(actualizarReloj, 1000);

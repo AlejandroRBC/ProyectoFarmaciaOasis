@@ -7,10 +7,11 @@ $dias_alerta = 30;
 $fecha_hoy = date('Y-m-d');
 $fecha_limite = date('Y-m-d', strtotime("+$dias_alerta days"));
 
-$sql = "SELECT nom_prod, fecha_expiracion 
-        FROM producto
-        WHERE fecha_expiracion BETWEEN ? AND ?
-        ORDER BY fecha_expiracion ASC";
+$sql = "SELECT nom_prod,l.nombre , fecha_expiracion 
+        FROM producto p, laboratorio l
+        WHERE p.fecha_expiracion BETWEEN ? AND ?
+        AND p.id_laboratorio = l.id_laboratorio
+        ORDER BY p.fecha_expiracion ASC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $fecha_hoy, $fecha_limite);
