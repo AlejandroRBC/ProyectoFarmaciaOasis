@@ -1,11 +1,51 @@
 <?php
 require_once '../Modelo/codigo.php';
 
-// ────────────────────────────────
-// Manejo de acciones CRUD PRODUCTO
-// ────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Agregar producto
+
+    // Si es una llamada AJAX para el carrito
+    if (isset($_POST['ajax'])) {
+        $accion = $_POST['accion'] ?? '';
+        $id_detalle = (int)($_POST['id_detalle'] ?? 0);
+        $cantidad = (int)($_POST['cantidad'] ?? 1);
+
+        switch ($accion) {
+            case 'aumentar':
+                actualizarCantidad($id_detalle, $cantidad + 1);
+                break;
+            case 'disminuir':
+                actualizarCantidad($id_detalle, max(1, $cantidad - 1));
+                break;
+            case 'eliminar':
+                eliminarProductoCarrito($id_detalle);
+                break;
+            case 'borrar_todo':
+                borrarTodoCarrito();
+                break;
+            case 'agregar_producto':
+                $id_producto = (int)$_POST['id_producto'];
+                agregarAlCarrito($id_producto, 1);
+                break;
+        }
+
+        $carrito = obtenerCarrito();
+$total_items = 0;
+foreach ($carrito as $item) {
+    $total_items += $item['cantidad'];
+}
+
+$productos = buscarProductos(''); // Productos actualizados con stock
+
+echo json_encode([
+    'carrito' => $carrito,
+    'total_items' => $total_items,
+    'productos' => $productos
+]);
+exit;
+
+    }
+
+    // Agregar producto (modo tradicional)
     if (isset($_POST['agregar_nuevo_producto'])) {
         $nombre = $_POST['nombre'];
         $precio = (float)$_POST['precio'];
@@ -15,11 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         agregarProducto($nombre, $precio, $stock, $fecha_expiracion, $id_laboratorio);
     }
 
-    // Agregar Laboratorio
+    // Agregar laboratorio
     if (isset($_POST['agregar_nuevo_laboratorio'])) {
         $nombre = $_POST['nombre_laboratorio'];
         $direccion = $_POST['direccion_laboratorio'];
-        $resultado = agregarLaboratorio($nombre, $direccion);
+        agregarLaboratorio($nombre, $direccion);
     }
 
     // Modificar producto
@@ -39,43 +79,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         eliminarProducto($id_producto);
     }
 
-    // ────────────────────────────────
-    // Manejo de acciones del carrito
-    // ────────────────────────────────
+    // Agregar al carrito desde botón (modo clásico, sin AJAX)
     if (isset($_POST['agregar_producto'])) {
         $id_producto = (int)$_POST['id_producto'];
         agregarAlCarrito($id_producto, 1);
     }
 
+    // Aumentar cantidad (modo clásico)
     if (isset($_POST['aumentar_cantidad'])) {
         $id_detalle = (int)$_POST['id_detalle'];
         $cantidad = (int)$_POST['cantidad'] + 1;
         actualizarCantidad($id_detalle, $cantidad);
     }
 
+    // Disminuir cantidad (modo clásico)
     if (isset($_POST['disminuir_cantidad'])) {
         $id_detalle = (int)$_POST['id_detalle'];
         $cantidad = max(1, (int)$_POST['cantidad'] - 1);
         actualizarCantidad($id_detalle, $cantidad);
     }
 
+    // Eliminar del carrito (modo clásico)
     if (isset($_POST['eliminar_producto'])) {
         $id_detalle = (int)$_POST['id_detalle'];
         eliminarProductoCarrito($id_detalle);
     }
 
+    // Vaciar todo el carrito (modo clásico)
     if (isset($_POST['borrar_todo'])) {
         borrarTodoCarrito();
     }
 }
 
-// Obtener productos actualizados
+// Obtener datos para cargar la vista
 $productos = buscarProductos('');
-// Carrito actualizado
 $carrito = obtenerCarrito();
-// Obtener laboratorios
 $laboratorios = listarLaboratorios();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -136,7 +177,10 @@ $laboratorios = listarLaboratorios();
                     <tr>
                         <td><?= htmlspecialchars($prod['id_producto']) ?></td>
                         <td><?= htmlspecialchars($prod['nom_prod']) ?></td>
-                        <td><?= htmlspecialchars($prod['stock']) ?></td>
+                        <td id="stock-prod-<?= $prod['id_producto'] ?>">
+  <?= htmlspecialchars($prod['stock']) ?>
+</td>
+
                         <td><?= htmlspecialchars($prod['precio']) ?> Bs</td>
                         <td><?= htmlspecialchars($prod['fecha_expiracion']) ?></td>
                         <td><?= htmlspecialchars($prod['laboratorio']) ?></td>
@@ -284,61 +328,38 @@ $laboratorios = listarLaboratorios();
     </main>
 
     <!-- CARRITO DE COMPRAS -->
-    <div id="MenuCarrito" class="menu-carrito">
-        <!-- Botón para cerrar -->
-        <button
-          onclick="mostrarCarrito()"
-          style="position: absolute; top: 10px; right: 10px; padding: 6px 10px; font-size: 1rem; cursor: pointer;">
-          X
-        </button>
+<div id="MenuCarrito" class="menu-carrito">
+  <button onclick="mostrarCarrito()" style="position: absolute; top: 10px; right: 10px;">X</button>
+  <h1>CARRITO DE COMPRAS</h1>
+  <hr />
+  <div id="carrito-contenido">
+    <?php if (empty($carrito)): ?>
+      <p>El carrito está vacío.</p>
+    <?php else: ?>
+      <?php foreach ($carrito as $item): ?>
+        <div class="carrito-item">
+          <p><strong>Nombre Producto:</strong> <?= htmlspecialchars($item['nom_prod']) ?></p>
+          <div>
+            <strong>Cantidad:</strong>
+            <span><?= $item['cantidad'] ?></span>
+            <button class="btn-cantidad"
+              data-accion="aumentar"
+              data-id="<?= $item['id_detalle'] ?>"
+              data-cantidad="<?= $item['cantidad'] ?>">+</button>
+            <button class="btn-cantidad"
+              data-accion="disminuir"
+              data-id="<?= $item['id_detalle'] ?>"
+              data-cantidad="<?= $item['cantidad'] ?>">−</button>
+          </div>
+          <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
+          <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
+          <hr />
+        </div>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
+</div>
 
-        <h1>CARRITO DE COMPRAS</h1>
-        <!-- Separador -->
-        <hr style="border: none; border-top: 1px solid #ccc; margin: 10px 0;" />
-        <?php if (empty($carrito)): ?>
-            <p>El carrito está vacío.</p>
-        <?php else: ?>
-            <?php foreach ($carrito as $item): ?>
-                <div class="carrito-item" style="margin-bottom:15px; position:relative;">
-
-                    <p style="font-weight: bold; color: black; margin: 0;">
-                        <strong>Nombre Producto:</strong>
-                        <span style="color:#034C8C; font-weight:600;"><?= htmlspecialchars($item['nom_prod']) ?></span>
-                    </p>
-
-                    <!-- Cantidad y botones de control -->
-                    <form method="POST" style="display: flex; align-items: center; gap: 8px;">
-                        <strong style="color: black;">Cantidad:</strong>
-                        <span style="font-weight: bold; min-width: 24px; text-align: center; color: #034C8C;">
-                            <?= $item['cantidad'] ?>
-                        </span>
-                        <input type="hidden" name="id_detalle" value="<?= $item['id_detalle'] ?>" />
-                        <input type="hidden" name="cantidad" value="<?= $item['cantidad'] ?>" />
-                        <button type="submit" name="aumentar_cantidad" class="btn-cantidad" title="Aumentar cantidad"
-                          style="padding:2px 6px; font-size:14px; line-height:1;">+</button>
-                        <button type="submit" name="disminuir_cantidad" class="btn-cantidad" title="Disminuir cantidad"
-                          style="padding:2px 6px; font-size:14px; line-height:1;">&minus;</button>
-                    </form>
-
-                    <!-- Separador -->
-                    <hr style="border: none; border-top: 1px solid #ccc; margin: 10px 0;" />
-
-                    <!-- Subtotal y botón eliminar -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; position: relative;">
-                        <p style="font-weight: bold; color: black; margin: 0;">
-                            Total: <span><?= number_format($item['subtotal'], 2) ?> Bs</span>
-                        </p>
-                        <form method="POST" style="margin: 0;">
-                            <input type="hidden" name="id_detalle" value="<?= $item['id_detalle'] ?>" />
-                            <button type="submit" name="eliminar_producto" title="Eliminar producto"
-                              style="padding: 4px 8px; font-size: 0.7rem;">
-                              Borrar
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
 
         <!-- Botones generales del carrito -->
         <div>
@@ -436,5 +457,97 @@ $laboratorios = listarLaboratorios();
             document.getElementById('modalCompra').style.display = 'none';
         }
     </script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const carritoDiv = document.getElementById("MenuCarrito");
+
+  carritoDiv.addEventListener("click", async (e) => {
+    // Botones + / -
+    if (e.target.matches(".btn-cantidad")) {
+      const id = e.target.dataset.id;
+      const cantidad = parseInt(e.target.dataset.cantidad);
+      const accion = e.target.dataset.accion;
+      await enviarAccionCarrito(accion, id, cantidad);
+    }
+
+    // Botón borrar
+    if (e.target.matches(".btn-eliminar")) {
+      const id = e.target.dataset.id;
+      await enviarAccionCarrito("eliminar", id, 1);
+    }
+  });
+});
+
+async function enviarAccionCarrito(accion, id_detalle, cantidad) {
+  const formData = new FormData();
+  formData.append("ajax", "1");
+  formData.append("accion", accion);
+  formData.append("id_detalle", id_detalle);
+  formData.append("cantidad", cantidad);
+
+  const res = await fetch("principal.php", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await res.json();
+  renderCarrito(data);
+}
+
+function renderCarrito(data) {
+  const carrito = data.carrito;
+  const totalItems = data.total_items;
+
+  // Actualizar el contenido del carrito
+  const contenedor = document.getElementById("carrito-contenido");
+  if (carrito.length === 0) {
+    contenedor.innerHTML = "<p>El carrito está vacío.</p>";
+  } else {
+    let html = "";
+    carrito.forEach(item => {
+      html += `
+        <div class="carrito-item">
+          <p><strong>Nombre Producto:</strong> ${item.nom_prod}</p>
+          <div>
+            <strong>Cantidad:</strong>
+            <span>${item.cantidad}</span>
+            <button class="btn-cantidad" data-accion="aumentar" data-id="${item.id_detalle}" data-cantidad="${item.cantidad}">+</button>
+            <button class="btn-cantidad" data-accion="disminuir" data-id="${item.id_detalle}" data-cantidad="${item.cantidad}">−</button>
+          </div>
+          <p>Total: ${parseFloat(item.subtotal).toFixed(2)} Bs</p>
+          <button class="btn-eliminar" data-id="${item.id_detalle}">Borrar</button>
+          <hr />
+        </div>
+      `;
+    });
+    contenedor.innerHTML = html;
+  }
+
+  // ✅ Actualizar contador del carrito
+  const contador = document.querySelector(".contador-carrito");
+  if (totalItems > 0) {
+    if (contador) {
+      contador.textContent = totalItems;
+    } else {
+      const span = document.createElement("span");
+      span.className = "contador-carrito";
+      span.textContent = totalItems;
+      document.querySelector(".cart-icon").appendChild(span);
+    }
+  } else {
+    if (contador) contador.remove();
+  }
+
+  // ✅ Actualizar stock visual
+  data.productos.forEach(producto => {
+    const stockSpan = document.getElementById("stock-prod-" + producto.id_producto);
+    if (stockSpan) {
+      stockSpan.textContent = producto.stock;
+    }
+  });
+}
+
+</script>
+
 </body>
 </html>
