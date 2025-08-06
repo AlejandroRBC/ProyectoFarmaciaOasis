@@ -151,6 +151,11 @@ button {
   user-select: none;
 }
 
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(3, 90, 166, 0.3);
+  filter: brightness(1.1);
+}
 
 /* Contenedor de botones */
 .botones {
@@ -233,9 +238,21 @@ button {
   background: #f0fafa;
   border: 1px solid #b2dcdc;
   border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 15px;
-  font-size: 0.95rem;
+  padding: 8px 10px;       
+  margin-bottom: 8px;      
+  font-size: 0.85rem;      
+  
+  display: flex;
+  flex-direction: column;
+  gap: 4px;                
+  position: relative;
+}
+
+
+.carrito-item .subtotal-eliminar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .menu-carrito h1 {
@@ -304,6 +321,106 @@ button {
   float: right;
   font-size: 22px;
   cursor: pointer;
+}
+
+/* ----------------------------------------------------
+  BOTONES PARA EL AJAX
+----------------------------------------------------- */
+.menu-carrito > button[onclick="mostrarCarrito()"] {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+   background: linear-gradient(135deg, #04BFAD, #035AA6);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+  user-select: none;
+  border-radius: 6px;
+}
+
+.menu-carrito > button[onclick="mostrarCarrito()"]:hover {
+  transform: scale(1.2);
+}
+
+
+.btn-cantidad {
+  background: linear-gradient(135deg, #04BFAD, #035AA6);
+  color: white;
+  border: none;
+  padding: 4px 10px;        
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;          
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  user-select: none;
+  min-width: 28px;         
+  text-align: center;
+  margin-left: 6px;
+}
+
+.btn-cantidad:hover {
+  background-color: #022f5b;
+  transform: scale(1.1);
+}
+
+.btn-eliminar {
+  background: linear-gradient(135deg, #04BFAD, #035AA6);
+  color: white;
+  border: none;
+  padding: 4px 10px;        
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;      
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  user-select: none;
+  margin-top: 6px;
+  width: auto;
+  align-self: flex-end;
+  min-width: 70px;          
+}
+
+
+
+.btn-eliminar:hover {
+  background-color: #022f5b;
+  transform: scale(1.1);
+}
+
+.menu-carrito > div[style*="margin-top"] > form > button,
+.menu-carrito > div[style*="margin-top"] > button {
+  background: linear-gradient(135deg, #04BFAD, #035AA6);
+  color: white;
+  border: none;
+  padding: 10px 20px; 
+  border-radius: 18px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  user-select: none;
+  min-width: 110px; 
+  white-space: nowrap;
+  flex: none;
+}
+
+
+
+.menu-carrito > div[style*="margin-top"] > form > button:hover,
+.menu-carrito > div[style*="margin-top"] > button:hover {
+  transform: scale(1.05);
+}
+
+#carrito-contenido {
+  max-height: 60vh;  
+  overflow-y: auto;  /* activa scroll vertical si es necesario */
+  padding-right: 10px; 
 }
 
 

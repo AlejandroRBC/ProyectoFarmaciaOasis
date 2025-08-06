@@ -3,7 +3,7 @@ require_once '../Modelo/codigo.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Si es una llamada AJAX para el carrito
+    // LLAMADO AJAX
     if (isset($_POST['ajax'])) {
         $accion = $_POST['accion'] ?? '';
         $id_detalle = (int)($_POST['id_detalle'] ?? 0);
@@ -19,33 +19,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'eliminar':
                 eliminarProductoCarrito($id_detalle);
                 break;
-            case 'borrar_todo':
-                borrarTodoCarrito();
-                break;
-            case 'agregar_producto':
-                $id_producto = (int)$_POST['id_producto'];
-                agregarAlCarrito($id_producto, 1);
-                break;
         }
 
         $carrito = obtenerCarrito();
-$total_items = 0;
-foreach ($carrito as $item) {
-    $total_items += $item['cantidad'];
-}
-
-$productos = buscarProductos(''); // Productos actualizados con stock
-
-echo json_encode([
-    'carrito' => $carrito,
-    'total_items' => $total_items,
-    'productos' => $productos
-]);
-exit;
-
+        $total_items = 0;
+        foreach ($carrito as $item) {
+            $total_items += $item['cantidad'];
+        }
+        $productos = buscarProductos('');
+        echo json_encode([
+            'carrito' => $carrito,
+            'total_items' => $total_items,
+            'productos' => $productos
+        ]);
+        exit;
     }
 
-    // Agregar producto (modo tradicional)
+    //MODO NORMAL SIN AJAX
+
+    //CRUD
+
+    // Agregar producto 
     if (isset($_POST['agregar_nuevo_producto'])) {
         $nombre = $_POST['nombre'];
         $precio = (float)$_POST['precio'];
@@ -79,33 +73,14 @@ exit;
         eliminarProducto($id_producto);
     }
 
-    // Agregar al carrito desde botón (modo clásico, sin AJAX)
+    //CARRITO
+
+    // Agregar al carrito desde botón
     if (isset($_POST['agregar_producto'])) {
         $id_producto = (int)$_POST['id_producto'];
         agregarAlCarrito($id_producto, 1);
     }
-
-    // Aumentar cantidad (modo clásico)
-    if (isset($_POST['aumentar_cantidad'])) {
-        $id_detalle = (int)$_POST['id_detalle'];
-        $cantidad = (int)$_POST['cantidad'] + 1;
-        actualizarCantidad($id_detalle, $cantidad);
-    }
-
-    // Disminuir cantidad (modo clásico)
-    if (isset($_POST['disminuir_cantidad'])) {
-        $id_detalle = (int)$_POST['id_detalle'];
-        $cantidad = max(1, (int)$_POST['cantidad'] - 1);
-        actualizarCantidad($id_detalle, $cantidad);
-    }
-
-    // Eliminar del carrito (modo clásico)
-    if (isset($_POST['eliminar_producto'])) {
-        $id_detalle = (int)$_POST['id_detalle'];
-        eliminarProductoCarrito($id_detalle);
-    }
-
-    // Vaciar todo el carrito (modo clásico)
+    // Vaciar todo el carrito
     if (isset($_POST['borrar_todo'])) {
         borrarTodoCarrito();
     }
@@ -177,10 +152,7 @@ $laboratorios = listarLaboratorios();
                     <tr>
                         <td><?= htmlspecialchars($prod['id_producto']) ?></td>
                         <td><?= htmlspecialchars($prod['nom_prod']) ?></td>
-                        <td id="stock-prod-<?= $prod['id_producto'] ?>">
-  <?= htmlspecialchars($prod['stock']) ?>
-</td>
-
+                        <td id="stock-prod-<?= $prod['id_producto'] ?>"><?= htmlspecialchars($prod['stock']) ?></td>
                         <td><?= htmlspecialchars($prod['precio']) ?> Bs</td>
                         <td><?= htmlspecialchars($prod['fecha_expiracion']) ?></td>
                         <td><?= htmlspecialchars($prod['laboratorio']) ?></td>
@@ -328,49 +300,61 @@ $laboratorios = listarLaboratorios();
     </main>
 
     <!-- CARRITO DE COMPRAS -->
-<div id="MenuCarrito" class="menu-carrito">
-  <button onclick="mostrarCarrito()" style="position: absolute; top: 10px; right: 10px;">X</button>
-  <h1>CARRITO DE COMPRAS</h1>
-  <hr />
-  <div id="carrito-contenido">
-    <?php if (empty($carrito)): ?>
-      <p>El carrito está vacío.</p>
-    <?php else: ?>
-      <?php foreach ($carrito as $item): ?>
-        <div class="carrito-item">
-          <p><strong>Nombre Producto:</strong> <?= htmlspecialchars($item['nom_prod']) ?></p>
-          <div>
-            <strong>Cantidad:</strong>
-            <span><?= $item['cantidad'] ?></span>
-            <button class="btn-cantidad"
-              data-accion="aumentar"
-              data-id="<?= $item['id_detalle'] ?>"
-              data-cantidad="<?= $item['cantidad'] ?>">+</button>
-            <button class="btn-cantidad"
-              data-accion="disminuir"
-              data-id="<?= $item['id_detalle'] ?>"
-              data-cantidad="<?= $item['cantidad'] ?>">−</button>
-          </div>
-          <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
-          <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
-          <hr />
-        </div>
-      <?php endforeach; ?>
-    <?php endif; ?>
-  </div>
-</div>
+    <div id="MenuCarrito" class="menu-carrito">
+    <!-- Botón cerrar -->
+    <button onclick="mostrarCarrito()" style="position: absolute; top: 10px; right: 10px;">X</button>
 
+    <!-- Título -->
+    <h1>CARRITO DE COMPRAS</h1>
+    <hr />
 
-        <!-- Botones generales del carrito -->
-        <div>
-            <form method="POST" style="margin:0;">
-                <button type="submit" name="borrar_todo">Borrar Todo</button>
-                <button type="button" onclick="mostrarModal()">Realizar Compra</button>
-            </form>
-        </div>
+    <!-- Contenido dinámico del carrito -->
+    <div id="carrito-contenido">
+        <?php if (empty($carrito)): ?>
+        <p>El carrito está vacío.</p>
+        <?php else: ?>
+        <?php foreach ($carrito as $item): ?>
+            <div class="carrito-item">
+            <!-- Nombre del producto -->
+            <p>
+                <strong>Nombre Producto:</strong>
+                <?= htmlspecialchars($item['nom_prod']) ?>
+            </p>
 
-        <!-- Modal para los datos del cliente -->
-        <div id="modalCompra" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+            <!-- Cantidad + botones -->
+            <div>
+                <strong>Cantidad:</strong>
+                <span><?= $item['cantidad'] ?></span>
+                <button class="btn-cantidad"
+                data-accion="aumentar"
+                data-id="<?= $item['id_detalle'] ?>"
+                data-cantidad="<?= $item['cantidad'] ?>">+</button>
+                <button class="btn-cantidad"
+                data-accion="disminuir"
+                data-id="<?= $item['id_detalle'] ?>"
+                data-cantidad="<?= $item['cantidad'] ?>">−</button>
+            </div>
+
+            <!-- Subtotal y botón eliminar -->
+            <hr />
+            <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
+            <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
+            </div>
+        <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+    <!-- Botones generales -->
+    <div style="margin-top: 15px; display: flex; gap: 10px;">
+        <form method="POST" style="margin: 0;">
+        <button type="submit" name="borrar_todo">Borrar Todo</button>
+        </form>
+        <button type="button" onclick="mostrarModal()">Realizar Compra</button>
+    </div>
+    </div>
+                
+    <!-- Modal para los datos del cliente -->
+    <div id="modalCompra" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
             <form method="POST" action="generar_factura.php" class="modal-contenid" style="background:#fff; padding:20px; border-radius:10px; position: relative;">
                 <span onclick="cerrarModal()" class="cerrar" style="position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; cursor: pointer; user-select: none;" title="Cerrar"> &times;</span>
                 <h2>Datos del Cliente : </h2>
@@ -457,97 +441,99 @@ $laboratorios = listarLaboratorios();
             document.getElementById('modalCompra').style.display = 'none';
         }
     </script>
+
+    <!-- SCRIPT AJAX --> 
+
     <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const carritoDiv = document.getElementById("MenuCarrito");
+        document.addEventListener("DOMContentLoaded", () => {
+            const carritoDiv = document.getElementById("MenuCarrito");
+                carritoDiv.addEventListener("click", async (e) => {
+                    // Botones + / -
+                    if (e.target.matches(".btn-cantidad")) {
+                        const id = e.target.dataset.id;
+                        const cantidad = parseInt(e.target.dataset.cantidad);
+                        const accion = e.target.dataset.accion;
+                        await enviarAccionCarrito(accion, id, cantidad);
+                    }
 
-  carritoDiv.addEventListener("click", async (e) => {
-    // Botones + / -
-    if (e.target.matches(".btn-cantidad")) {
-      const id = e.target.dataset.id;
-      const cantidad = parseInt(e.target.dataset.cantidad);
-      const accion = e.target.dataset.accion;
-      await enviarAccionCarrito(accion, id, cantidad);
-    }
+                    // Botón borrar
+                    if (e.target.matches(".btn-eliminar")) {
+                        const id = e.target.dataset.id;
+                        await enviarAccionCarrito("eliminar", id, 1);
+                    }
+                });
+        });
 
-    // Botón borrar
-    if (e.target.matches(".btn-eliminar")) {
-      const id = e.target.dataset.id;
-      await enviarAccionCarrito("eliminar", id, 1);
-    }
-  });
-});
+        async function enviarAccionCarrito(accion, id_detalle, cantidad) {
+        const formData = new FormData();
+        formData.append("ajax", "1");
+        formData.append("accion", accion);
+        formData.append("id_detalle", id_detalle);
+        formData.append("cantidad", cantidad);
 
-async function enviarAccionCarrito(accion, id_detalle, cantidad) {
-  const formData = new FormData();
-  formData.append("ajax", "1");
-  formData.append("accion", accion);
-  formData.append("id_detalle", id_detalle);
-  formData.append("cantidad", cantidad);
+        const res = await fetch("principal.php", {
+            method: "POST",
+            body: formData
+        });
 
-  const res = await fetch("principal.php", {
-    method: "POST",
-    body: formData
-  });
+        const data = await res.json();
+        renderCarrito(data);
+        }
 
-  const data = await res.json();
-  renderCarrito(data);
-}
+        function renderCarrito(data) {
+        const carrito = data.carrito;
+        const totalItems = data.total_items;
 
-function renderCarrito(data) {
-  const carrito = data.carrito;
-  const totalItems = data.total_items;
+        // Actualizar el contenido del carrito
+        const contenedor = document.getElementById("carrito-contenido");
+        if (carrito.length === 0) {
+            contenedor.innerHTML = "<p>El carrito está vacío.</p>";
+        } else {
+            let html = "";
+            carrito.forEach(item => {
+            html += `
+                <div class="carrito-item">
+                <p><strong>Nombre Producto:</strong> ${item.nom_prod}</p>
+                <div>
+                    <strong>Cantidad:</strong>
+                    <span>${item.cantidad}</span>
+                    <button class="btn-cantidad" data-accion="aumentar" data-id="${item.id_detalle}" data-cantidad="${item.cantidad}">+</button>
+                    <button class="btn-cantidad" data-accion="disminuir" data-id="${item.id_detalle}" data-cantidad="${item.cantidad}">−</button>
+                </div>
+                <hr />
+                <p>Total: ${parseFloat(item.subtotal).toFixed(2)} Bs</p>
+                <button class="btn-eliminar" data-id="${item.id_detalle}">Borrar</button>
+                </div>
+            `;
+            });
+            contenedor.innerHTML = html;
+        }
 
-  // Actualizar el contenido del carrito
-  const contenedor = document.getElementById("carrito-contenido");
-  if (carrito.length === 0) {
-    contenedor.innerHTML = "<p>El carrito está vacío.</p>";
-  } else {
-    let html = "";
-    carrito.forEach(item => {
-      html += `
-        <div class="carrito-item">
-          <p><strong>Nombre Producto:</strong> ${item.nom_prod}</p>
-          <div>
-            <strong>Cantidad:</strong>
-            <span>${item.cantidad}</span>
-            <button class="btn-cantidad" data-accion="aumentar" data-id="${item.id_detalle}" data-cantidad="${item.cantidad}">+</button>
-            <button class="btn-cantidad" data-accion="disminuir" data-id="${item.id_detalle}" data-cantidad="${item.cantidad}">−</button>
-          </div>
-          <p>Total: ${parseFloat(item.subtotal).toFixed(2)} Bs</p>
-          <button class="btn-eliminar" data-id="${item.id_detalle}">Borrar</button>
-          <hr />
-        </div>
-      `;
-    });
-    contenedor.innerHTML = html;
-  }
+        // ✅ Actualizar contador del carrito
+        const contador = document.querySelector(".contador-carrito");
+        if (totalItems > 0) {
+            if (contador) {
+            contador.textContent = totalItems;
+            } else {
+            const span = document.createElement("span");
+            span.className = "contador-carrito";
+            span.textContent = totalItems;
+            document.querySelector(".cart-icon").appendChild(span);
+            }
+        } else {
+            if (contador) contador.remove();
+        }
 
-  // ✅ Actualizar contador del carrito
-  const contador = document.querySelector(".contador-carrito");
-  if (totalItems > 0) {
-    if (contador) {
-      contador.textContent = totalItems;
-    } else {
-      const span = document.createElement("span");
-      span.className = "contador-carrito";
-      span.textContent = totalItems;
-      document.querySelector(".cart-icon").appendChild(span);
-    }
-  } else {
-    if (contador) contador.remove();
-  }
+        // ✅ Actualizar stock visual
+        data.productos.forEach(producto => {
+            const stockSpan = document.getElementById("stock-prod-" + producto.id_producto);
+            if (stockSpan) {
+            stockSpan.textContent = producto.stock;
+            }
+        });
+        }
 
-  // ✅ Actualizar stock visual
-  data.productos.forEach(producto => {
-    const stockSpan = document.getElementById("stock-prod-" + producto.id_producto);
-    if (stockSpan) {
-      stockSpan.textContent = producto.stock;
-    }
-  });
-}
-
-</script>
-
+    </script>
+    
 </body>
 </html>
