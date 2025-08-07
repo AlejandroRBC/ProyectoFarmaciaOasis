@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/estilos.css">
   <link rel="stylesheet" href="css/modal.css">
   <link rel="stylesheet" href="css/tablaProds.css">
+  <link rel="stylesheet" href="css/botones.css">
 </head>
 <body>
   <!-- Llamar al navbar -->

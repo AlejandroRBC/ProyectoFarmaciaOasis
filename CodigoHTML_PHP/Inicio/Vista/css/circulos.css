@@ -37,25 +37,3 @@
     margin-top: 5px;
     color: #fff;
   }
-  
-  /*Botones de abajo de circulos*/
-  .botones{
-    text-align: center;
-    /* display: flex; */
-    align-items: center; 
-    padding: 30px;
-  }
-  .botones button {
-    padding: 8px 16px;
-    background-color: transparent;
-    border: 2px solid #035AA6;
-    color: #035AA6;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-  }
-  .botones button:hover {
-    background-color: #035AA6;
-    color: white;
-  }

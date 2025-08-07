@@ -8,33 +8,15 @@ $historial = obtenerHistorialFacturas();
     <meta charset="UTF-8">
     <title>Historial de Facturas</title>
     <link rel="stylesheet" href="../../NavBar/Vista/css/estilos.css">
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table th, table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-        }
-        table th {
-            background-color: #f2f2f2;
-        }
-        h2 {
-            margin-top: 40px;
-            text-align: center;
-        }
-    </style>
     <script src="../../NavBar/Vista/javaScript/script.js"></script>
+
+    <link rel="stylesheet" href="css/tablas.css">
 </head>
 <body>
 
     <?php require('../../NavBar/Vista/Principal.php'); ?>
-
     <div class="contenido">
-        <h2>Historial de Facturas</h2>
-
+            <h2>Historial de Facturas</h2>
         <table>
             <thead>
                 <tr>

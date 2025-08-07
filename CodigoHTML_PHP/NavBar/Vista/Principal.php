@@ -9,7 +9,9 @@
 <body>
 
 <nav class="navbar">
-    <img src="img/logo.jpg" class="logo" alt="Logo">
+    <a href="../../Inicio/Vista/principal.php">
+        <img src="img/logo.jpg" class="logo" alt="Logo">
+    </a>
     <div class="menu"><span id="menuToggle"> menu</span></div>
 </nav>
 
