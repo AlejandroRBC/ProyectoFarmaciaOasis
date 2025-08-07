@@ -127,70 +127,71 @@ $laboratorios = listarLaboratorios();
     <main>
         <h1>INVENTARIO</h1>
 
-        <!-- Buscador -->
-        <div class="busqueda-container" style="display:flex; align-items:center; gap:8px;">
-            <input type="text" placeholder="¿Qué estás buscando?" class="busqueda" />
+       <!-- Buscador con autocompletado -->
+        <div class="busqueda-container">
+            <input type="text" placeholder="¿Qué estás buscando?" class="busqueda" id="busqueda" autocomplete="off" />
             <img src="img/lupa.png" alt="Buscar" class="icono" title="Buscar" style="cursor:pointer;" id="btnBuscar" />
         </div>
-
         <!-- Tabla de productos -->
-        <table>
-            <thead>
-                <tr>
-                    <th>CÓDIGO</th>
-                    <th>NOMBRE</th>
-                    <th>STOCK</th>
-                    <th>PRECIO</th>
-                    <th>Fecha Exp.</th>
-                    <th>LABORATORIO</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($productos as $prod): ?>
+        <div style="max-height: 350px; overflow-y: auto; margin-top: 20px;">
+            <table>
+                <thead>
                     <tr>
-                        <td><?= htmlspecialchars($prod['id_producto']) ?></td>
-                        <td><?= htmlspecialchars($prod['nom_prod']) ?></td>
-                        <td id="stock-prod-<?= $prod['id_producto'] ?>"><?= htmlspecialchars($prod['stock']) ?></td>
-                        <td><?= htmlspecialchars($prod['precio']) ?> Bs</td>
-                        <td><?= htmlspecialchars($prod['fecha_expiracion']) ?></td>
-                        <td><?= htmlspecialchars($prod['laboratorio']) ?></td>
-                        <td>
-                            <!-- Formulario oculto para agregar producto al carrito -->
-                            <form id="form-<?= $prod['id_producto'] ?>" method="POST" style="display:none;">
-                                <input type="hidden" name="id_producto" value="<?= $prod['id_producto'] ?>" />
-                                <input type="hidden" name="agregar_producto" value="1" />
-                            </form>
-                            <img
-                                src="img/CarritoA.png"
-                                alt="Agregar al carrito"
-                                class="icono"
-                                title="Agregar al carrito"
-                                style="cursor:pointer;"
-                                onclick="document.getElementById('form-<?= $prod['id_producto'] ?>').submit();"
-                            />
-                        </td>
-                        <td>
-                            <!-- BOTONES PARA ABRIR LOS MODALES DE ELIMINAR Y MODIFICAR PRODUCTO -->
-                            <button
-                                onclick="abrirModalModificar(
-                                    <?= $prod['id_producto'] ?>,
-                                    '<?= addslashes($prod['nom_prod']) ?>',
-                                    <?= $prod['precio'] ?>,
-                                    <?= $prod['stock'] ?>,
-                                    '<?= $prod['fecha_expiracion'] ?>',
-                                    <?= $prod['id_laboratorio'] ?>
-                                )"
-                            >
-                                Modificar
-                            </button>
-                            <button onclick="abrirModalEliminar(<?= $prod['id_producto'] ?>)">Eliminar</button>
-                        </td>
+                        <th>CÓDIGO</th>
+                        <th>NOMBRE</th>
+                        <th>STOCK</th>
+                        <th>PRECIO</th>
+                        <th>Fecha Exp.</th>
+                        <th>LABORATORIO</th>
+                        <th></th>
+                        <th></th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($productos as $prod): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($prod['id_producto']) ?></td>
+                            <td><?= htmlspecialchars($prod['nom_prod']) ?></td>
+                            <td id="stock-prod-<?= $prod['id_producto'] ?>"><?= htmlspecialchars($prod['stock']) ?></td>
+                            <td><?= htmlspecialchars($prod['precio']) ?> Bs</td>
+                            <td><?= htmlspecialchars($prod['fecha_expiracion']) ?></td>
+                            <td><?= htmlspecialchars($prod['laboratorio']) ?></td>
+                            <td>
+                                <!-- Formulario oculto para agregar producto al carrito -->
+                                <form id="form-<?= $prod['id_producto'] ?>" method="POST" style="display:none;">
+                                    <input type="hidden" name="id_producto" value="<?= $prod['id_producto'] ?>" />
+                                    <input type="hidden" name="agregar_producto" value="1" />
+                                </form>
+                                <img
+                                    src="img/CarritoA.png"
+                                    alt="Agregar al carrito"
+                                    class="icono"
+                                    title="Agregar al carrito"
+                                    style="cursor:pointer;"
+                                    onclick="document.getElementById('form-<?= $prod['id_producto'] ?>').submit();"
+                                />
+                            </td>
+                            <td>
+                                <!-- BOTONES PARA ABRIR LOS MODALES DE ELIMINAR Y MODIFICAR PRODUCTO -->
+                                <button
+                                    onclick="abrirModalModificar(
+                                        <?= $prod['id_producto'] ?>,
+                                        '<?= addslashes($prod['nom_prod']) ?>',
+                                        <?= $prod['precio'] ?>,
+                                        <?= $prod['stock'] ?>,
+                                        '<?= $prod['fecha_expiracion'] ?>',
+                                        <?= $prod['id_laboratorio'] ?>
+                                    )"
+                                >
+                                    Modificar
+                                </button>
+                                <button onclick="abrirModalEliminar(<?= $prod['id_producto'] ?>)">Eliminar</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
         <!-- MODAL MODIFICAR PRODUCTO -->
         <div id="modalModificar" class="modal" style="display:none;">
@@ -532,8 +533,53 @@ $laboratorios = listarLaboratorios();
             }
         });
         }
-
+        
     </script>
+
+    <!-- SCRIPT PARA CIERRE FUERA DE LOS MODALES--> 
+
+    <script>
+        document.addEventListener('click', function(event) {
+            // MODAL AGREGAR PRODUCTO
+            const modalAgregar = document.getElementById('modalAgregar');
+            if (event.target === modalAgregar) {
+                cerrarModalAgregar();
+            }
+
+            // MODAL AGREGAR LABORATORIO
+            const modalLab = document.getElementById('modalAgregarLaboratorio');
+            if (event.target === modalLab) {
+                cerrarModalAgregarLaboratorio();
+            }
+
+            // MODAL MODIFICAR PRODUCTO
+            const modalMod = document.getElementById('modalModificar');
+            if (event.target === modalMod) {
+                cerrarModalModificar();
+            }
+
+            // MODAL ELIMINAR PRODUCTO
+            const modalElim = document.getElementById('modalEliminar');
+            if (event.target === modalElim) {
+                cerrarModalEliminar();
+            }
+
+            // MODAL COMPRA (Datos del Cliente)
+            const modalCompra = document.getElementById('modalCompra');
+            if (event.target === modalCompra) {
+                cerrarModal();
+            }
+
+            // CARRITO LATERAL
+            const carrito = document.getElementById('MenuCarrito');
+            if (carrito.classList.contains('activo') && !carrito.contains(event.target) && !event.target.closest('.cart-icon')) {
+                carrito.classList.remove('activo');
+            }
+        });
+    </script>
+    
+    
+
     
 </body>
 </html>
