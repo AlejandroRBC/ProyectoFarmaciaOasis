@@ -200,18 +200,13 @@ $pdf->Ln(5);
 
 // Totales
 $pdf->SetX($xTabla);
-$iva = $total * 0.13;
-$totalConIva = $total + $iva;
-
-$pdf->SetFont('', 'B', 11);
-$pdf->Cell($wCant + $wDesc + $wPU, 7, 'Subtotal', 0, 0, 'R');
-$pdf->Cell($wSub, 7, 'Bs. ' . number_format($total, 2), 0, 1, 'R');
-
+// $iva = $total * 0.13;     // Eliminado
+// $totalConIva = $total + $iva;  // Eliminado
 $pdf->SetX($xTabla);
 $pdf->SetFont('', 'B', 14);
 $pdf->Cell($wCant + $wDesc + $wPU, 10, 'Total', 0, 0, 'R');
 $pdf->SetTextColor(...$colorAzul);
-$pdf->Cell($wSub, 10, 'Bs. ' . number_format($totalConIva, 2), 0, 1, 'R');
+$pdf->Cell($wSub, 10, 'Bs. ' . number_format($total, 2), 0, 1, 'R'); 
 $pdf->SetTextColor(0, 0, 0);
 
 $pdf->Ln(10);
