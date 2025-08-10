@@ -194,7 +194,7 @@ $laboratorios = listarLaboratorios();
         </div>
 
         <!-- MODAL MODIFICAR PRODUCTO -->
-        <div id="modalModificar" class="modal" style="display:none;">
+        <div id="modalModificar" class="modal" >
             <div class="modal-contenido">
                 <span class="cerrar" onclick="cerrarModalModificar()">&times;</span>
                 <h2>Modificar Producto</h2>
@@ -228,7 +228,7 @@ $laboratorios = listarLaboratorios();
         </div>
 
         <!-- MODAL ELIMINAR PRODUCTO -->
-        <div id="modalEliminar" class="modal" style="display:none;">
+        <div id="modalEliminar" class="modal">
             <div class="modal-contenido">
                 <span class="cerrar" onclick="cerrarModalEliminar()">&times;</span>
                 <h2>¿Eliminar producto?</h2>
@@ -246,7 +246,7 @@ $laboratorios = listarLaboratorios();
         </div>
 
         <!-- MODAL AGREGAR PRODUCTO -->
-        <div id="modalAgregar" class="modal" style="display:none;">
+        <div id="modalAgregar" class="modal" >
             <div class="modal-contenido">
                 <span class="cerrar" onclick="cerrarModalAgregar()">&times;</span>
                 <h2>Agregar Nuevo Producto</h2>
@@ -280,9 +280,8 @@ $laboratorios = listarLaboratorios();
         </div>
 
         <!-- MODAL AGREGAR LABORATORIO -->
-        <div id="modalAgregarLaboratorio" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-             background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-            <div class="modal-contenido" style="background:#fff; padding:20px; border-radius:10px; position:relative; width: 300px;">
+        <div id="modalAgregarLaboratorio" class="modal">
+            <div class="modal-contenido" >
                 <span class="cerrar" onclick="cerrarModalAgregarLaboratorio()" 
                       style="position:absolute; top:10px; right:15px; font-size:24px; font-weight:bold; cursor:pointer;">&times;</span>
                 <h2>Agregar Laboratorio</h2>
@@ -307,43 +306,48 @@ $laboratorios = listarLaboratorios();
 
     <!-- Título -->
     <h1>CARRITO DE COMPRAS</h1>
-    <hr />
+<hr />
 
-    <!-- Contenido dinámico del carrito -->
-    <div id="carrito-contenido">
-        <?php if (empty($carrito)): ?>
+<div id="carrito-contenido">
+    <?php if (empty($carrito)): ?>
         <p>El carrito está vacío.</p>
-        <?php else: ?>
-        <?php foreach ($carrito as $item): ?>
+    <?php else: ?>
+        <?php 
+        $totalVenta = 0; // acumulador
+        foreach ($carrito as $item): 
+            $totalVenta += $item['subtotal']; // sumar subtotales
+        ?>
             <div class="carrito-item">
-            <!-- Nombre del producto -->
-            <p>
-                <strong>Nombre Producto:</strong>
-                <?= htmlspecialchars($item['nom_prod']) ?>
-            </p>
+                <p>
+                    <strong>Nombre Producto:</strong>
+                    <?= htmlspecialchars($item['nom_prod']) ?>
+                </p>
 
-            <!-- Cantidad + botones -->
-            <div>
-                <strong>Cantidad:</strong>
-                <span><?= $item['cantidad'] ?></span>
-                <button class="btn-cantidad"
-                data-accion="aumentar"
-                data-id="<?= $item['id_detalle'] ?>"
-                data-cantidad="<?= $item['cantidad'] ?>">+</button>
-                <button class="btn-cantidad"
-                data-accion="disminuir"
-                data-id="<?= $item['id_detalle'] ?>"
-                data-cantidad="<?= $item['cantidad'] ?>">−</button>
-            </div>
+                <div>
+                    <strong>Cantidad:</strong>
+                    <span><?= $item['cantidad'] ?></span>
+                    <button class="btn-cantidad"
+                        data-accion="aumentar"
+                        data-id="<?= $item['id_detalle'] ?>"
+                        data-cantidad="<?= $item['cantidad'] ?>">+</button>
+                    <button class="btn-cantidad"
+                        data-accion="disminuir"
+                        data-id="<?= $item['id_detalle'] ?>"
+                        data-cantidad="<?= $item['cantidad'] ?>">−</button>
+                </div>
 
-            <!-- Subtotal y botón eliminar -->
-            <hr />
-            <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
-            <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
+                <hr />
+                <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
+                <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
             </div>
         <?php endforeach; ?>
+        
+        <!-- Total de toda la venta -->
+        <hr />
         <?php endif; ?>
     </div>
+    <h3 style="text-align:right;">TOTAL DE VENTA: <?= number_format($totalVenta, 2) ?> Bs</h3>
+
 
     <!-- Botones generales -->
     <div style="margin-top: 15px; display: flex; gap: 10px;">
@@ -355,9 +359,9 @@ $laboratorios = listarLaboratorios();
     </div>
                 
     <!-- Modal para los datos del cliente -->
-    <div id="modalCompra" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-            <form method="POST" action="generar_factura.php" class="modal-contenid" style="background:#fff; padding:20px; border-radius:10px; position: relative;">
-                <span onclick="cerrarModal()" class="cerrar" style="position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; cursor: pointer; user-select: none;" title="Cerrar"> &times;</span>
+    <div id="modalCompra" class="modal" >
+                <form method="POST" action="generar_factura.php" class="modal-contenido">
+                <span onclick="cerrarModal()" class="cerrar" title="Cerrar"> &times;</span>
                 <h2>Datos del Cliente : </h2>
                 <input name="nombre_cliente" placeholder="Nombre del Cliente" required><br><br>
                 <input name="ci_nit" placeholder="CI / NIT" required><br><br>
@@ -396,19 +400,19 @@ $laboratorios = listarLaboratorios();
         }
 
         function abrirModalAgregar() {
-            document.getElementById('modalAgregar').style.display = 'block';
+            document.getElementById('modalAgregar').classList.add('abierto')
         }
 
         function cerrarModalAgregar() {
-            document.getElementById('modalAgregar').style.display = 'none';
+            document.getElementById('modalAgregar').classList.remove('abierto')
         }
 
         function abrirModalAgregarLaboratorio() {
-            document.getElementById('modalAgregarLaboratorio').style.display = 'flex';
+            document.getElementById('modalAgregarLaboratorio').classList.add('abierto')
         }
 
         function cerrarModalAgregarLaboratorio() {
-            document.getElementById('modalAgregarLaboratorio').style.display = 'none';
+            document.getElementById('modalAgregarLaboratorio').classList.remove('abierto')
         }
 
         function abrirModalModificar(id, nombre, precio, stock, fecha, idLab) {
@@ -418,28 +422,28 @@ $laboratorios = listarLaboratorios();
             document.getElementById("mod_stock").value = stock;
             document.getElementById("mod_fecha_expiracion").value = fecha;
             document.getElementById("mod_id_laboratorio").value = idLab;
-            document.getElementById("modalModificar").style.display = "block";
+            document.getElementById("modalModificar").classList.add('abierto')
         }
 
         function cerrarModalModificar() {
-            document.getElementById("modalModificar").style.display = "none";
+            document.getElementById("modalModificar").classList.remove('abierto')
         }
 
         function abrirModalEliminar(id) {
             document.getElementById("elim_id_producto").value = id;
-            document.getElementById("modalEliminar").style.display = "block";
+            document.getElementById("modalEliminar").classList.add('abierto')
         }
 
         function cerrarModalEliminar() {
-            document.getElementById("modalEliminar").style.display = "none";
+            document.getElementById("modalEliminar").classList.remove('abierto')
         }
 
         function mostrarModal() {
-            document.getElementById('modalCompra').style.display = 'flex';
+            document.getElementById('modalCompra').classList.add('abierto')
         }
 
         function cerrarModal() {
-            document.getElementById('modalCompra').style.display = 'none';
+            document.getElementById('modalCompra').classList.remove('abierto')
         }
     </script>
 
@@ -577,9 +581,6 @@ $laboratorios = listarLaboratorios();
             }
         });
     </script>
-    
-    
 
-    
 </body>
 </html>
