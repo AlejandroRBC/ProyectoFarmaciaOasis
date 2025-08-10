@@ -63,131 +63,241 @@ while ($row = $detalles->fetch_assoc()) {
 
 // *** GENERAR PDF CON TCPDF ***
 
-// Inicializar TCPDF
 require_once '../tcpdf/tcpdf.php';
-$pdf = new TCPDF();
+
+$pdf = new TCPDF('P', 'mm', 'A5');
+$pdf->SetMargins(10, 10, 10);
 $pdf->AddPage();
+
+// Definir color azul para encabezados
+$colorAzul = [13, 71, 161];
+
+// Fuente general
 $pdf->SetFont('helvetica', '', 10);
 
-// Título de la factura en el PDF
-$pdf->SetFont('', 'B', 14);
-$pdf->Cell(0, 10, "Factura Nº " . $factura['id_factura'], 0, 1, 'C');
+// Título principal centrado
+$pdf->SetFont('', 'B', 16);
+$pdf->SetTextColor(...$colorAzul);
+$pdf->Cell(0, 12, 'Factura Electrónica', 0, 1, 'C');
 
-// Datos cliente en el PDF
+// Restaurar color negro para contenido
+$pdf->SetTextColor(0, 0, 0);
+
+// Definir márgenes y anchos
+$xInicio = 15; 
+$yInicio = $pdf->GetY() + 5; 
+$anchoCol = ($pdf->getPageWidth() - 30) / 2; 
+
+// --- Columna izquierda: Datos Emisor ---
+$pdf->SetFont('', 'B', 11);
+$pdf->SetXY($xInicio, $yInicio);
+$pdf->Cell($anchoCol, 7, 'Datos Emisor', 0, 1);
+
 $pdf->SetFont('', '', 10);
-$pdf->Ln(4);
-$pdf->Cell(0, 6, "Cliente: " . $factura['nombre'], 0, 1);
-$pdf->Cell(0, 6, "CI/NIT: " . $factura['ci_nit'], 0, 1);
-$pdf->Cell(0, 6, "Fecha: " . $factura['fecha'], 0, 1);
-$pdf->Ln(5);
+$pdf->SetXY($xInicio, $pdf->GetY());
+$pdf->MultiCell(
+    $anchoCol, 6,
+    "Nombre: FARMACIA OASIS\nNIT: 00000000\nDirección: NOSEWEON\nTeléfono: 0000",
+    0, 'L', false,
+    1,
+    $xInicio,
+    $pdf->GetY()
+);
 
-// Construir tabla HTML para el PDF
-$html = '<table border="1" cellpadding="4">
-    <thead>
-        <tr>
-            <th><b>Producto</b></th>
-            <th><b>Cantidad</b></th>
-            <th><b>Precio Unitario</b></th>
-            <th><b>Subtotal</b></th>
-        </tr>
-    </thead>
-    <tbody>';
+// --- Columna derecha: Datos Cliente ---
+$pdf->SetFont('', 'B', 11);
+$pdf->SetXY($xInicio + $anchoCol + 10, $yInicio); 
+$pdf->Cell($anchoCol, 7, 'Datos Cliente', 0, 1);
 
+$pdf->SetFont('', '', 10);
+$pdf->SetXY($xInicio + $anchoCol + 10, $pdf->GetY());
+$pdf->MultiCell(
+    $anchoCol, 6,
+    "Nombre: " . $factura['nombre'] . "\n" .
+    "NIT/CI: " . $factura['ci_nit'] . "\n" .
+    "Dirección: " . ($factura['direccion'] ?? 'N/A') . "\n" .
+    "Teléfono: " . ($factura['telefono'] ?? 'N/A'),
+    0, 'L', false,
+    1,
+    $xInicio + $anchoCol + 10,
+    $pdf->GetY()
+);
+
+// Ajustar Y para continuar debajo de la sección datos
+$yDespuesDatos = max(
+    $pdf->GetY(),
+    $yInicio + 40 
+);
+
+$pdf->SetXY($xInicio, $yDespuesDatos + 5);
+
+// --- Datos Factura ---
+// Definir un X fijo para empezar
+$xInicioDatos = 15;
+$pdf->SetX($xInicioDatos);
+
+// Factura Nº
+$pdf->SetFont('', 'B', 11);
+$pdf->Cell(40, 7, "Factura Nº:", 0, 0, 'L'); 
+$pdf->SetFont('', '', 11);
+$pdf->Cell(50, 7, $factura['id_factura'], 0, 1, 'L'); 
+
+// Fecha
+$pdf->SetX($xInicioDatos);
+$pdf->SetFont('', 'B', 11);
+$pdf->Cell(40, 7, "Fecha:", 0, 0, 'L');
+$pdf->SetFont('', '', 11);
+$pdf->Cell(50, 7, $factura['fecha'], 0, 1, 'L');
+
+$pdf->Ln(8);
+
+// --- Tabla productos ---
+
+// Anchos ajustados 
+$wCant = 15;  // Cantidad más estrecha
+$wDesc = 55;  // Descripción más ancha
+$wPU   = 30;  // Precio Unitario estrecho
+$wSub  = 28;  // Subtotal
+
+// Posición inicial tabla (igual que antes)
+$xTabla = $xInicio;
+$pdf->SetX($xTabla);
+
+// Encabezados
+$pdf->SetFillColor(...$colorAzul);
+$pdf->SetTextColor(255, 255, 255);
+$pdf->SetFont('', 'B', 10);
+
+$pdf->Cell($wCant, 8, 'Cant.', 1, 0, 'C', 1);
+$pdf->Cell($wDesc, 8, 'Descripción', 1, 0, 'C', 1);
+$pdf->Cell($wPU, 8, 'Precio Unit.', 1, 0, 'C', 1);
+$pdf->Cell($wSub, 8, 'Subtotal', 1, 1, 'C', 1);
+
+// Filas
+$pdf->SetFillColor(240, 240, 240);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->SetFont('', '', 10);
+
+$fill = 0;
 $total = 0;
+
 foreach ($datosProductos as $row) {
     $total += $row['subtotal'];
-    $html .= '<tr>
-        <td>' . htmlspecialchars($row['producto']) . '</td>
-        <td>' . $row['cantidad'] . '</td>
-        <td>' . number_format($row['precio_unitario'], 2) . '</td>
-        <td>' . number_format($row['subtotal'], 2) . '</td>
-    </tr>';
+
+    $pdf->SetX($xTabla);
+    $pdf->Cell($wCant, 7, $row['cantidad'], 'LR', 0, 'C', $fill);
+    $pdf->Cell($wDesc, 7, $row['producto'], 'LR', 0, 'L', $fill);
+    $pdf->Cell($wPU, 7, 'Bs. ' . number_format($row['precio_unitario'], 2), 'LR', 0, 'R', $fill);
+    $pdf->Cell($wSub, 7, 'Bs. ' . number_format($row['subtotal'], 2), 'LR', 1, 'R', $fill);
+
+    $fill = !$fill;
 }
 
-$html .= '<tr>
-    <td colspan="3" align="right"><b>Total</b></td>
-    <td><b>' . number_format($total, 2) . '</b></td>
-</tr>';
+$pdf->SetX($xTabla);
+$pdf->Cell(array_sum([$wCant, $wDesc, $wPU, $wSub]), 0, '', 'T');
 
-$html .= '</tbody></table>';
+$pdf->Ln(5);
 
-// Escribir tabla en PDF
-$pdf->writeHTML($html, true, false, false, false, '');
+// Totales
+$pdf->SetX($xTabla);
+$iva = $total * 0.13;
+$totalConIva = $total + $iva;
 
-// Guardar PDF en carpeta 'facturas'
+$pdf->SetFont('', 'B', 11);
+$pdf->Cell($wCant + $wDesc + $wPU, 7, 'Subtotal', 0, 0, 'R');
+$pdf->Cell($wSub, 7, 'Bs. ' . number_format($total, 2), 0, 1, 'R');
+
+$pdf->SetX($xTabla);
+$pdf->SetFont('', 'B', 14);
+$pdf->Cell($wCant + $wDesc + $wPU, 10, 'Total', 0, 0, 'R');
+$pdf->SetTextColor(...$colorAzul);
+$pdf->Cell($wSub, 10, 'Bs. ' . number_format($totalConIva, 2), 0, 1, 'R');
+$pdf->SetTextColor(0, 0, 0);
+
+$pdf->Ln(10);
+// Mensaje final centrado
+$pdf->SetFont('', 'I', 9);
+$pdf->Cell(0, 6, 'Gracias por su compra', 0, 1, 'C');
+$pdf->Cell(0, 6, 'Factura electrónica con validez legal', 0, 1, 'C');
+
+// --- Guardar PDF ---
 $nombreArchivo = "Factura_" . $factura['id_factura'] . ".pdf";
+$rutaEscritorio = "C:\\Users\\VictorAlbertoMachaca\\Desktop\\Facturas";
 
-//Necesario crear carpeta en el escritorio que vas a usar
-$rutaEscritorio = "C:\Users\Administrador\Desktop\Facturas";
-//$carpetaRelativa = 'C:/facturas/'; directo al C borrar el comentario si es necesario
-$carpetaRelativa = $rutaEscritorio;
-
-// Crear carpeta si no existe
-if (!file_exists($carpetaRelativa)) {
-    mkdir($carpetaRelativa, 0777, true);
+if (!file_exists($rutaEscritorio)) {
+    mkdir($rutaEscritorio, 0777, true);
 }
-
-$carpeta = realpath($carpetaRelativa);
+$carpeta = realpath($rutaEscritorio);
 if ($carpeta === false) {
     die("Error: no se pudo acceder o crear la carpeta de facturas.");
 }
-
 $rutaPDF = $carpeta . DIRECTORY_SEPARATOR . $nombreArchivo;
+
 $pdf->Output($rutaPDF, 'F');
 
-// Mostrar mensaje con enlace al PDF
-// echo "Factura guardada exitosamente: <a href='../$carpetaRelativa/$nombreArchivo' target='_blank'>Ver PDF</a>";
-
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vista Factura</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Factura</title>
+    <link rel="stylesheet" href="css/estilos.css" />
 </head>
-<body class="p-3">
+    <body style="background-color: #f8f9fa; padding: 20px;">
 
-<h5>Factura Nº <?= htmlspecialchars($factura['id_factura']) ?></h5>
-<p>
-    <strong>Cliente:</strong> <?= htmlspecialchars($factura['nombre']) ?><br />
-    <strong>CI/NIT:</strong> <?= htmlspecialchars($factura['ci_nit']) ?><br />
-    <strong>Fecha:</strong> <?= htmlspecialchars($factura['fecha']) ?>
-</p>
-<!-- Tabla visible en la página -->
-<table class="table table-bordered table-dark table-sm">
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio Unitario</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $totalTabla = 0;
-        foreach ($datosProductos as $row):
-            $totalTabla += $row['subtotal'];
-        ?>
-        <tr>
-            <td><?= htmlspecialchars($row['producto']) ?></td>
-            <td><?= $row['cantidad'] ?></td>
-            <td><?= number_format($row['precio_unitario'], 2) ?></td>
-            <td><?= number_format($row['subtotal'], 2) ?></td>
-        </tr>
-        <?php endforeach; ?>
-        <tr>
-            <td colspan="3" class="text-right"><strong>Total</strong></td>
-            <td><strong><?= number_format($totalTabla, 2) ?></strong></td>
-        </tr>
-    </tbody>
-</table>
-</body>
+        <div class="factura-container">
+
+            <h3 class="titulo-factura">Factura Nº <?= htmlspecialchars($factura['id_factura']) ?></h3>
+
+            <div class="factura-datos">
+                <p>
+                    <strong>Cliente:</strong> <?= htmlspecialchars($factura['nombre']) ?><br>
+                    <strong>CI/NIT:</strong> <?= htmlspecialchars($factura['ci_nit']) ?><br>
+                    <strong>Fecha:</strong> <?= htmlspecialchars($factura['fecha']) ?>
+                </p>
+            </div>
+
+            <!-- Tabla de productos -->
+            <table class="tabla-factura">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $totalTabla = 0;
+                    foreach ($datosProductos as $row):
+                        $totalTabla += $row['subtotal'];
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['producto']) ?></td>
+                        <td><?= $row['cantidad'] ?></td>
+                        <td><?= number_format($row['precio_unitario'], 2) ?></td>
+                        <td><?= number_format($row['subtotal'], 2) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <tr class="fw-bold">
+                        <td colspan="3" style="text-align:right;">Total</td>
+                        <td><?= number_format($totalTabla, 2) ?></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Mensaje final -->
+            <div class="factura-mensaje">
+                <!-- <h2>La Factura se guardo... !</h2>-->
+                <a href="../../Inicio/Vista/principal.php" class="btn-inicio">
+                <img src="../Vista/img/iconCasa.png" alt="Inicio" style="width: 30px; height: 30px;">
+                </a>
+            </div>
+        </div>
+
+    </body>
 </html>
 
 

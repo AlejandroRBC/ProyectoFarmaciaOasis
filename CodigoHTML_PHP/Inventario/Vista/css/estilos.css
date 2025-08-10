@@ -421,8 +421,83 @@ button:hover {
   overflow-y: auto;  /* activa scroll vertical si es necesario */
   padding-right: 10px; 
 }
+/* ----------------------------------------------------
+  ESTILOS DE FACTURA
+----------------------------------------------------- */
+.factura-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* TITULO Y DATOS*/
+.titulo-factura, .factura-datos {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* TABLA */
+.tabla-factura {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.tabla-factura thead {
+  background-color: #007BFF;
+  color: white;
+}
+
+.tabla-factura th, .tabla-factura td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+/* DATOS DE LA FACTURA */
+.factura-datos p {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.factura-mensaje {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.factura-mensaje h2 {
+  margin-bottom: 10px;
+  color: black;
+}
 
 
+.btn-inicio {
+  display: inline-block;
+  background: transparent; 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(3, 90, 166, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+.btn-inicio:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(3, 90, 166, 0.4);
+}
 
 
 /* ----------------------------------------------------
