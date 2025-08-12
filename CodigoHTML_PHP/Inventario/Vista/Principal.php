@@ -19,17 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'eliminar':
                 eliminarProductoCarrito($id_detalle);
                 break;
+            case 'borrar_todo': // Agrega este caso para borrar todo via ajax si quieres hacerlo por ajax
+                borrarTodoCarrito();
+                break;
         }
 
         $carrito = obtenerCarrito();
         $total_items = 0;
+        $total_venta = 0;
         foreach ($carrito as $item) {
             $total_items += $item['cantidad'];
+            $total_venta += $item['subtotal'];
         }
         $productos = buscarProductos('');
         echo json_encode([
             'carrito' => $carrito,
             'total_items' => $total_items,
+            'total_venta' => number_format($total_venta, 2, '.', ''),
             'productos' => $productos
         ]);
         exit;
@@ -241,7 +247,7 @@ $laboratorios = listarLaboratorios();
         </div>
 
         <!-- BOTÓN PARA ABRIR EL MODAL AGREGAR PRODUCTO -->
-        <div class="botones">
+        <div style="text-align: center;">
             <button onclick="abrirModalAgregar()">Agregar Producto</button>
             <button onclick="abrirModalAgregarLaboratorio()">Agregar Laboratorio</button>
         </div>
@@ -303,74 +309,81 @@ $laboratorios = listarLaboratorios();
 
     <!-- CARRITO DE COMPRAS -->
     <div id="MenuCarrito" class="menu-carrito">
-    <!-- Botón cerrar -->
-    <button onclick="mostrarCarrito()" style="position: absolute; top: 10px; right: 10px;">X</button>
 
-    <!-- Título -->
-    <h1>CARRITO DE COMPRAS</h1>
-<hr />
+        <!-- Botón cerrar -->
+        <button onclick="mostrarCarrito()" style="position: absolute; top: 10px; right: 10px;">X</button>
 
-<div id="carrito-contenido">
-    <?php if (empty($carrito)): ?>
-        <p>El carrito está vacío.</p>
-    <?php else: ?>
-        <?php 
-        $totalVenta = 0; // acumulador
-        foreach ($carrito as $item): 
-            $totalVenta += $item['subtotal']; // sumar subtotales
-        ?>
-            <div class="carrito-item">
-                <p>
-                    <strong>Nombre Producto:</strong>
-                    <?= htmlspecialchars($item['nom_prod']) ?>
-                </p>
-
-                <div>
-                    <strong>Cantidad:</strong>
-                    <span><?= $item['cantidad'] ?></span>
-                    <button class="btn-cantidad"
-                        data-accion="aumentar"
-                        data-id="<?= $item['id_detalle'] ?>"
-                        data-cantidad="<?= $item['cantidad'] ?>">+</button>
-                    <button class="btn-cantidad"
-                        data-accion="disminuir"
-                        data-id="<?= $item['id_detalle'] ?>"
-                        data-cantidad="<?= $item['cantidad'] ?>">−</button>
-                </div>
-
-                <hr />
-                <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
-                <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
-            </div>
-        <?php endforeach; ?>
-        
-        <!-- Total de toda la venta -->
+        <!-- Título -->
+        <h1>CARRITO DE COMPRAS</h1>
         <hr />
-        <?php endif; ?>
-    </div>
-    <h3 style="text-align:right;">TOTAL DE VENTA: <?= number_format($totalVenta, 2) ?> Bs</h3>
 
+        <?php $totalVenta = 0; ?>
 
-    <!-- Botones generales -->
-    <div style="margin-top: 15px; display: flex; gap: 10px;">
-        <form method="POST" style="margin: 0;">
-        <button type="submit" name="borrar_todo">Borrar Todo</button>
-        </form>
-        <button type="button" onclick="mostrarModal()">Realizar Compra</button>
-    </div>
-    </div>
+        <div id="carrito-contenido">
+            <?php if (empty($carrito)): ?>
+                <p>El carrito está vacío.</p>
+            <?php else: ?>
+                <?php 
+                $totalVenta = 0; // acumulador
+                foreach ($carrito as $item): 
+                    $totalVenta += $item['subtotal']; // sumar subtotales
+                ?>
+                    <div class="carrito-item">
+                        <p>
+                            <strong>Nombre Producto:</strong>
+                            <?= htmlspecialchars($item['nom_prod']) ?>
+                        </p>
+
+                        <div>
+                            <strong>Cantidad:</strong>
+                            <span><?= $item['cantidad'] ?></span>
+                            <button class="btn-cantidad"
+                                data-accion="aumentar"
+                                data-id="<?= $item['id_detalle'] ?>"
+                                data-cantidad="<?= $item['cantidad'] ?>">+</button>
+                            <button class="btn-cantidad"
+                                data-accion="disminuir"
+                                data-id="<?= $item['id_detalle'] ?>"
+                                data-cantidad="<?= $item['cantidad'] ?>">−</button>
+                        </div>
+
+                        <hr />
+                        <p>Total: <?= number_format($item['subtotal'], 2) ?> Bs</p>
+                        <button class="btn-eliminar" data-id="<?= $item['id_detalle'] ?>">Borrar</button>
+                    </div>
+                <?php endforeach; ?>
                 
-    <!-- Modal para los datos del cliente -->
-    <div id="modalCompra" class="modal" >
-                <form method="POST" action="generar_factura.php" class="modal-contenido">
-                <span onclick="cerrarModal()" class="cerrar" title="Cerrar"> &times;</span>
-                <h2>Datos del Cliente : </h2>
+                <hr />
+            <?php endif; ?>
+        </div>
+
+        <h3 id="total-venta" style="text-align:right;">
+            TOTAL DE VENTA: <?= number_format($totalVenta, 2) ?> Bs
+        </h3>
+
+        <!-- Botones generales -->
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <form method="POST" style="margin: 0;">
+                <button type="button" id="btn-borrar-todo">Borrar Todo</button>
+            </form>
+            <button type="button" onclick="mostrarModal()">Realizar Compra</button>
+        </div>
+        </div>
+
+        <!-- Modal para los datos del cliente -->
+        <div id="modalCompra" class="modal">
+            <form method="POST" action="generar_factura.php" class="modal-contenido">
+                <span onclick="cerrarModal()" class="cerrar" title="Cerrar">&times;</span>
+                <h2>Datos del Cliente </h2>
                 <input name="nombre_cliente" placeholder="Nombre del Cliente" required><br><br>
                 <input name="ci_nit" placeholder="CI / NIT" required><br><br>
                 <button type="submit">Generar Factura</button>
             </form>
         </div>
+        
+
     </div>
+
     <!-- SCRIPT JS -->
     
     <script>
@@ -452,6 +465,7 @@ $laboratorios = listarLaboratorios();
     <!-- SCRIPT AJAX --> 
 
     <script>
+        document.getElementById("btn-borrar-todo").addEventListener("click", async () => {await enviarAccionCarrito("borrar_todo", 0, 0);});
         document.addEventListener("DOMContentLoaded", () => {
             const carritoDiv = document.getElementById("MenuCarrito");
                 carritoDiv.addEventListener("click", async (e) => {
@@ -490,6 +504,7 @@ $laboratorios = listarLaboratorios();
         function renderCarrito(data) {
         const carrito = data.carrito;
         const totalItems = data.total_items;
+        const totalVenta = data.total_venta; 
 
         // Actualizar el contenido del carrito
         const contenedor = document.getElementById("carrito-contenido");
@@ -511,11 +526,17 @@ $laboratorios = listarLaboratorios();
                 <p>Total: ${parseFloat(item.subtotal).toFixed(2)} Bs</p>
                 <button class="btn-eliminar" data-id="${item.id_detalle}">Borrar</button>
                 </div>
+                <hr />
             `;
             });
             contenedor.innerHTML = html;
         }
-
+        
+        // Actualizar total venta dinámicamente
+        const totalVentaElement = document.getElementById("total-venta");
+        if (totalVentaElement) {
+            totalVentaElement.textContent = `TOTAL DE VENTA: ${parseFloat(totalVenta).toFixed(2)} Bs`;
+        }
         // ✅ Actualizar contador del carrito
         const contador = document.querySelector(".contador-carrito");
         if (totalItems > 0) {

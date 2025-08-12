@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Guardar ID de factura en sesión
     $_SESSION['factura'] = $factura;
 
-    
+    header("Location: generar_factura.php");
     exit();
 }
 ?>
@@ -214,7 +214,7 @@ $pdf->Cell(0, 6, 'Factura electrónica con validez legal', 0, 1, 'C');
 
 // --- Guardar PDF ---
 $nombreArchivo = "Factura_" . $factura['id_factura'] . ".pdf";
-$rutaEscritorio = "C:\\Users\\VictorAlbertoMachaca\\Desktop\\Facturas";
+$rutaEscritorio = "C:\\Facturas";
 
 if (!file_exists($rutaEscritorio)) {
     mkdir($rutaEscritorio, 0777, true);
