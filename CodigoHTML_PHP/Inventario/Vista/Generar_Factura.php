@@ -19,8 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Guardar ID de factura en sesión
     $_SESSION['factura'] = $factura;
 
-    // Redirigir a la página donde mostrarás la factura
-    header("Location: Generar_Factura.php");
+    
     exit();
 }
 ?>
@@ -114,9 +113,7 @@ $pdf->SetXY($xInicio + $anchoCol + 10, $pdf->GetY());
 $pdf->MultiCell(
     $anchoCol, 6,
     "Nombre: " . $factura['nombre'] . "\n" .
-    "NIT/CI: " . $factura['ci_nit'] . "\n" .
-    "Dirección: " . ($factura['direccion'] ?? 'N/A') . "\n" .
-    "Teléfono: " . ($factura['telefono'] ?? 'N/A'),
+    "NIT/CI: " . $factura['ci_nit'] ,
     0, 'L', false,
     1,
     $xInicio + $anchoCol + 10,
@@ -210,7 +207,7 @@ $pdf->Cell($wSub, 10, 'Bs. ' . number_format($total, 2), 0, 1, 'R');
 $pdf->SetTextColor(0, 0, 0);
 
 $pdf->Ln(10);
-// Mensaje final centrado
+// Mensaje final 
 $pdf->SetFont('', 'I', 9);
 $pdf->Cell(0, 6, 'Gracias por su compra', 0, 1, 'C');
 $pdf->Cell(0, 6, 'Factura electrónica con validez legal', 0, 1, 'C');

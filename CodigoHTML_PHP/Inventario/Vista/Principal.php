@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //CRUD
 
     // Agregar producto 
+
     if (isset($_POST['agregar_nuevo_producto'])) {
         $nombre = $_POST['nombre'];
         $precio = (float)$_POST['precio'];
@@ -276,6 +277,7 @@ $laboratorios = listarLaboratorios();
                     <br><br>
                     <button type="submit" name="agregar_nuevo_producto">Agregar Producto</button>
                 </form>
+                <div id="mensaje"></div>
             </div>
         </div>
 
@@ -369,8 +371,8 @@ $laboratorios = listarLaboratorios();
             </form>
         </div>
     </div>
-
     <!-- SCRIPT JS -->
+    
     <script>
         // Mostrar u ocultar el carrito
         function mostrarCarrito() {
@@ -537,7 +539,7 @@ $laboratorios = listarLaboratorios();
             }
         });
         }
-        
+    
     </script>
 
     <!-- SCRIPT PARA CIERRE FUERA DE LOS MODALES--> 
@@ -581,6 +583,7 @@ $laboratorios = listarLaboratorios();
             }
         });
     </script>
+    <script src="../Vista/javaScript/validaciones.js"></script>
 
 </body>
 </html>
