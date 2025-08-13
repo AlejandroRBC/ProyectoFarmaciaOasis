@@ -1,5 +1,5 @@
 <?php
-require_once '../Modelo/conexion.php';
+require_once '../../config/conexion.php';
 
 $fecha_hoy = date('Y-m-d');
 

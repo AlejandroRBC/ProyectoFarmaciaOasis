@@ -4,7 +4,7 @@ date_default_timezone_set('America/La_Paz');
 // Datos de conexión
 $host = "localhost";
 $usuario = "root";
-$contraseña = ""; // cambiar si tu MySQL tiene contraseña
+$contraseña = "";
 $base_datos = "proyecto farmacia";
 
 // Crear conexión

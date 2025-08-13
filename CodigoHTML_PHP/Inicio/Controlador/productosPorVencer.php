@@ -1,6 +1,5 @@
 <?php
-require_once '../Modelo/conexion.php';
-
+require_once '../../config/conexion.php';
 
 // Definir el rango de fechas para considerar "próximo a vencer" (ej: 30 días)
 $dias_alerta = 30;

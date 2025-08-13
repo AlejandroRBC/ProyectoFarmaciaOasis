@@ -1,5 +1,5 @@
 <?php
-require_once '../Modelo/conexion.php';
+require_once '../../config/conexion.php';
 $fecha_hoy = date('Y-m-d');
 // Consulta para sumar productos vendidos hoy en facturas CERRADAS
 $sql = "SELECT SUM(dv.cantidad) as total_productos

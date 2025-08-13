@@ -1,5 +1,5 @@
 <?php
-require_once '../Modelo/conexion.php';
+require_once '../../config/conexion.php';
 
 // Definir qué consideramos "bajo stock" (ej: menos de 10 unidades)
 $referencia_Bajo = 10;
