@@ -1,0 +1,23 @@
+/* ----------------------------------------------------
+  RESPONSIVE (pantallas pequeñas)
+----------------------------------------------------- */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 16px 20px;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .busqueda {
+    width: 90%;
+  }
+
+  table, th, td {
+    font-size: 14px;
+  }
+
+  .botones button {
+    margin: 12px 0;
+    width: 90%;
+  }
+}
