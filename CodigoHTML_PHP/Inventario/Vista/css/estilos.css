@@ -567,6 +567,16 @@ button:hover {
 }
 
 
+
+input.error {
+  border: 2px solid red !important;
+  background-color: #ffe6e6 !important;
+}
+
+input.ok {
+  border: 2px solid green !important;
+  background-color: #e6ffe6 !important;
+}
 /* ----------------------------------------------------
   RESPONSIVE (pantallas pequeñas)
 ----------------------------------------------------- */
