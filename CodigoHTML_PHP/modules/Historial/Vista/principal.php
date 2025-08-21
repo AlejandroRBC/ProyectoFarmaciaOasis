@@ -11,12 +11,13 @@ $historial = obtenerHistorialFacturas();
     <script src="../../NavBar/Vista/javaScript/script.js"></script>
 
 <link rel="stylesheet" href="../../../assets/css/estiloTabla.css">
+<link rel="stylesheet" href="../../../assets/css/titulo.css">
 </head>
 <body>
 
     <?php require('../../NavBar/Vista/Principal.php'); ?>
     <div class="contenido">
-            <h2>Historial de Facturas</h2>
+            <h1>Historial de Facturas</h1>
         <table>
             <thead>
                 <tr>
