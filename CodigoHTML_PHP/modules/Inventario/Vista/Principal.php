@@ -17,6 +17,7 @@ $laboratorios = listarLaboratorios();
 <head>
     <meta charset="UTF-8" />
     <title>Inventario</title>
+    <link rel="stylesheet" href="css/estiloCelda.css" />
     <link rel="stylesheet" href="css/estilos.css" />
     <link rel="stylesheet" href="css/iconos.css" />
     <link rel="stylesheet" href="css/botones.css" />
@@ -302,6 +303,5 @@ $laboratorios = listarLaboratorios();
     <script src="javaScript/filtroTabla.js"></script>
     <script src="javaScript/AJAX.js"></script>
     <script src="javaScript/validaciones.js"></script>
-
 </body>
 </html>
