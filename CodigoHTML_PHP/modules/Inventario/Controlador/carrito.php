@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Agrega un producto al carrito (detalle de venta), creando la factura si es necesario.
+ * Agrega un producto al carrito (detalle de venta), creando la venta si es necesario.
  * 
  * @param int $id_producto ID del producto
  * @param int $cantidad Cantidad a agregar (por defecto 1)
@@ -9,7 +9,7 @@
  */
 function agregarAlCarrito($id_producto, $cantidad = 1) {
     global $conn;
-    $id_factura = obtenerFacturaAbierta();
+    $id_venta = obtenerVentaAbierta();
 
     // Verificar existencia del producto
     $res = $conn->query("SELECT precio, stock FROM PRODUCTO WHERE id_producto = $id_producto");
@@ -20,7 +20,7 @@ function agregarAlCarrito($id_producto, $cantidad = 1) {
     $stock_actual = (int)$producto['stock'];
 
     // Verificar si ya existe en el carrito
-    $res2 = $conn->query("SELECT id_detalle, cantidad FROM DETALLEVENTA WHERE id_factura = $id_factura AND id_producto = $id_producto");
+    $res2 = $conn->query("SELECT id_detalle, cantidad FROM DETALLEVENTA WHERE id_venta = $id_venta AND id_producto = $id_producto");
 
     if ($res2 && $res2->num_rows > 0) {
         $detalle = $res2->fetch_assoc();
@@ -40,30 +40,30 @@ function agregarAlCarrito($id_producto, $cantidad = 1) {
         if ($stock_actual < $cantidad) return ['error'=>'Stock insuficiente para la cantidad solicitada'];
 
         $subtotal = $cantidad * $precio;
-        $conn->query("INSERT INTO DETALLEVENTA (id_factura, id_producto, cantidad, subtotal) VALUES ($id_factura, $id_producto, $cantidad, $subtotal)");
+        $conn->query("INSERT INTO DETALLEVENTA (id_venta, id_producto, cantidad, subtotal) VALUES ($id_venta, $id_producto, $cantidad, $subtotal)");
 
         $nuevo_stock = $stock_actual - $cantidad;
         $conn->query("UPDATE PRODUCTO SET stock = $nuevo_stock WHERE id_producto = $id_producto");
     }
 
-    return ['success'=>true, 'id_factura'=>$id_factura];
+    return ['success'=>true, 'id_venta'=>$id_venta];
 }
 
 
 
 /**
- * Obtiene los productos actuales del carrito (detalle de venta) para la factura abierta.
+ * Obtiene los productos actuales del carrito (detalle de venta) para la venta abierta.
  * 
  * @return array Lista de productos en el carrito
  */
 function obtenerCarrito() {
     global $conn;
-    $id_factura = obtenerFacturaAbierta();
+    $id_venta = obtenerVentaAbierta();
 
     $sql = "SELECT d.id_detalle, p.nom_prod,  d.cantidad, d.subtotal
             FROM DETALLEVENTA d
             JOIN PRODUCTO p ON d.id_producto = p.id_producto
-            WHERE d.id_factura = $id_factura";
+            WHERE d.id_venta = $id_venta";
 
     $result = $conn->query($sql);
     $carrito = [];
@@ -87,21 +87,21 @@ function eliminarProductoCarrito($id_detalle) {
     global $conn;
 
     // Recuperar información del detalle
-    $res = $conn->query("SELECT id_factura, id_producto, cantidad FROM DETALLEVENTA WHERE id_detalle = $id_detalle");
+    $res = $conn->query("SELECT id_venta, id_producto, cantidad FROM DETALLEVENTA WHERE id_detalle = $id_detalle");
     if (!$res || $res->num_rows === 0) return ['error' => 'Detalle no encontrado'];
     $row = $res->fetch_assoc();
 
-    $id_factura = $row['id_factura'];
+    $id_venta = $row['id_venta'];
     $id_producto = $row['id_producto'];
     $cantidad = (int)$row['cantidad'];
 
     // Verificar estado de la factura
-    $resEstado = $conn->query("SELECT estado FROM FACTURA WHERE id_factura = $id_factura");
-    if (!$resEstado || $resEstado->num_rows === 0) return ['error' => 'Factura no encontrada'];
+    $resEstado = $conn->query("SELECT estado FROM VENTA WHERE id_venta = $id_venta");
+    if (!$resEstado || $resEstado->num_rows === 0) return ['error' => 'Venta no encontrada'];
     $estado = $resEstado->fetch_assoc()['estado'];
 
     if ($estado !== 'ABIERTA') {
-        return ['error' => 'No se puede eliminar producto, la factura está cerrada'];
+        return ['error' => 'No se puede eliminar producto, la venta está cerrada'];
     }
 
     // Devolver cantidad al stock
@@ -122,10 +122,10 @@ function eliminarProductoCarrito($id_detalle) {
  */
 function borrarTodoCarrito() {
     global $conn;
-    $id_factura = obtenerFacturaAbierta();
+    $id_venta = obtenerVentaAbierta();
 
     // Recuperar los productos y cantidades
-    $res = $conn->query("SELECT id_producto, cantidad FROM DETALLEVENTA WHERE id_factura = $id_factura");
+    $res = $conn->query("SELECT id_producto, cantidad FROM DETALLEVENTA WHERE id_venta = $id_venta");
     if ($res) {
         while ($row = $res->fetch_assoc()) {
             $id_producto = $row['id_producto'];
@@ -135,7 +135,7 @@ function borrarTodoCarrito() {
     }
 
     // Eliminar todos los detalles de venta
-    $conn->query("DELETE FROM DETALLEVENTA WHERE id_factura = $id_factura");
+    $conn->query("DELETE FROM DETALLEVENTA WHERE id_venta = $id_venta");
 
     return ['success' => true];
 }

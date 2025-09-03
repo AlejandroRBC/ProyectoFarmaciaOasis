@@ -4,7 +4,7 @@ require_once '../../../config/conexion.php';
 $fecha_hoy = date('Y-m-d');
 
 $sql = "SELECT SUM(total) as totalHoy 
-        FROM factura 
+        FROM venta 
         WHERE fecha = '$fecha_hoy' 
         AND estado = 'CERRADA'";
 

@@ -78,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         eliminarProducto($id_producto);
     }
 
-    //CARRITO
 
     // Agregar al carrito desde botón
     if (isset($_POST['agregar_producto'])) {

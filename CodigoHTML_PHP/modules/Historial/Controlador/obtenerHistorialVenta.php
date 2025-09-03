@@ -2,10 +2,10 @@
 require_once '../../../config/conexion.php';
 
 // Función para obtener el historial de facturas cerradas
-function obtenerHistorialFacturas() {
+function obtenerHistorialVenta() {
     global $conn;
 
-    $sql = "SELECT * FROM HISTORIALFACTURA ORDER BY fecha DESC, id_historial DESC";
+    $sql = "SELECT * FROM HISTORIAL_VENTA ORDER BY fecha DESC, id_historial DESC";
     $result = $conn->query($sql);
 
     $historial = [];

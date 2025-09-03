@@ -3,7 +3,7 @@ require_once '../../../config/conexion.php';// Incluye la conexión a la base de
 require_once '../Controlador/carrito.php';
 require_once '../Controlador/CRUDlabo.php';
 require_once '../Controlador/CRUDproductos.php';
-require_once '../Controlador/factura.php';
+require_once '../Controlador/venta.php';
 require_once '../Controlador/AJAX.php';
 // Obtener datos para cargar la vista
 $productos = buscarProductos('');
@@ -18,7 +18,7 @@ $laboratorios = listarLaboratorios();
     <meta charset="UTF-8" />
     <title>Inventario</title>
     <link rel="stylesheet" href="css/estiloCelda.css" />
-    <link rel="stylesheet" href="css/estilos.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
     <link rel="stylesheet" href="css/iconos.css" />
     <link rel="stylesheet" href="css/botones.css" />
     <link rel="stylesheet" href="css/carrito.css" />
@@ -289,14 +289,24 @@ $laboratorios = listarLaboratorios();
         </div>
         <!-- Modal para los datos del cliente -->
         <div id="modalCompra" class="modal">
-            <form method="POST" action="generar_factura.php" class="modal-contenido">
+            <form method="POST" action="generar_venta.php" class="modal-contenido">
                 <span onclick="cerrarModal()" class="cerrar" title="Cerrar">&times;</span>
                 <h2>Datos del Cliente </h2>
+
                 <input name="nombre_cliente" placeholder="Nombre del Cliente" required><br><br>
                 <input name="ci_nit" placeholder="CI / NIT" required><br><br>
-                <button type="submit">Generar Factura</button>
+                <select name="metodo_pago" id="metodo_pago" required>
+                    <option value="" disabled selected>Metodo de Pago</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="qr">QR</option>
+                    <option value="mixto">Mixto</option>
+                </select>
+                <br><br>
+
+                <button type="submit">Generar Venta</button>
             </form>
         </div>
+
     </div>
     <!-- SCRIPT JS -->
     <script src="javaScript/modales.js"></script>

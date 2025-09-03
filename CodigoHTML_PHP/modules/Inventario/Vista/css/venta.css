@@ -1,7 +1,7 @@
 /* ----------------------------------------------------
-  ESTILOS DE FACTURA
+  ESTILOS DE VENTA
 ----------------------------------------------------- */
-.factura-container {
+.venta-container {
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
@@ -12,46 +12,47 @@
 }
 
 /* TITULO Y DATOS*/
-.titulo-factura, .factura-datos {
+.titulo-venta, .venta-datos {
   max-width: 400px;
   margin: 0 auto;
   text-align: center;
 }
 
 /* TABLA */
-.tabla-factura {
+.tabla-venta {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
   font-size: 14px;
 }
 
-.tabla-factura thead {
+.tabla-venta thead {
   background-color: #0d47a1;
   color: white;
 }
 
-.tabla-factura th, .tabla-factura td {
+.tabla-venta th, .tabla-venta td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-/* DATOS DE LA FACTURA */
-.factura-datos p {
+/* DATOS DE LA VENTA */
+.venta-datos p {
   font-size: 16px;
   margin-bottom: 10px;
 }
 
-.factura-mensaje {
+.venta-mensaje {
   text-align: center;
   margin-top: 25px;
 }
 
-.factura-mensaje h2 {
+.venta-mensaje h2 {
   margin-bottom: 10px;
   color: black;
 }
+
 .btn-inicio {
   display: inline-block;
   background: transparent; 

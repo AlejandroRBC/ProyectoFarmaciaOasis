@@ -44,7 +44,13 @@ function cerrarModalEliminar() {
 }
 
 function mostrarModal() {
-    document.getElementById('modalCompra').classList.add('abierto')
+    let totalVentaElem = document.getElementById('total-venta');
+    let total = parseFloat(totalVentaElem.textContent.replace(/[^\d.-]/g, ''));
+    if (total > 0) {
+        document.getElementById('modalCompra').classList.add('abierto');
+    } else {
+        alert('El carrito está vacío. No se puede realizar la compra.');
+    }
 }
 
 function cerrarModal() {
