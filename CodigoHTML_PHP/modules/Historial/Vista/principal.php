@@ -9,8 +9,8 @@ $historial = obtenerHistorialVenta();
     <title>Historial de Facturas</title>
     <link rel="stylesheet" href="../../NavBar/Vista/css/estilos.css">
     <script src="../../NavBar/Vista/javaScript/script.js"></script>
-    <link rel="stylesheet" href="css/estiloTabla.css">
-    <link rel="stylesheet" href="css/titulo.css">
+    <link rel="stylesheet" href="../../../assets/css/titulo.css">
+    <link rel="stylesheet" href="../../../assets/css/estiloTabla.css">
 </head>
 <body>
 

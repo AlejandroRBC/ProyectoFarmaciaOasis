@@ -6,6 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = $_POST['nombre_cliente'];
     $ci = $_POST['ci_nit'];
     $metodo_pago = $_POST['metodo_pago'] ?? '';
+    $fecha = date('Y-m-d');// 
     $hora = date('H:i:s'); // Hora actual al cerrar la venta
 
     // Insertar cliente y obtener su id
@@ -16,11 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $venta = obtenerVentaAbierta();
 
     // Cerrar la venta asociando cliente y hora
+    
     $conn->query("UPDATE VENTA 
-                  SET id_cliente = $id_cliente, 
-                      estado = 'CERRADA', 
-                      hora = '$hora'
-                  WHERE id_venta = $venta");
+                        SET id_cliente = $id_cliente, 
+                            estado = 'CERRADA', 
+                            fecha = '$fecha',
+                            hora = '$hora'
+                        WHERE id_venta = $venta");
 
     // Guardar ID de venta en sesión
     $_SESSION['venta'] = $venta;
@@ -50,9 +53,11 @@ $venta = $res->fetch_assoc();
 
 // Obtener detalles de productos de la venta
 $sql_detalles = "
-    SELECT P.nom_prod AS producto, DV.cantidad, 
-           (DV.subtotal / DV.cantidad) AS precio_unitario, 
-           DV.subtotal
+    SELECT P.nom_prod AS producto,
+        P.complemento,
+        DV.cantidad,
+        (DV.subtotal / DV.cantidad) AS precio_unitario, 
+        DV.subtotal
     FROM DETALLEVENTA DV
     JOIN PRODUCTO P ON DV.id_producto = P.id_producto
     WHERE DV.id_venta = $id_venta
@@ -131,7 +136,11 @@ $pdf->Cell(50, 7, $venta['fecha'], 0, 1, 'L');
 $pdf->Ln(8);
 
 // Tabla de productos
-$wCant = 15; $wDesc = 55; $wPU = 30; $wSub = 28;
+$wCant = 15;
+$wDesc = 25;
+$wComp = 30;
+$wPU = 30;
+$wSub = 28;
 $xTabla = $xInicio;
 $pdf->SetX($xTabla);
 
@@ -140,7 +149,10 @@ $pdf->SetFillColor(...$colorAzul);
 $pdf->SetTextColor(255, 255, 255);
 $pdf->SetFont('', 'B', 10);
 $pdf->Cell($wCant, 8, 'Cant.', 1, 0, 'C', 1);
-$pdf->Cell($wDesc, 8, 'Descripción', 1, 0, 'C', 1);
+$pdf->Cell($wDesc, 8, 'Descripción', 1, 0, 'C', 1); 
+
+$pdf->Cell($wComp, 8, 'Complemento', 1, 0, 'C', 1); 
+
 $pdf->Cell($wPU, 8, 'Precio Unit.', 1, 0, 'C', 1);
 $pdf->Cell($wSub, 8, 'Subtotal', 1, 1, 'C', 1);
 
@@ -155,6 +167,7 @@ foreach ($datosProductos as $row) {
     $pdf->SetX($xTabla);
     $pdf->Cell($wCant, 7, $row['cantidad'], 'LR', 0, 'C', $fill);
     $pdf->Cell($wDesc, 7, $row['producto'], 'LR', 0, 'L', $fill);
+    $pdf->Cell($wComp, 7, $row['complemento'], 'LR', 0, 'LR', $fill);
     $pdf->Cell($wPU, 7, 'Bs. ' . number_format($row['precio_unitario'], 2), 'LR', 0, 'R', $fill);
     $pdf->Cell($wSub, 7, 'Bs. ' . number_format($row['subtotal'], 2), 'LR', 1, 'R', $fill);
     $fill = !$fill;

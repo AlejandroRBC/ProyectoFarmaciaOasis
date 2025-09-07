@@ -47,12 +47,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['agregar_nuevo_producto'])) {
         $nombre = $_POST['nombre'];
-        $precio = (float)$_POST['precio'];
+        $lote = $_POST['lote'];
+        $precio_base = (float)$_POST['precio_base'];
+
+        $porcentaje_g = (float)$_POST['porcentaje_g'];
         $stock = (int)$_POST['stock'];
         $fecha_expiracion = $_POST['fecha_expiracion'];
         $id_laboratorio = (int)$_POST['id_laboratorio'];
-        agregarProducto($nombre, $precio, $stock, $fecha_expiracion, $id_laboratorio);
+        $complemento = $_POST['complemento'];
+        $complemento = $_POST['lote'];
+
+        agregarProducto($nombre, 
+        $precio_base,
+        $porcentaje_g, 
+        $stock, 
+        $fecha_expiracion, 
+        $id_laboratorio, 
+        $complemento,
+        $lote);
     }
+    
 
     // Agregar laboratorio
     if (isset($_POST['agregar_nuevo_laboratorio'])) {
@@ -65,11 +79,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['modificar_producto'])) {
         $id_producto = (int)$_POST['id_producto'];
         $nombre = $_POST['nombre'];
-        $precio = (float)$_POST['precio'];
+
+        $complemento=$_POST['complemento'];
+        $lote=$_POST['lote'];
+
+        $precio_base = (float)$_POST['precio_base'];
         $stock = (int)$_POST['stock'];
         $fecha_expiracion = $_POST['fecha_expiracion'];
         $id_laboratorio = (int)$_POST['id_laboratorio'];
-        modificarProducto($id_producto, $nombre, $precio, $stock, $fecha_expiracion, $id_laboratorio);
+        $porcentaje_g=(float)$_POST['porcentaje_g'];
+        // lo de abajo es la llamad anterior
+        
+        modificarProducto($id_producto,
+                        $nombre,
+                        $precio_base, 
+                        $stock, 
+                        $fecha_expiracion,
+                        $id_laboratorio, 
+                        $porcentaje_g,
+                        $complemento,
+                        $lote
+                    );
     }
 
     // Eliminar producto
@@ -90,4 +120,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-?>

@@ -14,7 +14,8 @@ function filtrarTabla() {
     const filtro = inputBusqueda.value.toLowerCase();
     Array.from(tabla.rows).forEach(row => {
         const codigo = row.cells[0].textContent.toLowerCase();
-        const nombre = row.cells[1].textContent.toLowerCase();
-        row.style.display = (codigo.startsWith(filtro) || nombre.startsWith(filtro)) ? '' : 'none';
+        const lote = row.cells[1].textContent.toLowerCase();
+        const nombre = row.cells[2].textContent.toLowerCase();
+        row.style.display = (lote.startsWith(filtro) || codigo.startsWith(filtro) || nombre.startsWith(filtro)) ? '' : 'none';
     });
 }

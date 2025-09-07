@@ -20,15 +20,35 @@ function cerrarModalAgregarLaboratorio() {
     document.getElementById('modalAgregarLaboratorio').classList.remove('abierto')
 }
 
-function abrirModalModificar(id, nombre, precio, stock, fecha, idLab) {
-    document.getElementById("mod_id_producto").value = id;
-    document.getElementById("mod_nombre").value = nombre;
-    document.getElementById("mod_precio").value = precio;
-    document.getElementById("mod_stock").value = stock;
-    document.getElementById("mod_fecha_expiracion").value = fecha;
-    document.getElementById("mod_id_laboratorio").value = idLab;
+
+function abrirModalModificar(
+                            id, 
+                            nombre,
+                            lote, 
+                            precio_base, 
+                            stock,
+                            fecha_exp, 
+                            id_laboratorio, 
+                            porcentaje_g,
+                            complemento
+                        ) {
+    document.getElementById('modalModificar').classList.remove('cerrar')
+    console.log("probar");
+    document.getElementById('mod_id_producto').value      = id;
+    document.getElementById('mod_nombre').value           = nombre;
+    document.getElementById('mod_lote').value             = lote;
+    document.getElementById('mod_precio').value           = precio_base;
+    document.getElementById('mod_stock').value            = stock;
+    document.getElementById('mod_fecha_expiracion').value = fecha_exp;
+    document.getElementById('mod_id_laboratorio').value   = id_laboratorio;
+    document.getElementById('mod_complemento').value   = complemento;
+
+    document.getElementById('mod_porcentaje').placeholder = "Actual: " + porcentaje_g + "%";
     document.getElementById("modalModificar").classList.add('abierto')
+    console.log("probar2");
+    
 }
+
 
 function cerrarModalModificar() {
     document.getElementById("modalModificar").classList.remove('abierto')

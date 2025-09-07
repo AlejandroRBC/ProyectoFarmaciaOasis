@@ -66,9 +66,12 @@ $laboratorios = listarLaboratorios();
                 <thead>
                     <tr>
                         <th>CÓDIGO</th>
+                            <th>LOTE</th>
                         <th>NOMBRE</th>
+                        <th>Complemento</th>
+                            <th>PRECIO BASE</th>
+                            <th>PRECIO VENTA</th>
                         <th>STOCK</th>
-                        <th>PRECIO</th>
                         <th>Fecha Exp.</th>
                         <th>LABORATORIO</th>
                         <th></th>
@@ -79,40 +82,43 @@ $laboratorios = listarLaboratorios();
                     <?php foreach ($productos as $prod): ?>
                         <tr>
                             <td><?= htmlspecialchars($prod['id_producto']) ?></td>
+                            <td><?= htmlspecialchars($prod['lote']) ?></td>
                             <td><?= htmlspecialchars($prod['nom_prod']) ?></td>
+                            <td><?= htmlspecialchars($prod['complemento']) ?></td>
+                            <td><?= htmlspecialchars($prod['precio_base']) ?> Bs</td>
+                            <td><?= htmlspecialchars($prod['precio_venta']) ?> Bs</td>
                             <td id="stock-prod-<?= $prod['id_producto'] ?>"><?= htmlspecialchars($prod['stock']) ?></td>
-                            <td><?= htmlspecialchars($prod['precio']) ?> Bs</td>
                             <td><?= htmlspecialchars($prod['fecha_expiracion']) ?></td>
                             <td><?= htmlspecialchars($prod['laboratorio']) ?></td>
+
+                            <!-- DEBEMOS CAMBIAR EL SENTIDO DE ESTO, POR ESO SE REINICIA LA PAGINA CADA QUE SE AGREGA UN ITEM AL CARRITO -->
                             <td>
                                 <!-- Formulario oculto para agregar producto al carrito -->
                                 <form id="form-<?= $prod['id_producto'] ?>" method="POST" style="display:none;">
                                     <input type="hidden" name="id_producto" value="<?= $prod['id_producto'] ?>" />
                                     <input type="hidden" name="agregar_producto" value="1" />
                                 </form>
-                                <img
-                                    src="img/CarritoA.png"
-                                    alt="Agregar al carrito"
-                                    class="icono"
-                                    title="Agregar al carrito"
-                                    style="cursor:pointer;"
-                                    onclick="document.getElementById('form-<?= $prod['id_producto'] ?>').submit();"
-                                />
+                                <img src="img/CarritoA.png" alt="Agregar al carrito" class="icono" title="Agregar al carrito" style="cursor:pointer;" onclick="document.getElementById('form-<?= $prod['id_producto'] ?>').submit();"/>
                             </td>
                             <td>
                                 <!-- BOTONES PARA ABRIR LOS MODALES DE ELIMINAR Y MODIFICAR PRODUCTO -->
                                 <button
-                                    onclick="abrirModalModificar(
+                                    onclick="abrirModalModificar
+                                    (
                                         <?= $prod['id_producto'] ?>,
                                         '<?= addslashes($prod['nom_prod']) ?>',
-                                        <?= $prod['precio'] ?>,
+                                        <?= $prod['lote'] ?>,
+                                        <?= $prod['precio_base'] ?>,
                                         <?= $prod['stock'] ?>,
                                         '<?= $prod['fecha_expiracion'] ?>',
-                                        <?= $prod['id_laboratorio'] ?>
+                                        <?= $prod['id_laboratorio'] ?>,
+                                        <?= $prod['porcentaje_g'] ?>,
+                                        '<?= $prod['complemento'] ?>'
                                     )"
                                 >
                                     Modificar
                                 </button>
+
                                 <button onclick="abrirModalEliminar(<?= $prod['id_producto'] ?>)">Eliminar</button>
                             </td>
                         </tr>
@@ -127,24 +133,50 @@ $laboratorios = listarLaboratorios();
                 <span class="cerrar" onclick="cerrarModalModificar()">&times;</span>
                 <h2>Modificar Producto</h2>
                 <form method="POST">
+                    
                     <input type="hidden" id="mod_id_producto" name="id_producto">
 
-                    <label for="mod_nombre">Nombre:</label>
+                    <label for="mod_nombre">
+                        Nombre:
+                    </label>
                     <input type="text" id="mod_nombre" name="nombre" required>
 
-                    <label for="mod_precio">Precio:</label>
-                    <input type="number" step="0.01" id="mod_precio" name="precio" required>
+                    <label for="mod_complemento">Complemento:</label>
+                    <input type="text" id="mod_complemento" name="complemento" required>
 
-                    <label for="mod_stock">Stock:</label>
+                    <label for="mod_lote">
+                        Lote:
+                    </label>
+                    <input type="text" id="mod_lote" name="lote" required>
+
+                    <label for="mod_precio">
+                        Precio Base:
+                    </label>
+                    <input type="number" step="0.01" id="mod_precio" name="precio_base" required>
+
+                    <label for="mod_porcentaje">
+                        Porcentaje Ganancia:
+                    </label>
+                    <input type="number" id="mod_porcentaje" name="porcentaje_g" placeholder="%" step="1">
+
+                    <label for="mod_stock">
+                        Stock:
+                    </label>
                     <input type="number" id="mod_stock" name="stock" required>
 
-                    <label for="mod_fecha_expiracion">Fecha de Expiración:</label>
+                    <label for="mod_fecha_expiracion">
+                        Fecha de Expiración:
+                    </label>
                     <input type="date" id="mod_fecha_expiracion" name="fecha_expiracion" required>
 
-                    <label for="mod_id_laboratorio">Laboratorio:</label>
+                    <label for="mod_id_laboratorio">
+                        Laboratorio:
+                    </label>
                     <select id="mod_id_laboratorio" name="id_laboratorio" required>
                         <?php foreach ($laboratorios as $lab): ?>
-                            <option value="<?= $lab['id_laboratorio'] ?>"><?= htmlspecialchars($lab['nombre']) ?></option>
+                            <option value="<?= $lab['id_laboratorio'] ?>">
+                                <?= htmlspecialchars($lab['nombre']) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
 
@@ -179,27 +211,35 @@ $laboratorios = listarLaboratorios();
                 <span class="cerrar" onclick="cerrarModalAgregar()">&times;</span>
                 <h2>Agregar Nuevo Producto</h2>
                 <form method="POST" action="">
-                    <label>Nombre:</label>
-                    <input type="text" name="nombre" required>
+                <label>Nombre:</label>
+                <input type="text" name="nombre" required>
+                
+                <label>Lote:</label>
+                <input type="number" name="lote" required>
 
-                    <label>Precio:</label>
-                    <input type="number" name="precio" step="0.01" required>
+                <label>Complemento (presentación):</label>
+                <input type="text" name="complemento" required>
 
-                    <label>Stock:</label>
-                    <input type="number" name="stock" required>
+                <label>Precio Base:</label>
+                <input type="number" name="precio_base" step="0.01" required>
 
-                    <label>Fecha de Expiración:</label>
-                    <input type="date" name="fecha_expiracion" required>
+                <label>Porcentaje Ganancia:</label>
+                <input type="number" name="porcentaje_g" step="1" placeholder="%">
 
-                    <label>Laboratorio:</label>
-                    <select name="id_laboratorio" required>
-                        <option value="">Seleccionar laboratorio</option>
-                        <?php
-                        foreach ($laboratorios as $lab) {
-                            echo "<option value=\"{$lab['id_laboratorio']}\">{$lab['nombre']}</option>";
-                        }
-                        ?>
-                    </select>
+                <label>Stock:</label>
+                <input type="number" name="stock" required>
+
+                <label>Fecha de Expiración:</label>
+                <input type="date" name="fecha_expiracion" required>
+
+                <label>Laboratorio:</label>
+                <select name="id_laboratorio" required>
+                    <option value="">Seleccionar laboratorio</option>
+                    <?php foreach ($laboratorios as $lab): ?>
+                        <option value="<?= $lab['id_laboratorio'] ?>"><?= htmlspecialchars($lab['nombre']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+
 
                     <br><br>
                     <button type="submit" name="agregar_nuevo_producto">Agregar Producto</button>
@@ -253,6 +293,10 @@ $laboratorios = listarLaboratorios();
                             <strong>Nombre Producto:</strong>
                             <?= htmlspecialchars($item['nom_prod']) ?>
                         </p>
+                        <p>
+                            <strong>Complemento:</strong>
+                            <?= htmlspecialchars($item['complemento']) ?>
+                        </p>
 
                         <div>
                             <strong>Cantidad:</strong>
@@ -279,7 +323,7 @@ $laboratorios = listarLaboratorios();
         <h3 id="total-venta" style="text-align:right;">
             TOTAL DE VENTA: <?= number_format($totalVenta, 2) ?> Bs
         </h3>
-        <!-- Botones generales -->
+        <!-- Botones generales PARA EL CARRITO-->
         <div style="margin-top: 15px; display: flex; gap: 10px;">
             <form method="POST" style="margin: 0;">
                 <button type="button" id="btn-borrar-todo">Borrar Todo</button>

@@ -12,11 +12,11 @@ function agregarAlCarrito($id_producto, $cantidad = 1) {
     $id_venta = obtenerVentaAbierta();
 
     // Verificar existencia del producto
-    $res = $conn->query("SELECT precio, stock FROM PRODUCTO WHERE id_producto = $id_producto");
+    $res = $conn->query("SELECT precio_base, stock FROM PRODUCTO WHERE id_producto = $id_producto");
     if (!$res || $res->num_rows === 0) return ['error'=>'Producto no encontrado'];
     $producto = $res->fetch_assoc();
 
-    $precio = (float)$producto['precio'];
+    $precio_base = (float)$producto['precio_base'];
     $stock_actual = (int)$producto['stock'];
 
     // Verificar si ya existe en el carrito
@@ -30,7 +30,7 @@ function agregarAlCarrito($id_producto, $cantidad = 1) {
 
         if ($stock_actual < $diferencia) return ['error'=>'Stock insuficiente para la cantidad solicitada'];
 
-        $subtotal = $nueva_cantidad * $precio;
+        $subtotal = $nueva_cantidad * $precio_base;
         $conn->query("UPDATE DETALLEVENTA SET cantidad = $nueva_cantidad, subtotal = $subtotal WHERE id_detalle = " . $detalle['id_detalle']);
 
         // Actualizar stock solo por la diferencia
@@ -39,7 +39,7 @@ function agregarAlCarrito($id_producto, $cantidad = 1) {
     } else {
         if ($stock_actual < $cantidad) return ['error'=>'Stock insuficiente para la cantidad solicitada'];
 
-        $subtotal = $cantidad * $precio;
+        $subtotal = $cantidad * $precio_base;
         $conn->query("INSERT INTO DETALLEVENTA (id_venta, id_producto, cantidad, subtotal) VALUES ($id_venta, $id_producto, $cantidad, $subtotal)");
 
         $nuevo_stock = $stock_actual - $cantidad;
@@ -60,7 +60,7 @@ function obtenerCarrito() {
     global $conn;
     $id_venta = obtenerVentaAbierta();
 
-    $sql = "SELECT d.id_detalle, p.nom_prod,  d.cantidad, d.subtotal
+    $sql = "SELECT d.id_detalle, p.nom_prod,p.complemento, d.cantidad, d.subtotal
             FROM DETALLEVENTA d
             JOIN PRODUCTO p ON d.id_producto = p.id_producto
             WHERE d.id_venta = $id_venta";
@@ -153,7 +153,7 @@ function actualizarCantidad($id_detalle, $cantidad) {
     if ($cantidad < 1) return ['error' => 'Cantidad inválida'];
 
     // Obtener información actual del producto en el detalle
-    $res = $conn->query("SELECT d.id_producto, d.cantidad AS cantidad_actual, p.precio, p.stock 
+    $res = $conn->query("SELECT d.id_producto, d.cantidad AS cantidad_actual, p.precio_base, p.stock 
                          FROM DETALLEVENTA d 
                          JOIN PRODUCTO p ON d.id_producto = p.id_producto 
                          WHERE d.id_detalle = $id_detalle");
@@ -177,7 +177,7 @@ function actualizarCantidad($id_detalle, $cantidad) {
     $nuevo_stock = $stock_actual - $diferencia;
     $conn->query("UPDATE PRODUCTO SET stock = $nuevo_stock WHERE id_producto = $id_producto");
 
-    $subtotal = $cantidad * $fila['precio'];
+    $subtotal = $cantidad * $fila['precio_base'];
     $conn->query("UPDATE DETALLEVENTA SET cantidad = $cantidad, subtotal = $subtotal WHERE id_detalle = $id_detalle");
 
     return ['success' => true];
