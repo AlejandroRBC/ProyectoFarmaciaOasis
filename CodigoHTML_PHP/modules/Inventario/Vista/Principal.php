@@ -328,7 +328,7 @@ $laboratorios = listarLaboratorios();
             <form method="POST" style="margin: 0;">
                 <button type="button" id="btn-borrar-todo">Borrar Todo</button>
             </form>
-            <button type="button" onclick="mostrarModal()">Realizar Compra</button>
+            <button type="button" onclick="mostrarModal()">Realizar Venta</button>
         </div>
         </div>
         <!-- Modal para los datos del cliente -->

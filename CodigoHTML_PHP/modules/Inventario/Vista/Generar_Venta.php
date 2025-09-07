@@ -2,62 +2,60 @@
 session_start();
 require_once '../Controlador/Venta.php';
 
+// Solo cerramos la venta y asociamos el cliente, NO tocamos stock
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = $_POST['nombre_cliente'];
     $ci = $_POST['ci_nit'];
     $metodo_pago = $_POST['metodo_pago'] ?? '';
-    $fecha = date('Y-m-d');// 
-    $hora = date('H:i:s'); // Hora actual al cerrar la venta
+    $fecha = date('Y-m-d');
+    $hora = date('H:i:s');
 
-    // Insertar cliente y obtener su id
+    // Insertar cliente y obtener su ID
     $conn->query("INSERT INTO CLIENTE (nombre, ci_nit, metodo_pago) VALUES ('$nombre', '$ci', '$metodo_pago')");
     $id_cliente = $conn->insert_id;
 
     // Obtener la venta abierta actual
     $venta = obtenerVentaAbierta();
 
-    // Cerrar la venta asociando cliente y hora
-    
+    // Cerrar la venta (solo cambia estado y asocia cliente)
     $conn->query("UPDATE VENTA 
-                        SET id_cliente = $id_cliente, 
-                            estado = 'CERRADA', 
-                            fecha = '$fecha',
-                            hora = '$hora'
-                        WHERE id_venta = $venta");
+                 SET id_cliente = $id_cliente, 
+                     estado = 'CERRADA', 
+                     fecha = '$fecha',
+                     hora = '$hora'
+                 WHERE id_venta = $venta");
 
     // Guardar ID de venta en sesión
     $_SESSION['venta'] = $venta;
 
+    // Redireccionar a la misma página o a un PDF/recibo
     header("Location: generar_venta.php");
     exit();
 }
 
-// Obtener el ID de la venta y asegurarnos que sea entero
+// Obtener el ID de la venta cerrada para mostrarla
 $id_venta = intval($_SESSION['venta']);
 
-if (!$conn) {
-    die("Error de conexión a la base de datos.");
-}
+// Validar conexión
+if (!$conn) die("Error de conexión a la base de datos.");
 
-// Obtener datos de la venta y cliente, incluyendo método de pago desde CLIENTE
+// Datos de la venta y cliente
 $sql = "SELECT V.id_venta, V.fecha, V.hora, C.nombre, C.ci_nit, C.metodo_pago
         FROM VENTA V 
         INNER JOIN CLIENTE C ON V.id_cliente = C.id_cliente 
         WHERE V.id_venta = $id_venta";
 
 $res = $conn->query($sql);
-if (!$res || $res->num_rows === 0) {
-    die("Venta no encontrada.");
-}
+if (!$res || $res->num_rows === 0) die("Venta no encontrada.");
 $venta = $res->fetch_assoc();
 
 // Obtener detalles de productos de la venta
 $sql_detalles = "
     SELECT P.nom_prod AS producto,
-        P.complemento,
-        DV.cantidad,
-        (DV.subtotal / DV.cantidad) AS precio_unitario, 
-        DV.subtotal
+           P.complemento,
+           DV.cantidad,
+           (DV.subtotal / DV.cantidad) AS precio_unitario, 
+           DV.subtotal
     FROM DETALLEVENTA DV
     JOIN PRODUCTO P ON DV.id_producto = P.id_producto
     WHERE DV.id_venta = $id_venta
@@ -70,6 +68,7 @@ $datosProductos = [];
 while ($row = $detalles->fetch_assoc()) {
     $datosProductos[] = $row;
 }
+
 
 // --- GENERAR PDF ---
 require_once '../tcpdf/tcpdf.php';

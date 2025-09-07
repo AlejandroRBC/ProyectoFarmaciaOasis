@@ -50,6 +50,7 @@ if (carrito.length === 0) {
     html += `
         <div class="carrito-item">
         <p><strong>Nombre Producto:</strong> ${item.nom_prod}</p>
+        <p><strong>Complemento:</strong> ${item.complemento}</p>
         <div>
             <strong>Cantidad:</strong>
             <span>${item.cantidad}</span>
