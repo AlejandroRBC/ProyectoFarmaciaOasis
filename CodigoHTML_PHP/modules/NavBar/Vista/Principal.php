@@ -22,6 +22,7 @@
         <a href="../../Inventario/Vista/principal.php"><i>Inventario</i></a>
         <a href="../../Historial/Vista/principal.php"><i>Historial Ventas</i></a>
         <a href="../../Historial_Productos/Vista/principal.php"><i>Historial Producto</i></a>
+        <a href="../../Generar_Reportes/Vista/principal.php"><i>Generar Reportes</i></a>
     </div>
 </div>
 <script src="javaScript/script.js"></script> </body>

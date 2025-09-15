@@ -66,11 +66,13 @@ $laboratorios = listarLaboratorios();
                 <thead>
                     <tr>
                         <th>CÓDIGO</th>
-                            <th>LOTE</th>
+                        <th>X</th>
+                        <th>LOTE</th>
                         <th>NOMBRE</th>
+                        <th>Y</th>
                         <th>Complemento</th>
-                            <th>PRECIO BASE</th>
-                            <th>PRECIO VENTA</th>
+                        <th>PRECIO BASE</th>
+                        <th>PRECIO VENTA</th>
                         <th>STOCK</th>
                         <th>Fecha Exp.</th>
                         <th>LABORATORIO</th>
@@ -82,8 +84,10 @@ $laboratorios = listarLaboratorios();
                     <?php foreach ($productos as $prod): ?>
                         <tr>
                             <td><?= htmlspecialchars($prod['id_producto']) ?></td>
+                            <td></td>
                             <td><?= htmlspecialchars($prod['lote']) ?></td>
                             <td><?= htmlspecialchars($prod['nom_prod']) ?></td>
+                            <td></td>
                             <td><?= htmlspecialchars($prod['complemento']) ?></td>
                             <td><?= htmlspecialchars($prod['precio_base']) ?> Bs</td>
                             <td><?= htmlspecialchars($prod['precio_venta']) ?> Bs</td>
