@@ -1,7 +1,7 @@
 <?php
 require_once '../../../config/conexion.php';
 
-function obtenerHistorialProducto($periodo = 'semana') {
+function reporteProducto($periodo = 'semana') {
     global $conn;
 
     if ($periodo == 'semana') {

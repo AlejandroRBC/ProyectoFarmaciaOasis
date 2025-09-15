@@ -2,7 +2,7 @@
 require_once 'historial_producto.php';
 
 $periodo = $_GET['periodo'] ?? 'semana';
-$datos = obtenerHistorialProducto($periodo);
+$datos = reporteProducto($periodo);
 
 if(count($datos) > 0){
     // Título del reporte

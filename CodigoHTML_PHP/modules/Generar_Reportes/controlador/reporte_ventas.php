@@ -2,18 +2,11 @@
 require_once 'historial_venta.php';
 
 $periodo = $_GET['periodo'] ?? 'semana';
+$datos = reporteVenta($periodo);
 
-global $conn;
+$totalGanado = 0;
 
 if ($periodo == 'semana') {
-    // Ventas de la semana (una por una)
-    $sql = "SELECT * 
-            FROM HISTORIAL_VENTA 
-            WHERE YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1) 
-            ORDER BY fecha DESC, id_historial DESC";
-    $result = $conn->query($sql);
-
-    $totalGanado = 0;
     echo "<h2>Reporte Semanal</h2>";
     echo "<table border='1' cellpadding='5' cellspacing='0'>";
     echo "<tr>
@@ -26,7 +19,8 @@ if ($periodo == 'semana') {
             <th>Productos</th>
             <th>Total</th>
         </tr>";
-    while ($fila = $result->fetch_assoc()) {
+
+    foreach ($datos as $fila) {
         echo "<tr>";
         echo "<td>{$fila['id_historial']}</td>";
         echo "<td>{$fila['fecha']}</td>";
@@ -39,19 +33,11 @@ if ($periodo == 'semana') {
         echo "</tr>";
         $totalGanado += $fila['total'];
     }
+
     echo "</table>";
     echo "<p><b>Total Ganado en la Semana:</b> $totalGanado</p>";
 
 } elseif ($periodo == 'mes') {
-    // Ventas del mes (una por una)
-    $sql = "SELECT * 
-            FROM HISTORIAL_VENTA 
-            WHERE YEAR(fecha) = YEAR(CURDATE()) 
-              AND MONTH(fecha) = MONTH(CURDATE())
-            ORDER BY fecha DESC, id_historial DESC";
-    $result = $conn->query($sql);
-
-    $totalGanado = 0;
     echo "<h2>Reporte Mensual</h2>";
     echo "<table border='1' cellpadding='5' cellspacing='0'>";
     echo "<tr>
@@ -64,7 +50,8 @@ if ($periodo == 'semana') {
             <th>Productos</th>
             <th>Total</th>
         </tr>";
-    while ($fila = $result->fetch_assoc()) {
+
+    foreach ($datos as $fila) {
         echo "<tr>";
         echo "<td>{$fila['id_historial']}</td>";
         echo "<td>{$fila['fecha']}</td>";
@@ -77,32 +64,37 @@ if ($periodo == 'semana') {
         echo "</tr>";
         $totalGanado += $fila['total'];
     }
+
     echo "</table>";
     echo "<p><b>Total Ganado en el Mes:</b> $totalGanado</p>";
 
 } elseif ($periodo == 'anio') {
-    // Agrupado por mes
-    $sql = "SELECT MONTH(fecha) AS mes, SUM(total) AS total_mes 
-            FROM HISTORIAL_VENTA 
-            WHERE YEAR(fecha) = YEAR(CURDATE())
-            GROUP BY MONTH(fecha)
-            ORDER BY MONTH(fecha)";
-    $result = $conn->query($sql);
-
-    $totalGanado = 0;
     echo "<h2>Reporte Anual</h2>";
     echo "<table border='1' cellpadding='5' cellspacing='0'>";
     echo "<tr><th>Mes</th><th>Total del Mes</th></tr>";
-    while ($fila = $result->fetch_assoc()) {
-        echo "<tr>";
-        echo "<td>{$fila['mes']}</td>";
-        echo "<td>{$fila['total_mes']}</td>";
-        echo "</tr>";
-        $totalGanado += $fila['total_mes'];
+
+    // Agrupar por mes con PHP
+    $totalesPorMes = [];
+    foreach ($datos as $fila) {
+        $mes = date('m', strtotime($fila['fecha']));
+        if (!isset($totalesPorMes[$mes])) {
+            $totalesPorMes[$mes] = 0;
+        }
+        $totalesPorMes[$mes] += $fila['total'];
     }
+
+    ksort($totalesPorMes); // ordenar por número de mes
+    foreach ($totalesPorMes as $mes => $totalMes) {
+        echo "<tr>";
+        echo "<td>$mes</td>";
+        echo "<td>$totalMes</td>";
+        echo "</tr>";
+        $totalGanado += $totalMes;
+    }
+
     echo "</table>";
     echo "<p><b>Total Ganado en el Año:</b> $totalGanado</p>";
 }
-echo '<button id="cerrarVentas">Cerrar</button>';
 
+echo '<button id="cerrarVentas">Cerrar</button>';
 ?>

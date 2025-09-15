@@ -2,7 +2,7 @@
 require_once '../../../config/conexion.php';
 
 // Función para obtener el historial de facturas cerradas
-function obtenerHistorialVenta($periodo = 'semana') {
+function reporteVenta($periodo = 'semana') {
     global $conn;
 
     $where = '';

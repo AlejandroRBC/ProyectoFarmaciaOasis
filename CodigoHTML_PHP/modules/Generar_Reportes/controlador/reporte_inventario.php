@@ -1,6 +1,6 @@
 <?php
 require_once 'historial_inventario.php'; 
-$datos = obtenerInventarioActual();
+$datos = InventarioActual();
 
 if(count($datos) > 0){
     echo "<table border='1' cellpadding='5' cellspacing='0'>";

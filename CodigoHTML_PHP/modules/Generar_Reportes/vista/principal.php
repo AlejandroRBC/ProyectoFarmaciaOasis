@@ -5,9 +5,8 @@ require_once '../controlador/historial_inventario.php';
 
 $periodo = $_GET['periodo'] ?? 'semana'; // Recibe semana, mes, año
 
-$ventas = obtenerHistorialVenta($periodo);
-$productos = obtenerHistorialProducto($periodo);
-
+$ventas = reporteVenta($periodo);
+$productos = reporteProducto($periodo);
 // Calcular total ganado
 $totalGanado = 0;
 foreach ($ventas as $v) {
