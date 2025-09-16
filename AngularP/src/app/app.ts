@@ -10,7 +10,7 @@ import { DetalleVenta } from './detalle-venta/detalle-venta';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Inventario, DetalleVenta],
+  imports: [RouterOutlet, Inventario, DetalleVenta, HistorialProduto, HistorialVentas, Inicio, Navbar],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
