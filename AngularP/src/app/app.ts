@@ -1,12 +1,15 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Inventario } from './inventario/inventario';
+import { DetalleVenta } from './detalle-venta/detalle-venta';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, Inventario, DetalleVenta],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
-  protected readonly title = signal('LaravelP');
+  protected readonly title = signal('AngularP');
 }
