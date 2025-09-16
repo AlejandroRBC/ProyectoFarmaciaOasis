@@ -77,6 +77,20 @@ function cerrarModal() {
     document.getElementById('modalCompra').classList.remove('abierto')
 }
 
+function VentaRapida() {
+    let totalVentaElem = document.getElementById('total-venta');
+    let total = parseFloat(totalVentaElem.textContent.replace(/[^\d.-]/g, ''));
+    if (total > 0) {
+        document.getElementById('modalVentaRapida').classList.add('abierto');
+    } else {
+        alert('El carrito está vacío. No se puede realizar la compra.');
+    }
+}
+
+function cerrarVentaRapida() {
+    document.getElementById('modalVentaRapida').classList.remove('abierto')
+}
+
 
 
 // SCRIPT PARA CIERRE FUERA DE LOS MODALES

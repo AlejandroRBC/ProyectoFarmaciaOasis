@@ -334,6 +334,8 @@ $laboratorios = listarLaboratorios();
             </form>
             <button type="button" onclick="mostrarModal()">Realizar Venta</button>
         </div>
+        <div style="margin-top: 8px; display: flex; gap: 10px;">
+            <button type="button" onclick="VentaRapida()">Venta Rapida</button>
         </div>
         <!-- Modal para los datos del cliente -->
         <div id="modalCompra" class="modal">
@@ -351,6 +353,21 @@ $laboratorios = listarLaboratorios();
                 </select>
                 <br><br>
 
+                <button type="submit">Generar Venta</button>
+            </form>
+        </div>
+        <!-- Modal para Venta Rapida-->
+        <div id="modalVentaRapida" class="modal">
+            <form method="POST" action="generar_venta.php" class="modal-contenido">
+                <span onclick="cerrarVentaRapida()" class="cerrar" title="Cerrar">&times;</span>
+                <select name="metodo_pago" id="metodo_pago" required>
+                    <h2>Venta Rapida </h2>
+                    <option value="" disabled selected>Metodo de Pago</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="qr">QR</option>
+                    <option value="mixto">Mixto</option>
+                </select>
+                <br><br>
                 <button type="submit">Generar Venta</button>
             </form>
         </div>

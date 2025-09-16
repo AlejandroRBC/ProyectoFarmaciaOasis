@@ -7,6 +7,7 @@ $periodo = $_GET['periodo'] ?? 'semana'; // Recibe semana, mes, año
 
 $ventas = reporteVenta($periodo);
 $productos = reporteProducto($periodo);
+
 // Calcular total ganado
 $totalGanado = 0;
 foreach ($ventas as $v) {
