@@ -1,29 +1,32 @@
 .navbar {
+    
+    background: linear-gradient(135deg, #04BFAD, #035AA6);
+    box-shadow: 0 8px 30px rgba(3, 76, 140, 0.25);
+    backdrop-filter: blur(12px);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
     background-color: #f8f9fa;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-decoration: none;
+
 }
 
 .navbar-logo {
     font-weight: bold;
     font-size: 1.5rem;
     text-decoration: none;
-    color: #333;
+    color: white;
 }
 
-.navbar-toggle {
+.navbar-palanca {
     cursor: pointer;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    color: white;
 }
 
-.navbar-toggle:hover {
-    background-color: #e9ecef;
-}
 
 .overlay-menu {
     position: fixed;
@@ -49,7 +52,8 @@
     right: 0;
     width: 300px;
     height: 100%;
-    background-color: white;
+    
+    background: linear-gradient(135deg, #035aa6, #04bfaced);
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     transform: translateX(100%);
     transition: transform 0.3s ease;
@@ -61,7 +65,7 @@
     transform: translateX(0);
 }
 
-.close-btn {
+.cerrar-btn {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -72,6 +76,7 @@
 }
 
 .menu-items {
+    
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -79,13 +84,15 @@
 }
 
 .menu-items a {
+    font-size: x-large;
     text-decoration: none;
-    color: #333;
+    color: white;
     padding: 0.5rem;
     border-radius: 4px;
     transition: background-color 0.3s;
 }
 
 .menu-items a:hover {
-    background-color: #f0f0f0;
+    
+    background-color: #f0f0f070;
 }

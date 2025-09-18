@@ -1,16 +1,17 @@
 <nav class="navbar">
+    
+    
     <a href="#" class="navbar-logo">
-        <!-- Aquí puedes agregar tu logo -->
-        <span>LogoFarmacia</span>
+        <span>Farmacia Oasis</span>
     </a>
-    <div class="navbar-toggle" (click)="toggleMenu()">
-        <span>Menú</span>
+    <div class="navbar-palanca" (click)="switchMenu()">
+        <span>☰</span>
     </div>
 </nav>
 
-<div class="overlay-menu" [class.active]="isMenuOpen" (click)="closeMenu()">
+<div class="overlay-menu" [class.active]="esMenuAbierto" (click)="cerrarMenu()">
     <div class="sidebar" (click)="$event.stopPropagation()">
-        <button class="close-btn" (click)="closeMenu()">&times;</button> 
+        <button class="cerrar-btn" (click)="cerrarMenu()">&times;</button> 
         <div class="menu-items">
             <a href="#"><i>Inicio</i></a>
             <a href="#"><i>Inventario</i></a>

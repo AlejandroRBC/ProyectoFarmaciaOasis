@@ -7,13 +7,12 @@ import { Component } from '@angular/core';
   styleUrl: './navbar.css'
 })
 export class Navbar {
-  isMenuOpen = false;
-
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
+  esMenuAbierto = false;
+  switchMenu() {
+    this.esMenuAbierto = !this.esMenuAbierto;
   }
 
-  closeMenu() {
-    this.isMenuOpen = false;
+  cerrarMenu() {
+    this.esMenuAbierto = false;
   }
 }
