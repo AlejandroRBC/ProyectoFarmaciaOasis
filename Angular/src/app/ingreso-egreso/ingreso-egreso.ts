@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-ingreso-egreso',
-  standalone: true,
   imports: [],
   templateUrl: './ingreso-egreso.html',
   styleUrl: './ingreso-egreso.css'

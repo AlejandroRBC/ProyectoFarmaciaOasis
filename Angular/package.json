@@ -1,5 +1,5 @@
 {
-  "name": "laravel-p",
+  "name": "angular",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:LaravelP": "node dist/LaravelP/server/server.mjs"
+    "serve:ssr:Angular": "node dist/Angular/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,

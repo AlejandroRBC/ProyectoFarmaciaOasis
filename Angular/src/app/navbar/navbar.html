@@ -1,0 +1,22 @@
+<nav class="navbar">
+    <a href="#" class="navbar-logo">
+        <!-- Aquí puedes agregar tu logo -->
+        <span>LogoFarmacia</span>
+    </a>
+    <div class="navbar-toggle" (click)="toggleMenu()">
+        <span>Menú</span>
+    </div>
+</nav>
+
+<div class="overlay-menu" [class.active]="isMenuOpen" (click)="closeMenu()">
+    <div class="sidebar" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeMenu()">&times;</button> 
+        <div class="menu-items">
+            <a href="#"><i>Inicio</i></a>
+            <a href="#"><i>Inventario</i></a>
+            <a href="#"><i>Historial Ventas</i></a>
+            <a href="#"><i>Historial Producto</i></a>
+            <a href="#"><i>Generar Reportes</i></a>
+        </div>
+    </div>
+</div>
