@@ -98,7 +98,7 @@ body {
     z-index: 1000;
     top: 0;
     right: 0;
-    background: linear-gradient(135deg, #035aa6, #04bfaced);
+    background: linear-gradient(135deg, #035aa67a, #04bfac84);
     overflow-x: hidden; 
     transition: 0.5s; 
     display: flex; 
