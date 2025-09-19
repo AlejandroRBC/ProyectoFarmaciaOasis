@@ -57,7 +57,9 @@ $laboratorios = listarLaboratorios();
 
        <!-- Buscador con autocompletado -->
         <div class="busqueda-container">
-            <input type="text" placeholder="¿Qué estás buscando?" class="busqueda" id="busqueda" autocomplete="off" />
+            <input type="text" 
+            placeholder="¿Qué estás buscando?" 
+            class="busqueda" id="busqueda" autocomplete="off" />
             <img src="img/lupa.png" alt="Buscar" class="icono" title="Buscar" style="cursor:pointer;" id="btnBuscar" />
         </div>
         <!-- Tabla de productos -->
