@@ -25,7 +25,12 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/assets/css/selects.css",
+              "src/assets/css/logos.css",
+              "src/assets/css/botones.css",
+              "src/assets/css/titulos.css",
+              "src/assets/css/tablas.css"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
