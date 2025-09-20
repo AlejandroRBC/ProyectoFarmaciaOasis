@@ -2,15 +2,18 @@
 /* ----------------------------------------------------
 TABLA DE INVENTARIO
 ----------------------------------------------------- */
+.containerTabla{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 table {
-    width: 95%;
-    margin: 0 auto 50px;
-    border-collapse: separate;
+    border-radius: 30px;
+    
+    width: max-content;
     border-spacing: 0;
     text-align: center;
     color: #034C8C;
-    background-color: #fff;
-    border-radius: 20px;
     box-shadow: 0 8px 30px rgba(3, 76, 140, 0.1);
     overflow: hidden;
     overflow-x: scroll;
@@ -21,7 +24,6 @@ table {
 table:hover {
     box-shadow: 0 10px 45px rgba(3, 76, 140, 0.2);
 }
-
 /* Encabezado de tabla */
 thead {
     background: linear-gradient(135deg, #04BFAD, #035AA6);
@@ -30,11 +32,9 @@ thead {
     font-size: 1rem;
     user-select: none;
 }
-
 /* Celdas de tabla */
 th, td {
     padding: 16px 20px;
-    border-bottom: 1px solid #ABB4B2;
     font-weight: 500;
     border-color: #ABB4B2;
     transition: background-color 0.3s ease;

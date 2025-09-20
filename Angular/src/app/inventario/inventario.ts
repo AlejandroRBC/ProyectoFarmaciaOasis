@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-inventario',
   imports: [],
   templateUrl: './inventario.html',
-  styleUrl: './inventario.css'
+  styleUrl: './inventario.scss'
 })
 export class Inventario {
 

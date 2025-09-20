@@ -2,6 +2,11 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "newProjectRoot": "projects",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
   "projects": {
     "Angular": {
       "projectType": "application",
@@ -25,12 +30,12 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "src/assets/css/selects.css",
-              "src/assets/css/logos.css",
-              "src/assets/css/botones.css",
-              "src/assets/css/titulos.css",
-              "src/assets/css/tablas.css"
+              "src/styles.scss",
+              "src/assets/css/selects.scss",
+              "src/assets/css/logos.scss",
+              "src/assets/css/botones.scss",
+              "src/assets/css/titulos.scss",
+              "src/assets/css/tablas.scss"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -92,7 +97,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ]
           }
         }

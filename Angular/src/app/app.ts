@@ -11,7 +11,7 @@ import { Inventario } from "./inventario/inventario";
   selector: 'app-root',
   imports: [RouterOutlet, Navbar, DetalleVenta, Inicio, HistorialVenta, IngresoEgreso, Inventario],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.scss'
 })
 export class App {
   protected readonly title = signal('Angular');

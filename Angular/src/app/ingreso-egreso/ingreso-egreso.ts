@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-ingreso-egreso',
   imports: [],
   templateUrl: './ingreso-egreso.html',
-  styleUrl: './ingreso-egreso.css'
+  styleUrl: './ingreso-egreso.scss'
 })
 export class IngresoEgreso {
 
