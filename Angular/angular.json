@@ -30,6 +30,13 @@
               }
             ],
             "styles": [
+              
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeflex/primeflex.css",
+              
+              "node_modules/primeicons/primeicons.css",
+
+
               "src/styles.scss",
               "src/assets/css/selects.scss",
               "src/assets/css/logos.scss",
