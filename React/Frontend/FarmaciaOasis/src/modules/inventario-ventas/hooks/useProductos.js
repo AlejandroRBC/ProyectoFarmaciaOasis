@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 
+// Datos de ejemplo
 const productosMock = [
   {
     id: 1,
@@ -40,31 +41,23 @@ export const useProductos = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Simular carga de datos
     setLoading(true);
     setTimeout(() => {
       setProductos(productosMock);
       setLaboratorios(laboratoriosMock);
       setLoading(false);
-    }, 1000);
+    },500);
   }, []);
 
   const agregarProducto = (nuevoProducto) => {
-    const id = Math.max(...productos.map(p => p.id), 0) + 1;
-    const productoConPrecio = {
-      ...nuevoProducto,
-      id,
-      precio_venta: nuevoProducto.precio_base * (1 + nuevoProducto.porcentaje_g / 100)
-    };
-    setProductos(prev => [...prev, productoConPrecio]);
+    const id = Math.max(...productos.map(p => p.id)) + 1;
+    setProductos(prev => [...prev, { ...nuevoProducto, id }]);
   };
 
   const actualizarProducto = (id, datosActualizados) => {
     setProductos(prev => prev.map(p => 
-      p.id === id ? { 
-        ...p, 
-        ...datosActualizados,
-        precio_venta: datosActualizados.precio_base * (1 + datosActualizados.porcentaje_g / 100)
-      } : p
+      p.id === id ? { ...p, ...datosActualizados } : p
     ));
   };
 
@@ -73,7 +66,7 @@ export const useProductos = () => {
   };
 
   const agregarLaboratorio = (nuevoLab) => {
-    const id = Math.max(...laboratorios.map(l => l.id), 0) + 1;
+    const id = Math.max(...laboratorios.map(l => l.id)) + 1;
     setLaboratorios(prev => [...prev, { ...nuevoLab, id }]);
   };
 
