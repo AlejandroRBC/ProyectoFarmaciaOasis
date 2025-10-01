@@ -1,6 +1,7 @@
 
 import './App.css'
-import UserList from "./components/UserList";
+// import UserList from "./components/UserList";
+import Inventario from "./modules/inventario-ventas/Inventario";
 
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
   return (
     <div style={{ padding: "20px" }}>
         <h1>Farmacia Oasis</h1>
-        <UserList />
+        <Inventario/>
       </div>
 
   )

@@ -1,0 +1,89 @@
+import { useState, useEffect } from 'react';
+
+const productosMock = [
+  {
+    id: 1,
+    codigo: '1',
+    lote: '12345',
+    nombre: 'Ibuprofeno',
+    complemento: 'Tabletas',
+    precio_base: 10,
+    precio_venta: 15,
+    stock: 50,
+    fecha_expiracion: '2025-12-31',
+    laboratorio: 'Lab Farma',
+    porcentaje_g: 50
+  },
+  {
+    id: 2,
+    codigo: '2',
+    lote: '67890',
+    nombre: 'Paracetamol',
+    complemento: 'Jarabe',
+    precio_base: 8,
+    precio_venta: 12,
+    stock: 30,
+    fecha_expiracion: '2025-08-20',
+    laboratorio: 'Lab Salud',
+    porcentaje_g: 50
+  }
+];
+
+const laboratoriosMock = [
+  { id: 1, nombre: 'Lab Farma', direccion: 'Av. Principal 123' },
+  { id: 2, nombre: 'Lab Salud', direccion: 'Calle Secundaria 456' }
+];
+
+export const useProductos = () => {
+  const [productos, setProductos] = useState([]);
+  const [laboratorios, setLaboratorios] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setProductos(productosMock);
+      setLaboratorios(laboratoriosMock);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  const agregarProducto = (nuevoProducto) => {
+    const id = Math.max(...productos.map(p => p.id), 0) + 1;
+    const productoConPrecio = {
+      ...nuevoProducto,
+      id,
+      precio_venta: nuevoProducto.precio_base * (1 + nuevoProducto.porcentaje_g / 100)
+    };
+    setProductos(prev => [...prev, productoConPrecio]);
+  };
+
+  const actualizarProducto = (id, datosActualizados) => {
+    setProductos(prev => prev.map(p => 
+      p.id === id ? { 
+        ...p, 
+        ...datosActualizados,
+        precio_venta: datosActualizados.precio_base * (1 + datosActualizados.porcentaje_g / 100)
+      } : p
+    ));
+  };
+
+  const eliminarProducto = (id) => {
+    setProductos(prev => prev.filter(p => p.id !== id));
+  };
+
+  const agregarLaboratorio = (nuevoLab) => {
+    const id = Math.max(...laboratorios.map(l => l.id), 0) + 1;
+    setLaboratorios(prev => [...prev, { ...nuevoLab, id }]);
+  };
+
+  return {
+    productos,
+    laboratorios,
+    loading,
+    agregarProducto,
+    actualizarProducto,
+    eliminarProducto,
+    agregarLaboratorio
+  };
+};
