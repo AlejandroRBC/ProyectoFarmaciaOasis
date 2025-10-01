@@ -1,0 +1,17 @@
+.layout {
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+  
+  .main-content {
+    margin-top: 70px; /* Altura del navbar */
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+  }
+  
+  @media (max-width: 768px) {
+    .main-content {
+      margin-top: 60px;
+      padding: 15px;
+    }
+  }
