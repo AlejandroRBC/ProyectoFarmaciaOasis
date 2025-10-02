@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './modules/layout/Layout';
+import Layout from './modules/navbar/Navbar';
 import Dashboard from './modules/dashboard/Dashboard';
 import Inventario from './modules/inventario-ventas/Inventario';
 import HistorialVentas from './modules/historial-ventas/Historial-ventas';
 
-// Páginas placeholder (puedes crearlas después)
+
 const HistorialProducto = () => <div>Historial Producto - En construcción</div>;
 const Reportes = () => <div>Generar Reportes - En construcción</div>;
 

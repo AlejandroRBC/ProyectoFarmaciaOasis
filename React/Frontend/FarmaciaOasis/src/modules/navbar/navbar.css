@@ -205,6 +205,24 @@
     color: #bdc3c7;
     font-size: 12px;
   }
+
+  .layout {
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+  
+  .main-content {
+    margin-top: 70px;
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+  }
+  
+  @media (max-width: 768px) {
+    .main-content {
+      margin-top: 60px;
+      padding: 15px;
+    }
+  }
   
   /* Responsive */
   @media (max-width: 480px) {
