@@ -3,10 +3,8 @@ import Layout from './modules/navbar/Navbar';
 import Dashboard from './modules/dashboard/Dashboard';
 import Inventario from './modules/inventario-ventas/Inventario';
 import HistorialVentas from './modules/historial-ventas/Historial-ventas';
+import IngresosEgresos from './modules/ingresos-egresos/Ingresos-Egresos';
 
-
-const HistorialProducto = () => <div>Historial Producto - En construcción</div>;
-const Reportes = () => <div>Generar Reportes - En construcción</div>;
 
 function App() {
   return (
@@ -16,8 +14,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/inventario" element={<Inventario />} />
           <Route path="/historial-ventas" element={<HistorialVentas />} />
-          <Route path="/historial-producto" element={<HistorialProducto />} />
-          <Route path="/reportes" element={<Reportes />} />
+          <Route path="/ingresos-egresos" element={<IngresosEgresos />} />
         </Routes>
       </Layout>
     </Router>

@@ -8,8 +8,7 @@ function Sidebar({ onClose }) {
     { path: '/', label: 'Inicio', icon: '🏠' },
     { path: '/inventario', label: 'Inventario', icon: '📦' },
     { path: '/historial-ventas', label: 'Historial Ventas', icon: '📊' },
-    { path: '/historial-producto', label: 'Historial Producto', icon: '📋' },
-    { path: '/reportes', label: 'Generar Reportes', icon: '📄' }
+    { path: '/ingresos-egresos', label: 'Ingresos y egresos', icon: '📋' }
   ];
 
   const handleNavigation = (path) => {
@@ -44,14 +43,7 @@ function Sidebar({ onClose }) {
         ))}
       </div>
 
-      {/* Información de usuario (opcional) */}
-      <div className="user-info">
-        <div className="user-avatar">👤</div>
-        <div className="user-details">
-          <span className="user-name">Usuario Farmacia</span>
-          <span className="user-role">Administrador</span>
-        </div>
-      </div>
+      
     </div>
   );
 }
