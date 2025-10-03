@@ -22,13 +22,29 @@
 
   "dependencies": {
 
+    "@emotion/react": "^11.14.0",
+
+    "@mantine/core": "^8.3.3",
+
+    "@mantine/form": "^8.3.3",
+
+    "@mantine/hooks": "^8.3.3",
+
+    "@tabler/icons-react": "^3.35.0",
+
     "axios": "^1.12.2",
+
+    "dayjs": "^1.11.18",
 
     "react": "^19.1.1",
 
     "react-dom": "^19.1.1",
 
-    "react-router-dom": "^7.9.3"
+    "react-intl": "^7.1.11",
+
+    "react-router-dom": "^7.9.3",
+
+    "recharts": "^3.2.1"
 
   },
 

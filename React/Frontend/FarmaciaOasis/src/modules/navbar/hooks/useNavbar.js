@@ -1,17 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export const useNavbar = () => {
   const [esMenuAbierto, setEsMenuAbierto] = useState(false);
 
   const abrirMenu = () => {
     setEsMenuAbierto(true);
-    // Bloquear scroll del body cuando el menú está abierto
     document.body.style.overflow = 'hidden';
   };
 
   const cerrarMenu = () => {
     setEsMenuAbierto(false);
-    // Restaurar scroll del body
     document.body.style.overflow = 'unset';
   };
 
@@ -22,6 +20,22 @@ export const useNavbar = () => {
       abrirMenu();
     }
   };
+
+  // Cerrar menú al cambiar de ruta
+  useEffect(() => {
+    // También cerrar con la tecla Escape
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        cerrarMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   return {
     esMenuAbierto,
