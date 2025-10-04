@@ -1,6 +1,7 @@
-// components/TopProductos.jsx
+// components/TopProductos.jsx - VERSIÓN CON CLASES CSS PERSONALIZADAS
 import { Paper, Title, Table, Badge, Text, Group, ThemeIcon, Progress, Stack, ScrollArea, Box } from '@mantine/core';
 import { IconCrown, IconStar, IconTrendingUp, IconAward } from '@tabler/icons-react';
+import '../dashboard.css';  // ✅ CSS separado
 
 function TopProductos({ productos }) {
   // MOSTRAR TODOS los productos, no hacer slice
@@ -32,28 +33,24 @@ function TopProductos({ productos }) {
     return icons[index] || icons.default;
   };
 
+  const getProgressColor = (index) => {
+    if (index === 0) return 'yellow';
+    if (index === 1) return 'gray';
+    if (index === 2) return 'orange';
+    return 'blue';
+  };
+
   const rows = todosProductos.map((producto, index) => {
     const positionColors = getPositionColor(index);
     const porcentaje = (producto.ventas / maxVentas) * 100;
+    const progressColor = getProgressColor(index);
     
     return (
       <Table.Tr 
         key={producto.nombre} 
-        style={{ 
-          borderBottom: '1px solid #f8f9fa',
-          transition: 'all 0.2s ease',
-          height: '65px' // Altura fija más compacta
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#f8f9fa';
-          e.currentTarget.style.transform = 'translateX(4px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-          e.currentTarget.style.transform = 'translateX(0)';
-        }}
+        className="mantine-Table-tr" // ✅ Usando tus clases CSS
       >
-        <Table.Td>
+        <Table.Td className="mantine-Table-td">
           <Badge 
             size="md"
             variant="gradient"
@@ -63,18 +60,12 @@ function TopProductos({ productos }) {
               deg: 135 
             }}
             leftSection={getPositionIcon(index)}
-            style={{
-              minWidth: '45px',
-              justifyContent: 'center',
-              fontWeight: 800,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            }}
           >
             #{index + 1}
           </Badge>
         </Table.Td>
         
-        <Table.Td>
+        <Table.Td className="mantine-Table-td">
           <Stack gap={2}>
             <Text fw={700} size="sm" c="dark.8" lineClamp={1}>
               {producto.nombre}
@@ -83,14 +74,13 @@ function TopProductos({ productos }) {
               size="xs" 
               variant="light" 
               color="gray"
-              style={{ width: 'fit-content' }}
             >
               {producto.categoria}
             </Badge>
           </Stack>
         </Table.Td>
         
-        <Table.Td>
+        <Table.Td className="mantine-Table-td">
           <Stack gap="xs" w="100%">
             <Group justify="space-between" gap="xs">
               <Group gap={4}>
@@ -108,16 +98,9 @@ function TopProductos({ productos }) {
             
             <Progress 
               value={porcentaje} 
-              color={
-                index === 0 ? 'yellow' : 
-                index === 1 ? 'gray' : 
-                index === 2 ? 'orange' : 'blue'
-              }
+              color={progressColor}
               size="sm"
               radius="xl"
-              style={{
-                boxShadow: '0 1px 4px rgba(0,0,0,0.1)'
-              }}
             />
           </Stack>
         </Table.Td>
@@ -131,17 +114,10 @@ function TopProductos({ productos }) {
       withBorder 
       radius="lg" 
       shadow="md"
-      style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-        border: '1px solid #e9ecef',
-        height: '500px', // Altura más compacta
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}
+      className="top-productos-container"
     >
       {/* Header compacto */}
-      <Box style={{ flexShrink: 0 }}>
+      <Box className="top-productos-header">
         <Group justify="space-between" align="flex-start" mb="md">
           <Group gap="sm">
             <ThemeIcon 
@@ -152,14 +128,10 @@ function TopProductos({ productos }) {
               <IconCrown size={18} />
             </ThemeIcon>
             <div>
-              <Title order={3} c="dark.8" style={{ 
-                fontFamily: 'system-ui',
-                fontWeight: 800,
-                fontSize: '1.1rem'
-              }}>
+              <Title order={3} c="dark.8" className="top-productos-title">
                 Top Productos
               </Title>
-              <Text size="xs" c="dimmed" style={{ fontWeight: 500 }}>
+              <Text size="xs" c="dimmed" className="top-productos-subtitle">
                 {totalProductos} productos en ranking
               </Text>
             </div>
@@ -175,63 +147,39 @@ function TopProductos({ productos }) {
         </Group>
       </Box>
 
-      {/* Tabla con scroll - MOSTRANDO TODOS LOS PRODUCTOS */}
-      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      {/* Tabla con scroll */}
+      <Box className="top-productos-content" style={{ height: '400px' }}>
         <ScrollArea 
-          style={{ 
-            flex: 1,
-            minHeight: 0
-          }}
+          h={400}
+          className="mantine-ScrollArea-root"
           scrollbarSize={6}
           type="auto"
         >
-          <Table>
-            <Table.Thead>
-              <Table.Tr style={{ borderBottom: '2px solid #e9ecef' }}>
-                <Table.Th style={{ 
-                  fontWeight: 700, 
-                  color: '#495057',
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  padding: '8px 12px'
-                }}>
+          <Table 
+            className="mantine-Table-table"
+            verticalSpacing="sm"
+          >
+            <Table.Thead className="mantine-Table-thead">
+              <Table.Tr className="mantine-Table-tr">
+                <Table.Th className="mantine-Table-th">
                   Pos
                 </Table.Th>
-                <Table.Th style={{ 
-                  fontWeight: 700, 
-                  color: '#495057',
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  padding: '8px 12px'
-                }}>
+                <Table.Th className="mantine-Table-th">
                   Producto
                 </Table.Th>
-                <Table.Th style={{ 
-                  fontWeight: 700, 
-                  color: '#495057',
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  padding: '8px 12px'
-                }}>
+                <Table.Th className="mantine-Table-th">
                   Ventas
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
+            <Table.Tbody className="mantine-Table-tbody">{rows}</Table.Tbody>
           </Table>
         </ScrollArea>
       </Box>
 
       {/* Footer compacto */}
-      <Box style={{ flexShrink: 0 }}>
-        <Group justify="space-between" mt="md" p="sm" style={{
-          background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-          borderRadius: '8px',
-          border: '1px solid #e9ecef'
-        }}>
+      <Box className="top-productos-footer">
+        <Group justify="space-between" mt="md" p="sm">
           <Group gap="xs">
             <ThemeIcon size="xs" color="green" variant="light">
               <IconTrendingUp size={12} />

@@ -1,4 +1,4 @@
-// components/Header.jsx - VERSIÓN MEJORADA
+// components/Header.jsx - VERSIÓN COMPLETA SIN CSS INLINE
 import { useState, useEffect, useRef } from 'react';
 import { 
   Group, 
@@ -14,11 +14,11 @@ import {
   IconAlertTriangle,
   IconCalendarExclamation
 } from '@tabler/icons-react';
+import '../dashboard.css'; 
 
 function Header({ productosBajos = [], productosPorVencer = [] }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [fechaHora, setFechaHora] = useState({ hora: '' });
-  const [notificacionSonido, setNotificacionSonido] = useState(false);
   const audioPlayedRef = useRef(false);
 
   // Calcular notificaciones
@@ -39,7 +39,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
     return () => clearInterval(intervalo);
   }, []);
 
-  // Efecto para sonido de notificación (se ejecuta en cada recarga)
+  // Efecto para sonido de notificación
   useEffect(() => {
     if (totalNotificaciones > 0 && !audioPlayedRef.current) {
       reproducirSonido();
@@ -79,98 +79,56 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
   };
 
   return (
-    <div style={{ 
-      background: 'transparent',
-      padding: '16px 0',
-      position: 'relative'
-    }}>
+    <div className="dashboard-header">
       <Group justify="center" align="center">
         {/* Título Centrado */}
         <Stack gap={2} align="center">
-          <Text 
-            fw={900} 
-            size="32px" 
-            c="blue.6"
-            style={{
-              background: 'linear-gradient(135deg, #034C8C 0%, #0277BD 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}
-          >
+          <Text className="dashboard-title">
             MÉTRICAS
           </Text>
           <Text 
             size="lg" 
             c="dimmed" 
             fw={500}
-            style={{ letterSpacing: '1px' }}
+            className="dashboard-subtitle"
           >
             Dashboard de Gestión
           </Text>
         </Stack>
 
-        {/* Notificaciones - Posicionada a la derecha SIN CONTENEDOR */}
-        {/* Notificaciones - Campanita 100% transparente */}
-{/* Notificaciones - Campanita con contenedor más grande */}
-<Menu 
-  shadow="md" 
-  width={350} 
-  position="bottom-end"
-  opened={menuAbierto}
-  onChange={setMenuAbierto}
->
-  <Menu.Target>
-    <ActionIcon 
-      variant="subtle" 
-      color="blue" 
-      size="xl" 
-      style={{ 
-        position: 'absolute',
-        right: '20px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        background: 'transparent',
-        border: 'none',
-        width: '50px',
-        height: '50px'
-      }}
-    >
-      <IconBell size={25} />
-      
-      {totalNotificaciones > 0 && (
-        <Badge 
-          size ="sm" 
-          circle 
-          color="red" 
-          variant="filled"
-          style={{ 
-            position: 'absolute',
-            top: '5px',
-            right: '5px',
-            minWidth: '10px',
-            minHeight: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            animation: totalNotificaciones > 0 ? 'pulse 2s infinite' : 'none'
-          }}
+        {/* Notificaciones */}
+        <Menu 
+          shadow="md" 
+          width={350} 
+          position="bottom-end"
+          opened={menuAbierto}
+          onChange={setMenuAbierto}
         >
-          {totalNotificaciones}
-        </Badge>
-      )}
-    </ActionIcon>
-  </Menu.Target>
+          <Menu.Target>
+            <ActionIcon 
+              variant="subtle" 
+              color="blue" 
+              size="xl" 
+              className="notification-bell"
+            >
+              <IconBell size={25} />
+              
+              {totalNotificaciones > 0 && (
+                <Badge 
+                  size="sm" 
+                  circle 
+                  color="red" 
+                  variant="filled"
+                  className={`notification-badge ${totalNotificaciones > 0 ? 'pulsing' : ''}`}
+                >
+                  {totalNotificaciones}
+                </Badge>
+              )}
+            </ActionIcon>
+          </Menu.Target>
 
           <Menu.Dropdown>
-            <Menu.Label style={{ 
-              fontSize: '16px', 
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
+            <Menu.Label className="notification-menu-label">
               <span>🔔 Sistema de Alertas</span>
               {totalNotificaciones > 0 && (
                 <Badge color="red" variant="light" size="lg">
@@ -184,7 +142,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
             {/* ALERTA STOCK BAJO */}
             {notificacionesStock > 0 ? (
               <Menu.Item 
-                style={{ padding: '12px' }}
+                className="notification-item"
                 leftSection={
                   <ThemeIcon color="orange" size="lg" variant="light">
                     <IconAlertTriangle size={18} />
@@ -199,7 +157,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
                 </div>
               </Menu.Item>
             ) : (
-              <Menu.Item style={{ padding: '12px' }}>
+              <Menu.Item className="notification-item">
                 <div>
                   <Text fw={600} c="green">✅ Stock Normal</Text>
                   <Text size="sm" c="dimmed" mt={4}>
@@ -212,7 +170,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
             {/* ALERTA VENCIMIENTO */}
             {notificacionesVencimiento > 0 ? (
               <Menu.Item 
-                style={{ padding: '12px' }}
+                className="notification-item"
                 leftSection={
                   <ThemeIcon color="red" size="lg" variant="light">
                     <IconCalendarExclamation size={18} />
@@ -227,7 +185,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
                 </div>
               </Menu.Item>
             ) : (
-              <Menu.Item style={{ padding: '12px' }}>
+              <Menu.Item className="notification-item">
                 <div>
                   <Text fw={600} c="green">✅ Vencimientos OK</Text>
                   <Text size="sm" c="dimmed" mt={4}>
@@ -239,7 +197,7 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
 
             <Menu.Divider />
             
-            <Menu.Item style={{ padding: '8px' }}>
+            <Menu.Item className="notification-time">
               <Text size="xs" c="dimmed" ta="center">
                 Actualizado: {fechaHora.hora}
               </Text>
@@ -247,17 +205,6 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
           </Menu.Dropdown>
         </Menu>
       </Group>
-
-      {/* Estilos para la animación de pulso */}
-      <style>
-        {`
-          @keyframes pulse {
-            0% { transform: translate(25%, -25%) scale(1); }
-            50% { transform: translate(25%, -25%) scale(1.1); }
-            100% { transform: translate(25%, -25%) scale(1); }
-          }
-        `}
-      </style>
     </div>
   );
 }

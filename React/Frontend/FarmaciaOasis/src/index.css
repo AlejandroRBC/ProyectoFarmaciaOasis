@@ -1,0 +1,254 @@
+/* ============================================= */
+/* COMPONENTES GLOBALES - TABLAS Y BOTONES */
+/* ============================================= */
+
+/* ===== SISTEMA DE TABLAs===== */
+/* 
+ * Tablas compactas con diseño elegante y gradiente
+ * Optimizadas para máxima legibilidad y espacio
+ */
+
+.mantine-Table-table {
+  border-collapse: collapse !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(24, 113, 193, 0.03) !important;
+  border: 1px solid rgba(24, 113, 193, 0.06) !important;
+  width: 100% !important;
+  background: white !important;
+}
+
+/* Contenedor de scroll para tablas */
+.mantine-ScrollArea-root {
+  border-radius: 12px !important;
+  height: 100% !important;
+}
+
+.mantine-ScrollArea-viewport {
+  border-radius: 12px !important;
+  max-height: 100% !important;
+}
+
+/* HEADER CON GRADIENTE AZUL-CIAN */
+.mantine-Table-thead {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  box-shadow: 0 1px 6px rgba(24, 113, 193, 0.12) !important;
+}
+
+/* Celdas de header compactas */
+.mantine-Table-th {
+  background: transparent !important;
+  color: white !important;
+  font-weight: 600 !important;
+  border: none !important;
+  padding: 12px 14px !important;
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  height: 42px !important;
+  position: relative !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Efecto hover sutil en headers */
+.mantine-Table-th:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Separadores verticales entre columnas del header */
+.mantine-Table-th:not(:last-child)::after {
+  content: '' !important;
+  position: absolute !important;
+  right: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: 16px !important;
+  width: 1px !important;
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* CELDAS DE CUERPO ULTRA COMPACTAS */
+.mantine-Table-td {
+  background: white !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(24, 113, 193, 0.04) !important;
+  padding: 12px 14px !important;
+  font-size: 0.8rem !important;
+  color: #2D3748 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  height: 46px !important;
+}
+
+/* Efecto hover sutil para filas completas */
+.mantine-Table-tr:hover .mantine-Table-td {
+  background: rgba(0, 0, 0, 0.08) !important; /* ✅ Gris fuerte */
+  color: #2D3748 !important;
+  transform: none !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+.mantine-Table-tr:hover {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* SCROLLBAR PERSONALIZADO */
+.mantine-ScrollArea-scrollbar {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 6px !important;
+}
+
+.mantine-ScrollArea-thumb {
+  background: white !important;
+  border-radius: 6px !important;
+}
+
+.mantine-ScrollArea-thumb:hover {
+  background: #f0f0f0 !important;
+}
+
+/* Eliminar borde inferior de la última fila */
+.mantine-Table-tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* ===== SISTEMA DE BOTONES ===== */
+/* 
+ * Botones con efecto shine y animaciones fluidas
+ * Diseño consistente en toda la aplicación
+ */
+
+.mantine-Button-root {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 
+    0 4px 16px rgba(24, 113, 193, 0.25),
+    0 8px 32px rgba(0, 188, 212, 0.15) !important;
+  position: relative !important;
+  overflow: visible !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px 24px !important;
+  min-height: 50px !important;
+  width: auto !important;
+}
+
+/* Efecto shine que se desplaza al hacer hover */
+.mantine-Button-root::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+  transition: left 0.6s ease !important;
+}
+
+/* Estados de hover para botones */
+.mantine-Button-root:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 
+    0 12px 40px rgba(24, 113, 193, 0.35),
+    0 16px 48px rgba(0, 188, 212, 0.2) !important;
+  background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%) !important;
+  color: white !important;
+}
+
+.mantine-Button-root:hover::before {
+  left: 100% !important;
+}
+
+/* ESTRUCTURA INTERNA DE BOTONES - CENTRADO PERFECTO */
+.mantine-Button-root .mantine-Button-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+.mantine-Button-root .mantine-Button-label {
+  color: white !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+  font-size: 14px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  flex: none !important;
+  width: auto !important;
+}
+
+.mantine-Button-root .mantine-Button-section {
+  color: white !important;
+  filter: brightness(1.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+/* ===== SISTEMA RESPONSIVE ===== */
+/* 
+ * Breakpoints optimizados para móvil, tablet y desktop
+ * Diseño adaptativo manteniendo la estética
+ */
+
+/* MOBILE - Diseño compacto (≤ 767px) */
+@media (max-width: 767px) {
+  .mantine-Table-th {
+    padding: 14px 16px !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+  }
+  
+  .mantine-Table-td {
+    padding: 14px 16px !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .mantine-Button-root {
+    width: 100% !important;
+    font-size: 0.95rem !important;
+    padding: 14px 20px !important;
+    border-radius: 10px !important;
+  }
+  
+  .mantine-Container-root {
+    padding: 0 16px !important;
+  }
+  
+  .mantine-Grid-col {
+    flex-basis: 100% !important;
+  }
+}
+
+/* TABLET - Diseño equilibrado (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mantine-Button-root {
+    font-size: 1.05rem !important;
+    padding: 16px 24px !important;
+  }
+}
+
+/* DESKTOP - Diseño expansivo (≥ 1024px) */
+@media (min-width: 1024px) {
+  .mantine-Button-root {
+    font-size: 1.1rem !important;
+    padding: 18px 28px !important;
+  }
+}

@@ -6,6 +6,7 @@ import App from './App';
 
 // IMPORTAR ESTILOS DE MANTINE (ESTO FALTA)
 import '@mantine/core/styles.css';
+import './index.css'; 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

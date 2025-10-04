@@ -1,4 +1,4 @@
-// components/MetricCard.jsx
+// components/MetricCard.jsx - VERSIÓN SIN CSS INLINE
 import { Paper, Text, Group, ThemeIcon, Badge } from '@mantine/core';
 import { 
   IconCurrencyDollar, 
@@ -8,6 +8,7 @@ import {
   IconArrowUpRight,
   IconArrowDownRight
 } from '@tabler/icons-react';
+import '../dashboard.css';  // ✅ CSS separado
 
 function MetricCard({ 
   valor, 
@@ -39,33 +40,16 @@ function MetricCard({
       withBorder 
       radius="lg"
       shadow="md"
-      style={{ 
-        borderLeft: `4px solid ${color}`,
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-        position: 'relative',
-        overflow: 'hidden',
-        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-        cursor: 'pointer'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
-      }}
+      className="metric-card"
+      style={{ borderLeft: `8px solid ${color}`, }}  // ✅ Solo el color dinámico queda inline
     >
       <Group justify="space-between" align="flex-start">
         <div style={{ flex: 1 }}>
-          <Text size="sm" c="dimmed" fw={600} style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <Text size="sm" c="dimmed" fw={600} className="metric-label">
             {etiqueta}
           </Text>
           
-          <Text size="32px" fw={800} c={color} style={{ 
-            lineHeight: 1.2,
-            margin: '8px 0'
-          }}>
+          <Text size="32px" fw={800} c={color} className="metric-value">
             {formattedValue}
           </Text>
 
@@ -86,9 +70,7 @@ function MetricCard({
           size="xl" 
           variant="light" 
           color={color}
-          style={{ 
-            borderRadius: '12px'
-          }}
+          className="metric-icon"
         >
           {getIcon()}
         </ThemeIcon>

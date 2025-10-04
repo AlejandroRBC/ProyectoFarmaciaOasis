@@ -1,8 +1,9 @@
-// components/VentasChart.jsx
+// components/VentasChart.jsx - VERSIÓN SIN CSS INLINE
 import { useState } from 'react';
 import { Paper, Title, Text, Group, Badge, ThemeIcon, Select, Button } from '@mantine/core';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { IconTrendingUp, IconCurrencyDollar, IconChartLine, IconPackage, IconReceipt } from '@tabler/icons-react';
+import '../dashboard.css';  // ✅ CSS separado
 
 function VentasChart({ data }) {
   const [año, setAño] = useState(2024);
@@ -47,10 +48,7 @@ function VentasChart({ data }) {
   const promedioActual = tipoGrafica === 'monto' ? promedioVentas : promedioNroVentas;
 
   return (
-    <Paper p="xl" withBorder radius="lg" shadow="md" style={{
-      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-      border: '1px solid #e9ecef'
-    }}>
+    <Paper p="xl" withBorder radius="lg" shadow="md" className="ventas-chart-container">
       {/* Header con filtro y métricas */}
       <Group justify="space-between" align="flex-start" mb="xl">
         <div>
@@ -58,15 +56,11 @@ function VentasChart({ data }) {
             <ThemeIcon size="lg" color="blue" variant="light">
               <IconChartLine size={20} />
             </ThemeIcon>
-            <Title order={2} c="dark.8" style={{ 
-              fontFamily: 'system-ui',
-              fontWeight: 800,
-              letterSpacing: '-0.5px'
-            }}>
+            <Title order={2} c="dark.8" className="ventas-chart-title">
               Análisis de Ventas {año}
             </Title>
           </Group>
-          <Text size="sm" c="dimmed" style={{ fontWeight: 500 }}>
+          <Text size="sm" c="dimmed" className="ventas-chart-subtitle">
             Tendencias mensuales y comportamiento comercial
           </Text>
         </div>
@@ -83,7 +77,7 @@ function VentasChart({ data }) {
             size="sm"
           />
           
-          <div style={{ textAlign: 'center' }}>
+          <div className="total-badge-container">
             <Badge color="blue" variant="light" size="sm" mb="xs">
               TOTAL {año}
             </Badge>
@@ -92,7 +86,7 @@ function VentasChart({ data }) {
             </Text>
           </div>
           
-          <div style={{ textAlign: 'center' }}>
+          <div className="tendencia-badge-container">
             <Badge color={crecimiento >= 0 ? "green" : "red"} variant="light" size="sm" mb="xs">
               {crecimiento >= 0 ? "📈" : "📉"} TENDENCIA
             </Badge>
@@ -112,6 +106,7 @@ function VentasChart({ data }) {
           onClick={() => setTipoGrafica('monto')}
           size="md"
           radius="xl"
+          className="chart-type-button"
         >
           Monto Ventas (Bs)
         </Button>
@@ -123,13 +118,14 @@ function VentasChart({ data }) {
           onClick={() => setTipoGrafica('numero')}
           size="md"
           radius="xl"
+          className="chart-type-button"
         >
           Número de Ventas
         </Button>
       </Group>
 
       {/* Gráfica dinámica según selección */}
-      <div style={{ width: '100%', height: 350 }}>
+      <div className="chart-container">
         <ResponsiveContainer>
           <LineChart data={datosGrafica}>
             <CartesianGrid 
@@ -190,94 +186,101 @@ function VentasChart({ data }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Footer con métricas dinámicas */}
-      <Group justify="space-around" mt="lg" p="md" style={{
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-        borderRadius: '12px',
-        border: '1px solid #e9ecef'
-      }}>
-        <Group gap="md">
-          <ThemeIcon size="lg" color="blue" variant="light">
-            <IconCurrencyDollar size={18} />
-          </ThemeIcon>
-          <div>
-            <Text fw={700} size="sm" c="dark.7">
-              {tipoGrafica === 'monto' ? 'Promedio Mensual' : 'Prom. Ventas/Mes'}
-            </Text>
-            <Text fw={600} size="lg" c="blue.6">
-              {tipoGrafica === 'monto' ? 'Bs ' : ''}{promedioActual.toLocaleString('es-ES', { maximumFractionDigits: tipoGrafica === 'monto' ? 0 : 1 })}
-            </Text>
-          </div>
-        </Group>
-        
-        <Group gap="md">
-          <ThemeIcon size="lg" color="green" variant="light">
-            <IconTrendingUp size={18} />
-          </ThemeIcon>
-          <div>
-            <Text fw={700} size="sm" c="dark.7">
-              {tipoGrafica === 'monto' ? 'Mejor Mes' : 'Mes Más Ventas'}
-            </Text>
-            <Text fw={600} size="lg" c="green.6">
-              {mejorMes.mes}
-            </Text>
-            <Text fw={500} size="sm" c="dimmed">
-              {tipoGrafica === 'monto' 
-                ? `Bs ${mejorMes.ventas.toLocaleString('es-ES')}`
-                : `${mejorMes.nroVentas} ventas`
-              }
-            </Text>
-          </div>
-        </Group>
-        
-        <Group gap="md">
-          <ThemeIcon size="lg" color="orange" variant="light">
-            <IconChartLine size={18} />
-          </ThemeIcon>
-          <div>
-            <Text fw={700} size="sm" c="dark.7">Mes Más Bajo</Text>
-            <Text fw={600} size="lg" c="orange.6">
-              {peorMes.mes}
-            </Text>
-            <Text fw={500} size="sm" c="dimmed">
-              {tipoGrafica === 'monto' 
-                ? `Bs ${peorMes.ventas.toLocaleString('es-ES')}`
-                : `${peorMes.nroVentas} ventas`
-              }
-            </Text>
-          </div>
-        </Group>
+      {/* Footer con metricas dinamicas */}
+        <Group direction="column" gap="md" mt="lg" p="md" className="ventas-chart-footer">
+          {/* FILA SUPERIOR - SIEMPRE 3 MÉTRICAS */}
+          <Group justify="space-around" w="100%">
+            {/* Promedio Mensual - SIEMPRE PRESENTE */}
+            <Group gap="md" className="metric-group">
+              <ThemeIcon className="metric-icon" color="blue" variant="light">
+                <IconCurrencyDollar size={18} />
+              </ThemeIcon>
+              <div>
+                <Text className="metric-label">
+                  {tipoGrafica === 'monto' ? 'Promedio Mensual' : 'Prom. Ventas/Mes'}
+                </Text>
+                <Text className="metric-value" c="blue.6">
+                  {tipoGrafica === 'monto' ? 'Bs ' : ''}{promedioActual.toLocaleString('es-ES', { maximumFractionDigits: tipoGrafica === 'monto' ? 0 : 1 })}
+                </Text>
+              </div>
+            </Group>
+            
+            {/* Mejor Mes - SIEMPRE PRESENTE */}
+            <Group gap="md" className="metric-group">
+              <ThemeIcon className="metric-icon" color="green" variant="light">
+                <IconTrendingUp size={18} />
+              </ThemeIcon>
+              <div>
+                <Text className="metric-label">
+                  {tipoGrafica === 'monto' ? 'Mejor Mes' : 'Mes Más Ventas'}
+                </Text>
+                <Text className="metric-value" c="green.6">
+                  {mejorMes.mes}
+                </Text>
+                <Text className="metric-detail">
+                  {tipoGrafica === 'monto' 
+                    ? `Bs ${mejorMes.ventas.toLocaleString('es-ES')}`
+                    : `${mejorMes.nroVentas} ventas`
+                  }
+                </Text>
+              </div>
+            </Group>
+            
+            {/* Mes Más Bajo - SIEMPRE PRESENTE */}
+            <Group gap="md" className="metric-group">
+              <ThemeIcon className="metric-icon" color="orange" variant="light">
+                <IconChartLine size={18} />
+              </ThemeIcon>
+              <div>
+                <Text className="metric-label">Mes Más Bajo</Text>
+                <Text className="metric-value" c="orange.6">
+                  {peorMes.mes}
+                </Text>
+                <Text className="metric-detail">
+                  {tipoGrafica === 'monto' 
+                    ? `Bs ${peorMes.ventas.toLocaleString('es-ES')}`
+                    : `${peorMes.nroVentas} ventas`
+                  }
+                </Text>
+              </div>
+            </Group>
+          </Group>
 
-        <Group gap="md">
-          <ThemeIcon size="lg" color="cyan" variant="light">
-            <IconPackage size={18} />
-          </ThemeIcon>
-          <div>
-            <Text fw={700} size="sm" c="dark.7">Total Productos</Text>
-            <Text fw={600} size="lg" c="cyan.6">
-              {totalProductos.toLocaleString('es-ES')}
-            </Text>
-            <Text fw={500} size="sm" c="dimmed">
-              unidades
-            </Text>
-          </div>
-        </Group>
+          {/* FILA INFERIOR - SIEMPRE 2 MÉTRICAS */}
+          <Group justify="space-around" w="100%">
+            {/* Total Productos - SIEMPRE PRESENTE */}
+            <Group gap="md" className="metric-group">
+              <ThemeIcon className="metric-icon" color="cyan" variant="light">
+                <IconPackage size={18} />
+              </ThemeIcon>
+              <div>
+                <Text className="metric-label">Total Productos</Text>
+                <Text className="metric-value" c="cyan.6">
+                  {totalProductos.toLocaleString('es-ES')}
+                </Text>
+                <Text className="metric-detail">
+                  unidades
+                </Text>
+              </div>
+            </Group>
 
-        <Group gap="md">
-          <ThemeIcon size="lg" color="violet" variant="light">
-            <IconReceipt size={18} />
-          </ThemeIcon>
-          <div>
-            <Text fw={700} size="sm" c="dark.7">Nro. de Ventas</Text>
-            <Text fw={600} size="lg" c="violet.6">
-              {totalNroVentas.toLocaleString('es-ES')}
-            </Text>
-            <Text fw={500} size="sm" c="dimmed">
-              transacciones
-            </Text>
-          </div>
+            {/* Nro. de Ventas - SIEMPRE PRESENTE */}
+            <Group gap="md" className="metric-group">
+              <ThemeIcon className="metric-icon" color="violet" variant="light">
+                <IconReceipt size={18} />
+              </ThemeIcon>
+              <div>
+                <Text className="metric-label">Nro. de Ventas</Text>
+                <Text className="metric-value" c="violet.6">
+                  {totalNroVentas.toLocaleString('es-ES')}
+                </Text>
+                <Text className="metric-detail">
+                  transacciones
+                </Text>
+              </div>
+            </Group>
+          </Group>
         </Group>
-      </Group>
     </Paper>
   );
 }

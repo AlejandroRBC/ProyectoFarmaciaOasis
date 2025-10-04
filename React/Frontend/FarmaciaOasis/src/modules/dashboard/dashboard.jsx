@@ -13,6 +13,7 @@ import ProductosBajosModal from './components/ProductosBajosModal';
 import ProductosVencerModal from './components/ProductosVencerModal';
 import VentasChart from './components/VentasChart';
 import TopProductos from './components/TopProductos';
+import './dashboard.css';  // ✅ CSS separado
 
 function Dashboard() {
   const {
@@ -38,7 +39,7 @@ function Dashboard() {
   }
 
   return (
-    <Container size="xl" py="md" style={{ marginTop: '20px' }}>
+    <Container size="xl" py="md" className="dashboard-main-container">
       {/* 1. HEADER */}
       <Header 
         productosBajos={productosBajos}
@@ -90,57 +91,27 @@ function Dashboard() {
       </Grid>
 
       {/* 5. BOTONES (ÚLTIMO) */}
-      <Group justify="center" mt="xl" gap="lg">
-        <Button 
-          size="md"
-          variant="gradient"
-          gradient={{ from: 'blue', to: 'cyan', deg: 135 }}
-          leftSection="⚠️"
-          onClick={() => setMostrarBajos(true)}
-          radius="xl"
-          style={{
-            padding: '12px 24px',
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 119, 182, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          PRODUCTOS POR ACABARSE
-        </Button>
-        
-        <Button 
-          size="md"
-          variant="gradient"
-          gradient={{ from: 'blue', to: 'cyan', deg: 135 }}
-          leftSection="📅"
-          onClick={() => setMostrarVencer(true)}
-          radius="xl"
-          style={{
-            padding: '12px 24px',
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 119, 182, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0) scale(1)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          PRODUCTOS POR VENCER
-        </Button>
-      </Group>
+        <Group className="dashboard-buttons-container" mt="xl" justify="center">
+          <Button 
+            size="md"
+            variant="filled" 
+            leftSection="⚠️"
+            onClick={() => setMostrarBajos(true)}
+            className="dashboard-button custom-gradient-btn"
+          >
+            PRODUCTOS POR ACABARSE
+          </Button>
+          
+          <Button 
+            size="md"
+            variant="filled"
+            leftSection="📅"
+            onClick={() => setMostrarVencer(true)}
+            className="dashboard-button custom-gradient-btn"
+          >
+            PRODUCTOS POR VENCER
+          </Button>
+        </Group>
 
       {/* MODALES */}
       <ProductosBajosModal
