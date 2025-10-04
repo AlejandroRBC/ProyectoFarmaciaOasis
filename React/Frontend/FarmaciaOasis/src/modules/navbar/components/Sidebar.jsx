@@ -5,7 +5,7 @@ function Sidebar({ onClose }) {
   const location = useLocation();
 
   const menuItems = [
-    { path: '/', label: 'Inicio', icon: '🏠' },
+    { path: '/', label: 'Dashboard', icon: '🏠' },
     { path: '/inventario', label: 'Inventario', icon: '📦' },
     { path: '/historial-ventas', label: 'Historial Ventas', icon: '📊' },
     { path: '/ingresos-egresos', label: 'Ingresos y egresos', icon: '📋' }
