@@ -1,56 +1,74 @@
-import { useVentas } from './hooks/useVentas';
+
 import VentasList from './components/VentasList';
+import { Select } from '../global/components/select/Select';
+import { IconPill, IconUser, IconBuilding } from '@tabler/icons-react';
+import { useState } from 'react';
+
+
 import './historial-ventas.css';
 
 function HistorialVentas() {
-  const { ventas, loading, error } = useVentas();
-
-  if (loading) {
-    return <div className="cargando">Cargando historial de ventas...</div>;
-  }
-
-  if (error) {
-    return <div className="error">Error: {error}</div>;
-  }
+  const [categoria, setCategoria] = useState('');
+  const [laboratorio, setLaboratorio] = useState('');
 
   return (
-    <div className="historial-ventas-container">
-      <h1>Historial de Ventas</h1>
-      
-      <div className="filtros-container">
-        <div className="busqueda-ventas">
-          <input 
-            type="text" 
-            placeholder="Buscar por cliente, CI/NIT o ID..."
-            className="busqueda"
-          />
-          <button className="btn-buscar">🔍 Buscar</button>
-        </div>
-        
-        <div className="filtros-fecha">
-          <input type="date" className="filtro-fecha" />
-          <span>a</span>
-          <input type="date" className="filtro-fecha" />
-          <button className="btn-filtrar">Filtrar</button>
-        </div>
-      </div>
+    <div style={{ padding: '20px', maxWidth: '300px' }}>
+      {/* Select básico */}
+      <Select
+        label="Categoría del Producto"
+        placeholder="Elige una categoría..."
+        data={[
+          { value: 'medicamentos', label: '💊 Medicamentos' },
+          { value: 'vitaminas', label: '🧪 Vitaminas y Suplementos' },
+          { value: 'cuidado', label: '🧴 Cuidado Personal' },
+          { value: 'maternidad', label: '👶 Maternidad e Infantil' },
+        ]}
+        value={categoria}
+        onChange={setCategoria}
+        required
+      />
 
-      <VentasList ventas={ventas} />
-      
-      <div className="resumen-ventas">
-        <div className="resumen-item">
-          <span className="resumen-label">Total Ventas:</span>
-          <span className="resumen-valor">
-            {ventas.length}
-          </span>
-        </div>
-        <div className="resumen-item">
-          <span className="resumen-label">Ingreso Total:</span>
-          <span className="resumen-valor">
-            {ventas.reduce((total, venta) => total + venta.total, 0).toFixed(2)} Bs
-          </span>
-        </div>
-      </div>
+      {/* Select con ícono y búsqueda */}
+      <Select
+        label="Laboratorio"
+        placeholder="Busca laboratorio..."
+        data={[
+          { value: 'lab1', label: 'Laboratorio ABC' },
+          { value: 'lab2', label: 'Lab Farma Internacional' },
+          { value: 'lab3', label: 'PharmaCorp Solutions' },
+          { value: 'lab4', label: 'BioTech Laboratories' },
+        ]}
+        value={laboratorio}
+        onChange={setLaboratorio}
+        icon={<IconBuilding size={18} />}
+        searchable
+        clearable
+      />
+
+      {/* Select con descripción */}
+      <Select
+        label="Tipo de Cliente"
+        placeholder="Selecciona tipo de cliente"
+        description="Esta selección afectará los precios y descuentos"
+        data={[
+          { value: 'regular', label: '👤 Cliente Regular' },
+          { value: 'frecuente', label: '⭐ Cliente Frecuente' },
+          { value: 'corporativo', label: '🏢 Cliente Corporativo' },
+        ]}
+        icon={<IconUser size={18} />}
+      />
+
+      {/* Select con error */}
+      <Select
+        label="Producto"
+        placeholder="Selecciona un producto"
+        data={[
+          { value: 'paracetamol', label: 'Paracetamol 500mg' },
+          { value: 'ibuprofeno', label: 'Ibuprofeno 400mg' },
+        ]}
+        error="Este producto está agotado"
+        icon={<IconPill size={18} />}
+      />
     </div>
   );
 }
