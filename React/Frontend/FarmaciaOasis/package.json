@@ -48,6 +48,8 @@
 
     "react-intl": "^7.1.11",
 
+    "react-responsive": "^10.0.1",
+
     "react-router-dom": "^7.9.3",
 
     "recharts": "^3.2.1"
