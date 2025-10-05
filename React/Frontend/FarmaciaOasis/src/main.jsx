@@ -6,7 +6,11 @@ import App from './App';
 
 // IMPORTAR ESTILOS DE MANTINE (ESTO FALTA)
 import '@mantine/core/styles.css';
-import './index.css'; 
+
+//IMPORTAR FUENTE
+import '@fontsource/montserrat/400.css';
+import '@fontsource/montserrat/700.css';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

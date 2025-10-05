@@ -36,7 +36,6 @@ function Navbar({ children }) {
                 <Text className="brand-name" fw={700}>
                   FARMACIA OASIS
                 </Text>
-                
               </div>
             </Group>
           </Group>
