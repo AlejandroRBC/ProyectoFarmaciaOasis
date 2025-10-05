@@ -48,6 +48,17 @@ npm i -g vite
 ```
 
 #### Dependencias principales:
+
+- **Responsive:**
+```bash
+npm npm install @fontsource/montserrat
+```
+
+- **Fuente:**
+```bash
+npm install react-responsive
+```
+
 - **Navegación (routing):**
 ```bash
 npm install react-router-dom
