@@ -7,7 +7,7 @@ function ProductoList({ productos, onAgregarCarrito, onEditar, onEliminar }) {
             <th>CÓDIGO</th>
             <th>LOTE</th>
             <th>NOMBRE</th>
-            <th>COMPLEMENTO</th>
+            <th>PRESENTACION</th>
             <th>PRECIO BASE</th>
             <th>PRECIO VENTA</th>
             <th>STOCK</th>
@@ -22,7 +22,7 @@ function ProductoList({ productos, onAgregarCarrito, onEditar, onEliminar }) {
                 <td>{producto.codigo}</td>
                 <td>{producto.lote}</td>
                 <td>{producto.nombre}</td>
-                <td>{producto.complemento}</td>
+                <td>{producto.presentacion}</td>
                 <td>{producto.precio_base} Bs</td>
                 <td>{producto.precio_venta} Bs</td>
                 <td>{producto.stock}</td>
@@ -30,7 +30,7 @@ function ProductoList({ productos, onAgregarCarrito, onEditar, onEliminar }) {
                 <td>{producto.laboratorio}</td>
                 <td className="acciones-celda">
                 <button 
-                    className="btn-agregar"
+                    className="btn-agregarPL"
                     onClick={() => onAgregarCarrito(producto)}
                 >
                     🛒

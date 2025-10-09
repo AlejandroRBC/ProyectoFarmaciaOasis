@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useProductos } from './hooks/useProductos';
 import { useCarrito } from './hooks/useCarrito';
+import { useModales } from './hooks/useModales'; 
 import ProductoList from './components/ProductoList';
-import Carrito from './components/Carrito';
 import ProductoForm from './components/ProductoForm';
 import LaboratorioForm from './components/LaboratorioForm';
 import VentaForm from './components/VentaForm';
+import Modal from './components/Modal.jsx';
 import './inventario.css';
 
 function Inventario() {
@@ -28,10 +29,18 @@ function Inventario() {
     totalVenta
   } = useCarrito();
 
-  const [mostrarFormProducto, setMostrarFormProducto] = useState(false);
-  const [mostrarFormLaboratorio, setMostrarFormLaboratorio] = useState(false);
-  const [mostrarVenta, setMostrarVenta] = useState(false);
-  const [productoEditando, setProductoEditando] = useState(null);
+  const {
+    modalProducto,
+    modalLaboratorio,
+    modalVenta,
+    abrirModalProducto,
+    cerrarModalProducto,
+    abrirModalLaboratorio,
+    cerrarModalLaboratorio,
+    abrirModalVenta,
+    cerrarModalVenta
+  } = useModales();
+
   const [busqueda, setBusqueda] = useState('');
 
   // Filtrar productos basado en búsqueda
@@ -44,7 +53,16 @@ function Inventario() {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
     alert(`Venta realizada exitosamente!\nTotal: ${totalVenta} Bs\nCliente: ${datosCliente.nombre}`);
     vaciarCarrito();
-    setMostrarVenta(false);
+    cerrarModalVenta();
+  };
+
+  const handleSubmitProducto = (datos) => {
+    if (modalProducto.producto) {
+      actualizarProducto(modalProducto.producto.id, datos);
+    } else {
+      agregarProducto(datos);
+    }
+    cerrarModalProducto();
   };
 
   if (loading) {
@@ -70,7 +88,7 @@ function Inventario() {
         <div className="carrito-info">
           <button 
             className="btn-carrito"
-            onClick={() => setMostrarVenta(true)}
+            onClick={abrirModalVenta}
           >
             🛒 Carrito ({carrito.reduce((total, item) => total + item.cantidad, 0)})
           </button>
@@ -81,7 +99,7 @@ function Inventario() {
       <ProductoList 
         productos={productosFiltrados}
         onAgregarCarrito={agregarAlCarrito}
-        onEditar={setProductoEditando}
+        onEditar={abrirModalProducto} 
         onEliminar={eliminarProducto}
       />
 
@@ -89,68 +107,66 @@ function Inventario() {
       <div className="acciones-inventario">
         <button 
           className="btn-primario"
-          onClick={() => setMostrarFormProducto(true)}
+          onClick={() => abrirModalProducto()}
         >
           ➕ Agregar Producto
         </button>
         <button 
           className="btn-secundario"
-          onClick={() => setMostrarFormLaboratorio(true)}
+          onClick={abrirModalLaboratorio}
         >
           🏭 Agregar Laboratorio
         </button>
       </div>
 
-      {/* Modales/Forms */}
-      {mostrarFormProducto && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <ProductoForm
-              laboratorios={laboratorios}
-              producto={productoEditando}
-              onSubmit={(datos) => {
-                if (productoEditando) {
-                  actualizarProducto(productoEditando.id, datos);
-                  setProductoEditando(null);
-                } else {
-                  agregarProducto(datos);
-                }
-                setMostrarFormProducto(false);
-              }}
-              onCancel={() => {
-                setMostrarFormProducto(false);
-                setProductoEditando(null);
-              }}
-            />
-          </div>
-        </div>
+      {/* Modal Agregar/Editar Producto */}
+      {modalProducto.abierto && (
+        <Modal 
+          titulo={modalProducto.producto ? "Editar Producto" : "Agregar Nuevo Producto"}
+          onClose={cerrarModalProducto}
+        >
+          <ProductoForm
+            laboratorios={laboratorios}
+            producto={modalProducto.producto}
+            onSubmit={handleSubmitProducto}
+            onCancel={cerrarModalProducto}
+          />
+        </Modal>
       )}
 
-      {mostrarFormLaboratorio && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <LaboratorioForm
-              onSubmit={agregarLaboratorio}
-              onCancel={() => setMostrarFormLaboratorio(false)}
-            />
-          </div>
-        </div>
+      {/* Modal Agregar Laboratorio */}
+      {modalLaboratorio && (
+        <Modal 
+          titulo="Agregar Nuevo Laboratorio"
+          onClose={cerrarModalLaboratorio}
+        >
+          <LaboratorioForm
+            onSubmit={(datosLaboratorio) => {
+              agregarLaboratorio(datosLaboratorio);
+              cerrarModalLaboratorio();
+            }}
+            onCancel={cerrarModalLaboratorio}
+          />
+        </Modal>
       )}
 
-      {mostrarVenta && (
-        <div className="modal-overlay">
-          <div className="modal-content grande">
-            <VentaForm
-              carrito={carrito}
-              totalVenta={totalVenta}
-              onModificarCantidad={modificarCantidad}
-              onEliminarItem={eliminarDelCarrito}
-              onVaciarCarrito={vaciarCarrito}
-              onRealizarVenta={handleRealizarVenta}
-              onCancel={() => setMostrarVenta(false)}
-            />
-          </div>
-        </div>
+      {/* Modal Venta */}
+      {modalVenta && (
+        <Modal 
+          titulo="Realizar Venta"
+          tamaño="grande"
+          onClose={cerrarModalVenta}
+        >
+          <VentaForm
+            carrito={carrito}
+            totalVenta={totalVenta}
+            onModificarCantidad={modificarCantidad}
+            onEliminarItem={eliminarDelCarrito}
+            onVaciarCarrito={vaciarCarrito}
+            onRealizarVenta={handleRealizarVenta}
+            onCancel={cerrarModalVenta}
+          />
+        </Modal>
       )}
     </div>
   );

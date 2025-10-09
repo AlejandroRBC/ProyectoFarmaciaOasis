@@ -20,30 +20,36 @@ function LaboratorioForm({ onSubmit, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-laboratorio">
-      <h3>Agregar Laboratorio</h3>
-      
-      <input
-        name="nombre"
-        value={formData.nombre}
-        onChange={handleChange}
-        placeholder="Nombre del laboratorio"
-        required
-      />
-      
-      <input
-        name="direccion"
-        value={formData.direccion}
-        onChange={handleChange}
-        placeholder="Dirección"
-        required
-      />
+    <form onSubmit={handleSubmit} className="laboratorio-form">
+      <div className="form-group">
+        <label htmlFor="nombre">Nombre del laboratorio</label>
+        <input
+          id="nombre"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          placeholder="Ingrese el nombre del laboratorio"
+          required
+        />
+      </div>
 
-      <div className="form-botones">
-        <button type="submit" className="btn-primario">
+      <div className="form-group">
+        <label htmlFor="direccion">Dirección</label>
+        <input
+          id="direccion"
+          name="direccion"
+          value={formData.direccion}
+          onChange={handleChange}
+          placeholder="Ingrese la dirección del laboratorio"
+          required
+        />
+      </div>
+
+      <div className="form-actions">
+        <button type="submit" className="btn-agregar">
           Agregar Laboratorio
         </button>
-        <button type="button" onClick={onCancel} className="btn-secundario">
+        <button type="button" onClick={onCancel} className="btn-cancelar">
           Cancelar
         </button>
       </div>
