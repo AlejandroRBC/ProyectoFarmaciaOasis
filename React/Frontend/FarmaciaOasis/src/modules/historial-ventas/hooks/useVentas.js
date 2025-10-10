@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // Datos mock del historial de ventas
+
 const ventasMock = [
   {
     id: 1,
@@ -11,7 +12,7 @@ const ventasMock = [
     ci_nit: '82343471',
     metodo_pago: 'QR',
     total: 5.50,
-    productos: 'Azitromicina x1 = 5.50 Bs'
+    productos: 'Azitromicina x1 = 5.50 Bs '
   },
   {
     id: 2,
@@ -59,35 +60,30 @@ const ventasMock = [
   }
 ];
 
+
 export const useVentas = () => {
-  const [ventas, setVentas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [ventas, setearVentas] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const cargarVentas = async () => {
       try {
-        setLoading(true);
-        // Simular llamada a API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
         // Ordenar por fecha y hora más reciente primero
         const ventasOrdenadas = [...ventasMock].sort((a, b) => {
           const fechaA = new Date(`${a.fecha} ${a.hora}`);
           const fechaB = new Date(`${b.fecha} ${b.hora}`);
           return fechaB - fechaA;
         });
-        
-        setVentas(ventasOrdenadas);
+        setearVentas(ventasOrdenadas);
+
+        setearVentas(ventasOrdenadas);
       } catch (err) {
         setError('Error al cargar el historial de ventas');
         console.error('Error:', err);
-      } finally {
-        setLoading(false);
       }
     };
-
     cargarVentas();
+
   }, []);
 
   const buscarVentas = (termino) => {
@@ -102,7 +98,6 @@ export const useVentas = () => {
 
   return {
     ventas,
-    loading,
     error,
     buscarVentas,
     filtrarPorFecha
