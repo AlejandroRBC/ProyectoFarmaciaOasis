@@ -102,7 +102,7 @@ function Inventario() {
         onEditar={abrirModalProducto} 
         onEliminar={eliminarProducto}
       />
-
+  
       {/* Botones de acción */}
       <div className="acciones-inventario">
         <button 
