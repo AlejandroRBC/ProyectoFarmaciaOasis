@@ -1,13 +1,20 @@
+
+import { IconAlertTriangle,
+  IconPackage, 
+  IconCheck, 
+  IconX } from '@tabler/icons-react';
+import { Modal,
+  Table,
+  Badge,
+  Text, 
+  Group, 
+  Paper, 
+  Title, 
+  Alert, 
+  ScrollArea, 
+  Box, 
+  ActionIcon } from '@mantine/core';
 function VentasList({ ventas }) {
-    const formatMetodoPago = (metodo) => {
-      const metodos = {
-        'efectivo': 'Efectivo',
-        'qr': 'QR',
-        'mixto': 'Mixto'
-      };
-      return metodos[metodo.toLowerCase()] || metodo;
-    };
-  
     const getBadgeColor = (metodo) => {
       const colores = {
         'efectivo': '#28a745',
@@ -24,54 +31,109 @@ function VentasList({ ventas }) {
         </div>
       );
     }
+
+    /// Cargar datos en formato tabla 
+    const filas = ventas.map((venta) => {
+        
+      return (
+        <Table.Tr 
+          key={venta.id} 
+          className="mantine-Table-tr" 
+        >
+          <Table.Td className="mantine-Table-td">
+            {venta.id_venta}
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+            {venta.fecha}
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+            {venta.hora}
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+            {venta.nombre_cliente}
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+            {venta.ci_nit}
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+          <Badge 
+              color={getBadgeColor(venta.metodo_pago)} 
+              variant="light" 
+              size="sm"
+            >
+            {venta.metodo_pago}
+          </Badge>
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+            {venta.total.toFixed(2)}
+          </Table.Td>
+          <Table.Td className="mantine-Table-td">
+            {venta.productos}
+          </Table.Td>
+        
+        </Table.Tr>
+      );
+    });
   
     return (
-      <div className="containerTabla">
-        <table>
-          <thead>
-            <tr>
-              <th>ID Venta</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Cliente</th>
-              <th>CI/NIT</th>
-              <th>Método de Pago</th>
-              <th>Total (Bs)</th>
-              <th>Productos</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ventas.map((venta) => (
-              <tr key={venta.id}>
-                <td className="id-venta">{venta.id_venta}</td>
-                <td className="fecha">
-                  {new Date(venta.fecha).toLocaleDateString('es-ES')}
-                </td>
-                <td className="hora">{venta.hora}</td>
-                <td className="cliente">{venta.nombre_cliente}</td>
-                <td className="ci-nit">{venta.ci_nit}</td>
-                <td className="metodo-pago">
-                  <span 
-                    className="badge-pago"
-                    style={{ backgroundColor: getBadgeColor(venta.metodo_pago) }}
-                  >
-                    {formatMetodoPago(venta.metodo_pago)}
-                  </span>
-                </td>
-                <td className="total">
-                  <strong>{venta.total.toFixed(2)}</strong>
-                </td>
-                <td className="productos" title={venta.productos}>
-                  {venta.productos.length > 50 
-                    ? `${venta.productos.substring(0, 50)}...` 
-                    : venta.productos
-                  }
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+    <Paper 
+          p="lg" 
+          withBorder 
+          radius="lg" 
+          shadow="md"
+        >
+
+
+      <Box className="top-productos-content" style={{ height: '400px' }}>
+        <ScrollArea 
+          h={400}
+          className="mantine-ScrollArea-root"
+          scrollbarSize={6}
+          type="auto"
+        >
+          <Table 
+            className="mantine-Table-table"
+            verticalSpacing="sm"
+          >
+            <Table.Thead className="mantine-Table-thead">
+              <Table.Tr className="mantine-Table-tr">
+
+                <Table.Th className="mantine-Table-th">
+                  idVenta
+                </Table.Th>
+
+                <Table.Th className="mantine-Table-th">
+                  Fecha
+                </Table.Th>
+                <Table.Th className="mantine-Table-th">
+                  hora
+                </Table.Th>
+                <Table.Th className="mantine-Table-th">
+                  cliente
+                </Table.Th>
+                <Table.Th className="mantine-Table-th">
+                  Ci/Nit
+                </Table.Th>
+                <Table.Th className="mantine-Table-th">
+                  
+                  metodo Pago
+                </Table.Th>
+                <Table.Th className="mantine-Table-th">
+                  Total(Bs.)
+                </Table.Th>
+                <Table.Th className="mantine-Table-th">
+                  productos
+                </Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody className="mantine-Table-tbody">
+              {filas}
+            </Table.Tbody>
+          </Table>
+        </ScrollArea>
+      </Box>
+      </Paper>
     );
   }
   
