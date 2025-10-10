@@ -109,19 +109,15 @@ function ProductoList({
             );
         });
     return (
+
         <Paper 
             p="lg" 
             withBorder 
             radius="lg" 
             shadow="md"
         >
-            <Box>
-            <ScrollArea 
-            h={400}
-            className="mantine-ScrollArea-root"
-            scrollbarSize={6}
-            type="auto"
-            >
+        <Box className="top-productos-content" style={{ height: '400px' }}>
+        <ScrollArea h={250} w="100%" offsetScrollbars scrollbarSize={20} scrollHideDelay={500} >
             <Table 
                 className="mantine-Table-table"
                 verticalSpacing="sm"
@@ -167,8 +163,9 @@ function ProductoList({
                 {filas}
                 </Table.Tbody>
             </Table>
-            </ScrollArea>
+        </ScrollArea>
         </Box>
+    
         {productos.length === 0 && (<p>No hay productos disponibles</p>)}
 
         </Paper>

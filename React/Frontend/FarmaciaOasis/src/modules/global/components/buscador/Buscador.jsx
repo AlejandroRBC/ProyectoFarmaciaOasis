@@ -37,10 +37,7 @@ const inputRef = useRef(null);
 // Manejar atajo de teclado (Ctrl+K / Cmd+K)
 useEffect(() => {
     const handleKeyDown = (event) => {
-    if (event.key === 't') {
-        event.preventDefault();
-        inputRef.current?.focus();
-    }
+    
     
     if (event.key === 'Escape') {
         setShowResults(false);
@@ -81,9 +78,10 @@ const handleResultClick = (result) => {
     if (onResultSelect) {
     onResultSelect(result);
     setShowResults(false);
-    onChange(result.label || result.value || '');
+    
     }
 };
+
 
 const handleInputFocus = () => {
     setIsFocused(true);
@@ -210,13 +208,14 @@ return (
                 ) : (
                 <Group justify="space-between" w="100%">
                     <Text size="sm" className={classes.resultText}>
-                    {result.label || result.name || result.value}
+                    {result.name}
                     </Text>
-                    {result.category && (
-                    <Text size="xs" c="dimmed" className={classes.resultCategory}>
-                        {result.category}
+                    <Text size="sm" className={classes.resultText}>
+                        {result.label}
                     </Text>
-                    )}
+                    <Text size="sm" className={classes.resultText}>
+                        {result.value} Bs
+                    </Text>
                 </Group>
                 )}
             </Box>

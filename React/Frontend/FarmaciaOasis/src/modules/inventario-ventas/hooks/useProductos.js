@@ -10,7 +10,7 @@ const productosMock = [
     presentacion: 'Cápsulas 500mg',
     precio_base: 12.50,
     precio_venta: 20.00,
-    stock: 55,
+    stock: 5,
     fecha_expiracion: '2026-03-15',
     laboratorio: 'PharmaGen',
     porcentaje_g: 40
@@ -23,7 +23,7 @@ const productosMock = [
     presentacion: 'Tabletas 50mg',
     precio_base: 25.00,
     precio_venta: 38.00,
-    stock: 120,
+    stock: 12,
     fecha_expiracion: '2025-11-20',
     laboratorio: 'BioLife',
     porcentaje_g: 35
@@ -71,11 +71,11 @@ const productosMock = [
     id: 6,
     codigo: 'MED006',
     lote: 'LOTE6F45',
-    nombre: 'Aspirina',
+    nombre: 'Losartan',
     presentacion: 'Tabletas 100mg',
     precio_base: 5.50,
     precio_venta: 9.00,
-    stock: 350,
+    stock: 3,
     fecha_expiracion: '2027-02-14',
     laboratorio: 'Bayer',
     porcentaje_g: 50
@@ -273,16 +273,13 @@ const laboratoriosMock = [
 export const useProductos = () => {
   const [productos, setProductos] = useState([]);
   const [laboratorios, setLaboratorios] = useState([]);
-  const [loading, setLoading] = useState(false);
+  
 
   useEffect(() => {
     // Simular carga de datos
-    setLoading(true);
-    setTimeout(() => {
       setProductos(productosMock);
       setLaboratorios(laboratoriosMock);
-      setLoading(false);
-    },500);
+    
   }, []);
 
   const agregarProducto = (nuevoProducto) => {
@@ -308,7 +305,7 @@ export const useProductos = () => {
   return {
     productos,
     laboratorios,
-    loading,
+
     agregarProducto,
     actualizarProducto,
     eliminarProducto,

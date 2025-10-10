@@ -1,4 +1,8 @@
-    function Carrito({ carrito, onModificarCantidad, onEliminarItem, totalVenta }) {
+    function Carrito({ 
+        carrito,
+        onModificarCantidad, 
+        onEliminarItem, 
+        totalVenta }) {
         if (carrito.length === 0) {
         return (
             <div className="carrito-vacio">
