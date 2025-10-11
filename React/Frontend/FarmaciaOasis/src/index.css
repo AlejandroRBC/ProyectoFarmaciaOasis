@@ -9,112 +9,113 @@
  */
 
 .mantine-Table-table {
-  border-collapse: collapse !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
+  border-collapse: collapse ;
+  border-radius: 12px ;
+  overflow: hidden ;
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.05),
-    0 2px 8px rgba(24, 113, 193, 0.03) !important;
-  border: 1px solid rgba(24, 113, 193, 0.06) !important;
-  width: 100% !important;
-  background: white !important;
+    0 2px 8px rgba(24, 113, 193, 0.03) ;
+  border: 1px solid rgba(24, 113, 193, 0.06) ;
+  width: 100% ;
+  background: white ;
 }
 
 /* Contenedor de scroll para tablas */
 .mantine-ScrollArea-root {
-  border-radius: 12px !important;
-  height: 100% !important;
+  border-radius: 12px ;
+  height: 100% ;
 }
 
 .mantine-ScrollArea-viewport {
-  border-radius: 12px !important;
-  max-height: 100% !important;
+  border-radius: 12px ;
+  max-height: 100% ;
 }
 
 /* HEADER CON GRADIENTE AZUL-CIAN */
 .mantine-Table-thead {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
-  box-shadow: 0 1px 6px rgba(24, 113, 193, 0.12) !important;
+  background: linear-gradient(135deg, 
+    var(--mantine-color-blue-9) 0%, 
+    var(--mantine-color-blue-8) 50%, 
+    var(--mantine-color-cyan-9) 100%);
+  position: sticky ;
+  top: 0 ;
+  z-index: 10 ;
+  box-shadow: 0 1px 6px rgba(24, 113, 193, 0.12) ;
 }
 
 /* Celdas de header compactas */
 .mantine-Table-th {
-  background: transparent !important;
-  color: white !important;
-  font-weight: 600 !important;
-  border: none !important;
-  padding: 12px 14px !important;
-  font-size: 0.7rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.3px !important;
-  height: 42px !important;
-  position: relative !important;
-  transition: all 0.2s ease !important;
+  background: transparent ;
+  color: white ;
+  font-weight: 600 ;
+  border: none ;
+  font-size: 0.7rem ;
+  text-transform: uppercase ;
+  letter-spacing: 0.3px ;
+  height: 42px ;
+  position: relative ;
+  transition: all 0.2s ease ;
 }
 
 /* Efecto hover sutil en headers */
 .mantine-Table-th:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.12) ;
 }
 
 /* Separadores verticales entre columnas del header */
 .mantine-Table-th:not(:last-child)::after {
-  content: '' !important;
-  position: absolute !important;
-  right: 0 !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  height: 16px !important;
-  width: 1px !important;
-  background: rgba(255, 255, 255, 0.25) !important;
+  content: '' ;
+  position: absolute ;
+  right: 0 ;
+  top: 50% ;
+  transform: translateY(-50%) ;
+  height: 16px ;
+  width: 1px ;
+  background: rgba(255, 255, 255, 0.25) ;
 }
 
 /* CELDAS DE CUERPO ULTRA COMPACTAS */
 .mantine-Table-td {
-  background: white !important;
-  border: none !important;
-  border-bottom: 1px solid rgba(24, 113, 193, 0.04) !important;
-  padding: 12px 14px !important;
-  font-size: 0.8rem !important;
-  color: #2D3748 !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-  height: 46px !important;
+  background: white ;
+  border: none ;
+  border-bottom: 1px solid rgba(24, 113, 193, 0.04) ;
+  font-size: 0.8rem ;
+  color: #2D3748 ;
+  font-weight: 500 ;
+  transition: all 0.2s ease ;
+  height: 46px ;
 }
 
 /* Efecto hover sutil para filas completas */
 .mantine-Table-tr:hover .mantine-Table-td {
-  background: rgba(0, 0, 0, 0.08) !important; /* ✅ Gris fuerte */
-  color: #2D3748 !important;
-  transform: none !important;
-  font-weight: 500 !important;
-  box-shadow: none !important;
+  background: rgba(0, 0, 0, 0.08) ; /* ✅ Gris fuerte */
+  color: #2D3748 ;
+  transform: none ;
+  font-weight: 500 ;
+  box-shadow: none ;
 }
 .mantine-Table-tr:hover {
-  background: rgba(0, 0, 0, 0.02) !important;
+  background: rgba(0, 0, 0, 0.02) ;
 }
 
 /* SCROLLBAR PERSONALIZADO */
 .mantine-ScrollArea-scrollbar {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.1) ;
+  border-radius: 6px ;
 }
 
 .mantine-ScrollArea-thumb {
-  background: white !important;
-  border-radius: 6px !important;
+  background: white ;
+  border-radius: 6px ;
 }
 
 .mantine-ScrollArea-thumb:hover {
-  background: #f0f0f0 !important;
+  background: #f0f0f0 ;
 }
 
 /* Eliminar borde inferior de la última fila */
 .mantine-Table-tbody tr:last-child td {
-  border-bottom: none !important;
+  border-bottom: none ;
 }
 
 /* ===== SISTEMA DE BOTONES ===== */
@@ -124,87 +125,87 @@
  */
 
 .mantine-Button-root {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) !important;
-  color: white !important;
-  border: none !important;
-  font-weight: 700 !important;
-  border-radius: 12px !important;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
+  color: white ;
+  border: none ;
+  font-weight: 700 ;
+  border-radius: 12px ;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) ;
   box-shadow: 
     0 4px 16px rgba(24, 113, 193, 0.25),
-    0 8px 32px rgba(0, 188, 212, 0.15) !important;
-  position: relative !important;
-  overflow: visible !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 16px 24px !important;
-  min-height: 50px !important;
-  width: auto !important;
+    0 8px 32px rgba(0, 188, 212, 0.15) ;
+  position: relative ;
+  overflow: visible ;
+  display: inline-flex ;
+  align-items: center ;
+  justify-content: center ;
+  padding: 16px 24px ;
+  min-height: 50px ;
+  width: auto ;
 }
 
 /* Efecto shine que se desplaza al hacer hover */
 .mantine-Button-root::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
-  transition: left 0.6s ease !important;
+  content: '' ;
+  position: absolute ;
+  top: 0 ;
+  left: -100% ;
+  width: 100% ;
+  height: 100% ;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) ;
+  transition: left 0.6s ease ;
 }
 
 /* Estados de hover para botones */
 .mantine-Button-root:hover {
-  transform: translateY(-3px) scale(1.02) !important;
+  transform: translateY(-3px) scale(1.02) ;
   box-shadow: 
     0 12px 40px rgba(24, 113, 193, 0.35),
-    0 16px 48px rgba(0, 188, 212, 0.2) !important;
-  background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%) !important;
-  color: white !important;
+    0 16px 48px rgba(0, 188, 212, 0.2) ;
+  background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%) ;
+  color: white ;
 }
 
 .mantine-Button-root:hover::before {
-  left: 100% !important;
+  left: 100% ;
 }
 
 /* ESTRUCTURA INTERNA DE BOTONES - CENTRADO PERFECTO */
 .mantine-Button-root .mantine-Button-inner {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
+  display: flex ;
+  align-items: center ;
+  justify-content: center ;
+  gap: 8px ;
+  width: 100% ;
+  margin: 0 auto ;
+  padding: 0 ;
 }
 
 .mantine-Button-root .mantine-Button-label {
-  color: white !important;
-  font-weight: 700 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
-  font-size: 14px !important;
-  white-space: nowrap !important;
-  overflow: visible !important;
-  text-align: center !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  flex: none !important;
-  width: auto !important;
+  color: white ;
+  font-weight: 700 ;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) ;
+  font-size: 14px ;
+  white-space: nowrap ;
+  overflow: visible ;
+  text-align: center ;
+  margin: 0 auto ;
+  padding: 0 ;
+  flex: none ;
+  width: auto ;
 }
 
 .mantine-Button-root .mantine-Button-section {
-  color: white !important;
-  filter: brightness(1.3) !important;
-  display: flex !important;
-  align-items: center !important;
-  margin: 0 !important;
+  color: white ;
+  filter: brightness(1.3) ;
+  display: flex ;
+  align-items: center ;
+  margin: 0 ;
 }
 
 /* FUENTES LETRAS */
 * {
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: 'Montserrat', sans-serif ;
     margin: 0;
     padding: 0;
     font-weight: 400;
@@ -212,7 +213,7 @@
 }
 
 body {
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: 'Montserrat', sans-serif ;
     font-weight: 400;
 }
 
@@ -284,7 +285,7 @@ body {
 }
 
 .btn-cerrar {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) !important;
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
@@ -300,7 +301,7 @@ body {
 }
 
 .btn-cerrar:hover {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) !important;
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
   transform: rotate(90deg);
 }
 
@@ -370,7 +371,7 @@ body {
 }
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: #000000 !important; 
+  color: #000000 ; 
   opacity: 1; 
 }
 /* BOTONES*/
@@ -424,6 +425,7 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(120, 144, 156, 0.3);
   background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%);
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
 }
 
 /*FORMULARIO LABORATORIO */

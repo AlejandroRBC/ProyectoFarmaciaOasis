@@ -33,7 +33,10 @@
 .dashboard-title {
   font-weight: 900;
   font-size: 45px !important;
-  background: linear-gradient(135deg, #034C8C 0%, #0277BD 50%, #04BFBF 100%);
+  background: linear-gradient(135deg, 
+    var(--mantine-color-blue-9) 0%, 
+    var(--mantine-color-blue-8) 50%, 
+    var(--mantine-color-cyan-9) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

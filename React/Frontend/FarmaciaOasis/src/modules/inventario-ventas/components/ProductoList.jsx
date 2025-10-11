@@ -47,6 +47,7 @@ function ProductoList({
             <Table.Tr 
                 key={producto.id} 
                 className="mantine-Table-tr" 
+                withTableBorder
             >
                 <Table.Td className="mantine-Table-td">
                 {producto.codigo}
@@ -69,7 +70,6 @@ function ProductoList({
                 <Table.Td className="mantine-Table-td">
                 <Badge 
                     color={getBadgeColor(producto.stock)}
-                    variant="light" 
                     size="sm"
                 >
                 {producto.stock}
@@ -85,25 +85,35 @@ function ProductoList({
                 {producto.porcentaje_g} %
                 </Table.Td>
                 <Table.Td className="mantine-Table-td">
-                    <ThemeIcon size="lg" color="green" variant="light">
-                        <IconShoppingCartPlus 
-                        size={20}
-                        onClick={() => onAgregarCarrito(producto)} />
-                    </ThemeIcon>
-                    <ThemeIcon size="lg" color="yellow" variant="light">
-                        <IconEdit 
-                            size={20}
-                            onClick={() => onEditar(producto)}/>
-                    </ThemeIcon>
-                    <ThemeIcon size="lg" color="red" variant="light">
-                        <IconTrash size={20} 
-                            onClick={() => {
-                                if (window.confirm(`¿Eliminar ${producto.nombre}?`)) {
-                                    onEliminar(producto.id);
-                                }
-                            }}
-                        />
-                    </ThemeIcon>
+                <ActionIcon 
+                    variant="subtle" 
+                    color="green" 
+                    size="xl" 
+                    onClick={() => onAgregarCarrito(producto)}
+                >
+                    
+                    <IconShoppingCartPlus size={20} />
+                </ActionIcon>
+                <ActionIcon 
+                    variant="subtle" 
+                    color="yellow" 
+                    size="xl" 
+                    onClick={() => onEditar(producto)}
+                >
+                    <IconEdit size={20}/>
+                </ActionIcon>
+                    <ActionIcon 
+                    variant="subtle" 
+                    color="red" 
+                    size="xl" 
+                    onClick={() => {
+                        if (window.confirm(`¿Eliminar ${producto.nombre}?`)) {
+                            onEliminar(producto.id);
+                        }
+                    }}
+                >
+                    <IconTrash size={20}/>
+                </ActionIcon>
                 </Table.Td>
             </Table.Tr>
             );
@@ -111,13 +121,10 @@ function ProductoList({
     return (
 
         <Paper 
-            p="lg" 
-            withBorder 
-            radius="lg" 
-            shadow="md"
+            
         >
-        <Box className="top-productos-content" style={{ height: '400px' }}>
-        <ScrollArea h={250} w="100%" offsetScrollbars scrollbarSize={20} scrollHideDelay={500} >
+        <Box className="top-productos-content" style={{ height: '350px' }}>
+        <ScrollArea h={250}  offsetScrollbars scrollbarSize={20} scrollHideDelay={500} >
             <Table 
                 className="mantine-Table-table"
                 verticalSpacing="sm"
@@ -125,7 +132,7 @@ function ProductoList({
                 <Table.Thead className="mantine-Table-thead">
                 <Table.Tr className="mantine-Table-tr">
                     <Table.Th className="mantine-Table-th">
-                    idProducto
+                            idProducto
                     </Table.Th>
                     <Table.Th className="mantine-Table-th">
                     Lote
@@ -169,44 +176,6 @@ function ProductoList({
         {productos.length === 0 && (<p>No hay productos disponibles</p>)}
 
         </Paper>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-        
     );
 }
 

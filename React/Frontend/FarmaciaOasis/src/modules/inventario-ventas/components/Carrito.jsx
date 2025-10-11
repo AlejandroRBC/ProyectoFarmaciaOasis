@@ -5,7 +5,7 @@
         totalVenta }) {
         if (carrito.length === 0) {
         return (
-            <div className="carrito-vacio">
+            <div>
             <p>El carrito está vacío</p>
             </div>
         );

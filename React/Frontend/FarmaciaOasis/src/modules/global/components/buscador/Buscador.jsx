@@ -164,16 +164,6 @@ return (
                 </ActionIcon>
             )}
             
-            {withShortcut && !value && (
-                <Group gap={4} className={classes.shortcut}>
-                <Kbd size="xs">
-                    <Group gap={2}>
-                    
-                    <Text size="15px">t</Text>
-                    </Group>
-                </Kbd>
-                </Group>
-            )}
 
             {withSearchButton && value && (
                 <ActionIcon
