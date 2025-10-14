@@ -123,8 +123,8 @@ function ProductoList({
         <Paper 
             
         >
-        <Box className="top-productos-content" style={{ height: '350px' }}>
-        <ScrollArea h={250}  offsetScrollbars scrollbarSize={20} scrollHideDelay={500} >
+        <Box className="top-productos-content">
+        <ScrollArea h={250}  scrollbarSize={20} scrollHideDelay={500} >
             <Table 
                 className="mantine-Table-table"
                 verticalSpacing="sm"
