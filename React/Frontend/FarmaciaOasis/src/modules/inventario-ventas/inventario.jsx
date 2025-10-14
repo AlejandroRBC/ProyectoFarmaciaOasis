@@ -1,15 +1,16 @@
 import { 
   IconBell,
   IconShoppingCart,
+  IconShoppingCartFilled,
   IconX
 } from '@tabler/icons-react';
 import { 
+  ThemeIcon,
   Stack,
   Badge,
   Text,
   Container,
   Flex,
-  
   ActionIcon,
   Button,
   Space,
@@ -254,18 +255,14 @@ function Inventario() {
         padding="md"
       >
         <Flex justify="space-between" align="center" mb="lg">
-          <Text size="xl" fw={700} c="blue.6">
-            🛒 Carrito de Compras
+        <ThemeIcon size="xl" variant="light">
+          <IconShoppingCartFilled/>  
+        </ThemeIcon>
+          <Text>
+            Carrito de Compras
           </Text>
-          <ActionIcon 
-            variant="subtle" 
-            color="gray" 
-            onClick={() => setSidebarAbierto(false)}
-          >
-            <IconX size={20} />
-          </ActionIcon>
         </Flex>
-
+        
         <VentaForm
           carrito={carrito}
           totalVenta={totalVenta}
