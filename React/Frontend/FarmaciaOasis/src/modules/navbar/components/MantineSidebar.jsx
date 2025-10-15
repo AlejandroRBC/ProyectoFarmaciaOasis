@@ -12,7 +12,7 @@ import { Group, CloseButton, Avatar, Text } from '@mantine/core';
 import classes from './MantineSidebar.module.css';
 
 const data = [
-  { link: '/', label: 'Inicio', icon: IconHome },
+  { link: '/', label: 'Dashboard', icon: IconHome },
   { link: '/inventario', label: 'Inventario', icon: IconPackage },
   { link: '/historial-ventas', label: 'Historial Ventas', icon: IconReceipt2 },
   { link: '/ingresos-egresos', label: 'Ingresos y Egresos', icon: IconListDetails },

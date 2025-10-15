@@ -29,7 +29,7 @@ import ProductoList from './components/ProductoList';
 import ProductoForm from './components/ProductoForm';
 import LaboratorioForm from './components/LaboratorioForm';
 import VentaForm from './components/VentaForm';
-import Modal from './components/Modal.jsx';
+import Modal from '../global/components/modal/Modal.jsx';
 
 
 

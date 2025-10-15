@@ -31,7 +31,7 @@ import {
 import { useMovimientos } from './hooks/useMovimientos';
 import MovimientosList from './components/MovimientosList';
 import { Select } from '../global/components/Select/Select';
-import { Buscador } from '../global/components/buscador/buscador';
+import { Buscador } from '../global/components/buscador/Buscador';
 import './ingresos-egresos.css';
 
 function IngresosEgresos() {
@@ -44,19 +44,19 @@ function IngresosEgresos() {
 
   // Opciones para el select de filtro
   const opcionesFiltro = [
-    { value: 'todos', label: '📊 Todos los movimientos' },
-    { value: 'ingreso', label: '📥 Solo ingresos' },
-    { value: 'egreso', label: '📤 Solo egresos' },
+    { value: 'todos', label: 'Todos los movimientos' },
+    { value: 'ingreso', label: 'Solo ingresos' },
+    { value: 'egreso', label: 'Solo egresos' },
   ];
 
   // Opciones para filtros rápidos de fecha
   const opcionesFiltroRapido = [
-    { value: 'general', label: '📅 General' },
-    { value: 'hoy', label: '🕐 Hoy' },
-    { value: 'semana', label: '📆 Esta semana' },
-    { value: 'mes', label: '🗓️ Este mes' },
-    { value: 'año', label: '📊 Este año' },
-    { value: 'intervalo', label: '⏰ Intervalo personalizado' },
+    { value: 'general', label: 'General' },
+    { value: 'hoy', label: 'Hoy' },
+    { value: 'semana', label: 'Esta semana' },
+    { value: 'mes', label: 'Este mes' },
+    { value: 'año', label: 'Este año' },
+    { value: 'intervalo', label: 'Intervalo personalizado' },
   ];
 
   // Función para aplicar filtros rápidos de fecha
