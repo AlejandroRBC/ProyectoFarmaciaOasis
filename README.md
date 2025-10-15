@@ -51,7 +51,7 @@ npm i -g vite
 
 - **Responsive:**
 ```bash
-npm npm install @fontsource/montserrat
+npm  install @fontsource/montserrat
 ```
 
 - **Fuente:**
@@ -87,6 +87,11 @@ npm install react-intl dayjs
 - **Iconos:**
 ```bash
 npm install @tabler/icons-react
+```
+- **Generar Pdf:**
+```bash
+npm install html2pdf.js
+
 ```
 
 ---
