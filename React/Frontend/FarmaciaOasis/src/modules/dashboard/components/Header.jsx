@@ -65,13 +65,15 @@ function Header({ productosBajos = [], productosPorVencer = [] }) {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
       
+    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       console.log('Audio no soportado');
       // Fallback simple
       try {
         const beep = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUgBjiN1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUgBjiN1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUgBmWf2fS7bCgF");
         beep.volume = 0.3;
-        beep.play().catch(e => console.log('No se pudo reproducir sonido'));
+        beep.play().catch(() => console.log('No se pudo reproducir sonido'));
+      // eslint-disable-next-line no-unused-vars
       } catch (e) {
         console.log('Sonido no disponible');
       }

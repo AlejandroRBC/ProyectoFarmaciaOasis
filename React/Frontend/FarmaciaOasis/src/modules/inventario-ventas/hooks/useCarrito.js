@@ -38,9 +38,7 @@ export const useCarrito = () => {
     setCarrito([]);
   };
 
-  const totalVenta = carrito.reduce(
-    (total, item) => total + (item.precio_venta * item.cantidad), 0
-  );
+  const totalVenta = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
 
   return {
     carrito,

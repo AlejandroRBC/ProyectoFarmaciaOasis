@@ -1,4 +1,8 @@
-function Modal({ titulo, children, onClose, tamaño = 'normal' }) {
+function Modal({ 
+  titulo, 
+  children, 
+  onClose, 
+  tamaño = 'normal' }) {
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
       onClose();
