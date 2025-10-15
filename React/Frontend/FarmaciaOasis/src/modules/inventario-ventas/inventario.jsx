@@ -255,12 +255,12 @@ function Inventario() {
         padding="md"
       >
         <Flex justify="space-between" align="center" mb="lg">
-        <ThemeIcon size="xl" variant="light">
-          <IconShoppingCartFilled/>  
-        </ThemeIcon>
-          <Text>
-            Carrito de Compras
-          </Text>
+          <ThemeIcon size="xl" variant="light">
+            <IconShoppingCartFilled/>  
+          </ThemeIcon>
+            <Text>
+              Carrito de Compras
+            </Text>
         </Flex>
         
         <VentaForm

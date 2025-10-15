@@ -7,6 +7,7 @@ import {
   Text, 
   Button, 
   ActionIcon,
+  Flex, 
   ThemeIcon,
   Badge,
   Stack,
@@ -187,20 +188,19 @@ function VentaForm({
         </Box>
 
         {/* Botones de acción */}
-        <Stack gap="sm">
+        <Stack gap>
+          <Group grow>
           <Button 
             onClick={abrirModalVenta}
-            color="blue" 
             size="md"
             fullWidth
           >
             <IconReceiptDollar/>
-            Facturar
+            Venta
           </Button>
 
           <Button 
             onClick={handleVentaRapida}
-            color="green" 
             size="md"
             fullWidth
             variant="light"
@@ -208,25 +208,25 @@ function VentaForm({
             <IconInvoice/>
             Venta Rápida
           </Button>
-          
-          <Group grow>
+
+          </Group>
+           <Flex
+            gap="md"
+            justify="center"
+            align="flex-start"
+            direction="row"
+            wrap="wrap"
+          >
             <Button 
               variant="light" 
-              color="red" 
               onClick={onVaciarCarrito}
-              size="sm"
+              size="md"
             >
               <IconTrash/> Vaciar
             </Button>
+          </Flex>
+          <Group grow>
             
-            <Button 
-              variant="light" 
-              color="gray" 
-              onClick={onCancel}
-              size="sm"
-            >
-              <IconCancel/> Cancelar
-            </Button>
           </Group>
         </Stack>
       </Box>
