@@ -6,15 +6,15 @@ function Modal({ titulo, children, onClose, tamaño = 'normal' }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className={`modal-content ${tamaño === 'grande' ? 'grande' : ''}`}>
-        <div className="modal-header">
-          <h2 className="modal-title">{titulo}</h2>
+    <div className="mantine-modal-overlay" onClick={handleOverlayClick}>
+      <div className={`mantine-modal-content ${tamaño === 'grande' ? 'grande' : ''}`}>
+        <div className="mantine-modal-header">
+          <h2 className="mantine-modal-title">{titulo}</h2>
           <button className="btn-cerrar" onClick={onClose} aria-label="Cerrar">
             &times;
           </button>
         </div>
-        <div className="modal-body">
+        <div className="mantine-modal-body">
           {children}
         </div>
       </div>
