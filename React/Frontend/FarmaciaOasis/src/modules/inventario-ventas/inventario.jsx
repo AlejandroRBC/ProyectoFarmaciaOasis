@@ -31,6 +31,9 @@ import LaboratorioForm from './components/LaboratorioForm';
 import VentaForm from './components/VentaForm';
 import Modal from './components/Modal.jsx';
 
+
+
+
 function Inventario() {
   const {
     productos,
@@ -65,20 +68,6 @@ function Inventario() {
 
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
-    
-    // Mostrar resumen de la venta
-    const productosVendidos = carrito.map(item => 
-      `${item.nombre} x${item.cantidad} = Bs ${(item.precio_venta * item.cantidad).toFixed(2)}`
-    ).join('\n');
-    
-    alert(`✅ Venta realizada exitosamente!\n\n` +
-          `Cliente: ${datosCliente.nombre}\n` +
-          `Método de pago: ${datosCliente.metodo_pago}\n` +
-          `Total: Bs ${totalVenta.toFixed(2)}\n\n` +
-          `Productos:\n${productosVendidos}`);
-    
-    vaciarCarrito();
-    // No cerramos el sidebar aquí para permitir múltiples ventas
   };
 
   const handleSubmitProducto = (datos) => {
@@ -304,6 +293,7 @@ function Inventario() {
           onVaciarCarrito={vaciarCarrito}
           onRealizarVenta={handleRealizarVenta}
           onCancel={() => setSidebarAbierto(false)}
+          
         />
       </Drawer>
     </>
