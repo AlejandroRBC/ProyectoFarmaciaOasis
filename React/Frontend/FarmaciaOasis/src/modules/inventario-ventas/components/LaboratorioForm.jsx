@@ -1,3 +1,4 @@
+import { Button } from '@mantine/core';
 import { useState } from 'react';
 
 function LaboratorioForm({ onSubmit, onCancel }) {
@@ -46,12 +47,12 @@ function LaboratorioForm({ onSubmit, onCancel }) {
       </div>
 
       <div className="mantine-form-actions">
-        <button type="submit" className="btn-agregar">
+        <Button type="submit" className="btn-agregar">
           Agregar Laboratorio
-        </button>
-        <button type="button" onClick={onCancel} className="btn-cancelar">
+        </Button>
+        <Button type="Button" onClick={onCancel} className="btn-cancelar">
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -1,4 +1,6 @@
+import { Button } from '@mantine/core';
 import { useState, useEffect } from 'react';
+
 
 function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -169,12 +171,12 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
 
       {/* Botones */}
       <div className="mantine-form-actions">
-        <button type="submit" className="btn-agregar">
+        <Button type="submit" className="btn-agregar">
           {producto ? 'Guardar Cambios' : 'Agregar Producto'}
-        </button>
-        <button type="button" onClick={onCancel} className="btn-cancelar">
+        </Button>
+        <Button type="Button" onClick={onCancel} className="btn-cancelar">
           Cancelar
-        </button>
+        </Button>
       </div>
     </form>
   );

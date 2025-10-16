@@ -138,6 +138,41 @@ function Inventario() {
             INVENTARIO
           </Text>
 
+          
+        </Flex>
+
+        {/* Barra de búsqueda centrada */}
+        <Flex
+          justify="center"
+          mb="xl"
+        >
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <Buscador
+              placeholder="Buscar por nombre o código..."
+              value={busqueda}
+              onChange={setBusqueda} 
+              results={resultadosParaBuscador}
+              onResultSelect={handleResultSelect} 
+            />
+          </div>
+        </Flex>
+
+        
+        {/* Switch para mostrar productos sin stock */}
+        <Flex justify="space-between" gap="md" >
+          <Switch
+            checked={mostrarSinStock}
+            onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
+            color="red"
+            size="md"
+            label={mostrarSinStock && (
+              <Badge color="red" variant="light">
+                {productosFiltrados.length} Eliminados
+              </Badge>
+            )}
+          />
+          
+
           {/* Carrito alineado a la derecha */}
           <ActionIcon 
             variant="subtle" 
@@ -162,43 +197,6 @@ function Inventario() {
               </Badge>
             )}
           </ActionIcon>
-        </Flex>
-
-        {/* Barra de búsqueda centrada */}
-        <Flex
-          justify="center"
-          mb="xl"
-        >
-          <div style={{ width: '100%', maxWidth: '500px' }}>
-            <Buscador
-              placeholder="Buscar por nombre o código..."
-              value={busqueda}
-              onChange={setBusqueda} 
-              results={resultadosParaBuscador}
-              onResultSelect={handleResultSelect} 
-            />
-          </div>
-        </Flex>
-
-        
-        {/* Switch para mostrar productos sin stock */}
-        <Flex align="center" gap="md" mb="xl">
-          <Switch
-            checked={mostrarSinStock}
-            onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
-            color="red"
-            size="md"
-            label={
-              <Text size="sm" fw={500}>
-                {mostrarSinStock ? "Mostrando productos sin stock" : "Mostrar productos sin stock"}
-              </Text>
-            }
-          />
-          {mostrarSinStock && (
-            <Badge color="red" variant="light">
-              {productosFiltrados.length} productos sin stock
-            </Badge>
-          )}
         </Flex>
         
         {/* Tabla de productos */}
