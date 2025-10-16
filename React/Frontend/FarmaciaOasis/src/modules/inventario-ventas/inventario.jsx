@@ -139,9 +139,13 @@ function Inventario() {
           >
             INVENTARIO
           </Text>
+          <br />
+          <br />
 
           
         </Flex>
+        <br />
+          <br />
 
         {/* Barra de búsqueda centrada */}
         <Flex
@@ -152,62 +156,65 @@ function Inventario() {
 
         
         {/* Switch para mostrar productos sin stock */}
-        <Flex justify="space-between" gap="md" mb="xl">
-          
-          <Switch
-            checked={mostrarSinStock}
-            onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
-            color="red"
-            size="md"
-            label={
-              <Text>
-                {mostrarSinStock ? 
-                <Badge size ="lg" color="red" variant="light" >
-                  <IconTrashX size={20}/>
-                </Badge>
-                :
-                <Badge size ="lg" color="gray" variant="light" >
-                  <IconTrashOff size={20}/>
-                </Badge>
-                }
-              </Text>
-            }
-          />
-          
-          <Buscador
+          <Flex justify="space-between" align="center" gap="md" mb="xl" wrap="wrap">
+            {/* Switch a la izquierda */}
+            <Switch
+              checked={mostrarSinStock}
+              onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
+              color="red"
+              size="md"
+              label={
+                <Text>
+                  {mostrarSinStock ? 
+                    <Badge size="lg" color="red" variant="light">
+                      <IconTrashX size={20}/>
+                    </Badge>
+                    :
+                    <Badge size="lg" color="gray" variant="light">
+                      <IconTrashOff size={20}/>
+                    </Badge>
+                  }
+                </Text>
+              }
+              
+            />
+            
+            {/* Buscador en el centro */}
+            <Buscador
               placeholder="Buscar por nombre o código..."
               value={busqueda}
               onChange={setBusqueda} 
               results={resultadosParaBuscador}
-              onResultSelect={handleResultSelect} 
-              maxWidth = '600px'
+              onResultSelect={handleResultSelect}
+              style={{ width: '500px', marginLeft: '-80px' }}
             />
-          {/* Carrito alineado a la derecha */}
-          <ActionIcon 
-            variant="subtle" 
-            color="blue" 
-            size="xl" 
-            onClick={() => setSidebarAbierto(true)}
-            style={{ position: 'relative', cursor: 'pointer' }}
-          >
-            <IconShoppingCart size={32} />
-            {cantidadCarrito > 0 && (
-              <Badge 
-                size="sm" 
-                circle 
-                color="red"
-                style={{ 
-                  position: 'absolute', 
-                  top: 2, 
-                  right: 2,
-                }}
-              >
-                {cantidadCarrito}
-              </Badge>
-            )}
-          </ActionIcon>
-        </Flex>
-        
+            
+            {/* Carrito alineado a la derecha */}
+            <ActionIcon 
+              variant="subtle" 
+              color="blue" 
+              size="xl" 
+              onClick={() => setSidebarAbierto(true)}
+              style={{ position: 'relative', cursor: 'pointer' }}
+            >
+              <IconShoppingCart size={32} />
+              {cantidadCarrito > 0 && (
+                <Badge 
+                  size="sm" 
+                  circle 
+                  color="red"
+                  style={{ 
+                    position: 'absolute', 
+                    top: 2, 
+                    right: 2,
+                  }}
+                >
+                  {cantidadCarrito}
+                </Badge>
+              )}
+            </ActionIcon>
+          </Flex>
+                  
         {/* Tabla de productos */}
         <ProductoList 
           productos={productosFiltrados}
@@ -218,6 +225,7 @@ function Inventario() {
         />
         
         {/* Botones de acción */}
+        <br />
         <Flex
           gap="lg"
           justify="center"

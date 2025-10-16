@@ -93,14 +93,7 @@ npm install @tabler/icons-react
 npm install html2pdf.js
 
 ```
-<!-- - **Generar EXCEL:**
-```bash
-npm install xlsx
-``` -->
-<!-- - **Generar EXCEL-TABLAS:**
-```bash
-npm install xlsx file-saver
-``` -->
+
 - **Generar EXCEL CON ESTILOS:**
 ```bash
 npm install exceljs file-saver
