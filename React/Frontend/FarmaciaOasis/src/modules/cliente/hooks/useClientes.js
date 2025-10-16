@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 
 const clientesIniciales = [
-  { id: 1, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '123456789' },
-  { id: 2, nombre: 'María García', email: 'maria@email.com', telefono: '987654321' },
-  { id: 3, nombre: 'Carlos López', email: 'carlos@email.com', telefono: '555555555' },
+  { id: 1, nombre: 'Juan Pérez', email: 'juan@email.com', telefono: '123456789', estado: 'activo' },
+  { id: 2, nombre: 'María García', email: 'maria@email.com', telefono: '987654321', estado: 'activo' },
+  { id: 3, nombre: 'Carlos López', email: 'carlos@email.com', telefono: '555555555', estado: 'activo' },
 ];
 
 export function useClientes() {
@@ -11,20 +11,23 @@ export function useClientes() {
   const [clienteEditando, setClienteEditando] = useState(null);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [busqueda, setBusqueda] = useState('');
+  const [clienteAEliminar, setClienteAEliminar] = useState(null);
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false); // ← ESTADO DEL MODAL
 
-  // Filtrar clientes en tiempo real
+  // Filtrar solo clientes activos
   const clientesFiltrados = useMemo(() => {
-    if (!busqueda.trim()) return clientes;
+    const clientesActivos = clientes.filter(cliente => cliente.estado === 'activo');
+    
+    if (!busqueda.trim()) return clientesActivos;
     
     const termino = busqueda.toLowerCase();
-    return clientes.filter(cliente => 
+    return clientesActivos.filter(cliente => 
       cliente.nombre.toLowerCase().includes(termino) ||
       cliente.email.toLowerCase().includes(termino) ||
       cliente.telefono.includes(termino)
     );
   }, [clientes, busqueda]);
 
-  // Generar resultados para el buscador (con sugerencias)
   const resultadosBusqueda = useMemo(() => {
     if (!busqueda.trim()) return [];
     
@@ -34,7 +37,7 @@ export function useClientes() {
       category: 'Cliente',
       email: cliente.email,
       telefono: cliente.telefono,
-      data: cliente // Datos completos para usar en renderResult
+      data: cliente
     }));
   }, [clientesFiltrados, busqueda]);
 
@@ -42,6 +45,7 @@ export function useClientes() {
     const cliente = {
       ...nuevoCliente,
       id: Math.max(0, ...clientes.map(c => c.id)) + 1,
+      estado: 'activo'
     };
     setClientes([...clientes, cliente]);
     setMostrarForm(false);
@@ -49,20 +53,34 @@ export function useClientes() {
 
   const actualizarCliente = (clienteActualizado) => {
     setClientes(clientes.map(c => 
-      c.id === clienteActualizado.id ? clienteActualizado : c
+      c.id === clienteActualizado.id ? { ...clienteActualizado, estado: 'activo' } : c
     ));
     setMostrarForm(false);
   };
 
+  // Eliminación suave (cambia estado a 'desactivado')
   const eliminarCliente = (id) => {
-    setClientes(clientes.filter(c => c.id !== id));
+    setClientes(clientes.map(c => 
+      c.id === id ? { ...c, estado: 'desactivado' } : c
+    ));
+    setMostrarConfirmacion(false); // ← Cerrar modal después de eliminar
+    setClienteAEliminar(null);
   };
 
-  // Manejar selección de resultado del buscador
+  // Abrir modal de confirmación
+  const solicitarEliminacion = (cliente) => {
+    setClienteAEliminar(cliente);
+    setMostrarConfirmacion(true); // ← Abrir modal
+  };
+
+  // Cerrar modal de confirmación
+  const cancelarEliminacion = () => {
+    setMostrarConfirmacion(false); // ← Cerrar modal
+    setClienteAEliminar(null);
+  };
+
   const manejarSeleccionResultado = (resultado) => {
-    // Aquí puedes decidir qué hacer cuando se selecciona un resultado
-    // Por ejemplo, abrir el modal de edición automáticamente
-    const clienteEncontrado = clientes.find(c => c.id === resultado.id);
+    const clienteEncontrado = clientes.find(c => c.id === resultado.id && c.estado === 'activo');
     if (clienteEncontrado) {
       abrirEditarCliente(clienteEncontrado);
     }
@@ -81,11 +99,15 @@ export function useClientes() {
     busqueda,
     setBusqueda,
     resultadosBusqueda,
+    clienteAEliminar,
+    mostrarConfirmacion, // ← Exportar este estado
     setClienteEditando,
     setMostrarForm,
     crearCliente,
     actualizarCliente,
     eliminarCliente,
+    solicitarEliminacion, // ← Exportar esta función
+    cancelarEliminacion,  // ← Exportar esta función
     manejarSeleccionResultado,
   };
 }

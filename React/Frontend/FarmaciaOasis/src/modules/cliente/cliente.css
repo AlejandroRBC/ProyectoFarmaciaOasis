@@ -192,4 +192,49 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 600;
+  
+}
+/* Estilos para el modal de eliminación */
+.modal-eliminar-content {
+  text-align: center;
+  padding: 10px;
+}
+
+.eliminar-icon {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.cliente-info-card,
+.proveedor-info-card {
+  background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%);
+  border: 1px solid #fed7d7;
+}
+
+.btn-cancelar {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.btn-cancelar:hover {
+  background: #edf2f7;
+}
+
+.btn-confirmar {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  border: none;
+}
+
+.btn-confirmar:hover {
+  background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+  transform: translateY(-1px);
+}
+/* styles.css */
+.titulo-gradiente {
+  font-weight: 700; /* hace la letra más ancha/gruesa */
+  font-size: 1.5rem; /* ajusta tamaño si quieres */
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

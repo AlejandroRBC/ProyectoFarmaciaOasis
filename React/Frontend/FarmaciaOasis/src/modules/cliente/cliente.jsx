@@ -11,12 +11,13 @@ import {
   Divider,
   Box
 } from '@mantine/core';
-import { IconPlus, IconX, IconUsers } from '@tabler/icons-react';
+import { IconPlus, IconX, IconUsers, IconTrash } from '@tabler/icons-react';
 import { useClientes } from './hooks/useClientes';
 import { ClienteList } from './components/ClienteList';
 import { ClienteForm } from './components/ClienteForm';
 import { Buscador } from '../global/components/buscador/buscador';
 import { useMediaQuery } from 'react-responsive';
+import Modal from '../global/components/Modal/Modal'; // ← Importa tu Modal
 import './cliente.css';
 
 export function ClientePage() {
@@ -28,11 +29,15 @@ export function ClientePage() {
     busqueda,
     setBusqueda,
     resultadosBusqueda,
+    clienteAEliminar,
+    mostrarConfirmacion,
     setClienteEditando,
     setMostrarForm,
     crearCliente,
     actualizarCliente,
     eliminarCliente,
+    solicitarEliminacion,
+    cancelarEliminacion,
     manejarSeleccionResultado,
   } = useClientes();
 
@@ -83,9 +88,6 @@ export function ClientePage() {
       <div>
         <Text size="sm" fw={500}>
           {resultado.label}
-        </Text>
-        <Text size="xs" c="dimmed">
-          {resultado.email} • {resultado.telefono}
         </Text>
       </div>
       <Text size="xs" c="blue" className="result-category">
@@ -146,13 +148,12 @@ export function ClientePage() {
                       Lista de Clientes
                     </Title>
                     <Text c="dimmed" size={isMobile ? "xs" : "sm"}>
-                      {clientes.length} de {clientesOriginales.length} clientes
+                      {clientes.length} de {clientesOriginales.length} clientes activos
                       {busqueda && ` - Buscando: "${busqueda}"`}
                     </Text>
                   </div>
                 </Group>
                 
-                {/* BUSCADOR RESPONSIVE */}
                 <Box className="buscador-container">
                   <Buscador
                     placeholder="Buscar clientes..."
@@ -176,13 +177,13 @@ export function ClientePage() {
               <ClienteList
                 clientes={clientes}
                 onEditar={abrirEditarCliente}
-                onEliminar={eliminarCliente}
+                onEliminar={solicitarEliminacion}
                 isMobile={isMobile}
               />
             </Paper>
           </Grid.Col>
 
-          {/* Formulario Responsive */}
+          {/* Formulario */}
           {mostrarForm && (
             <Grid.Col span={gridSpans.form}>
               <Card 
@@ -232,6 +233,48 @@ export function ClientePage() {
             </Grid.Col>
           )}
         </Grid>
+
+        {/* Modal de Confirmación de Eliminación */}
+        {mostrarConfirmacion && (
+          <Modal
+              titulo={<span className="titulo-gradiente">Confirmar Eliminación</span>}
+              onClose={cancelarEliminacion}
+              tamaño="normal"
+                >
+            <div className="modal-eliminar-content">
+              <div className="eliminar-icon">
+                <IconTrash size={48} color="#e53e3e" />
+              </div>
+              
+              <Text ta="center" size="lg" fw={600} mb="md">
+                ¿Estás seguro de que quieres eliminar este cliente?
+              </Text>
+              <Text ta="center" c="dimmed" size="sm" mb="xl">
+                ⚠️ El cliente cambiará a estado "desactivado" y no aparecerá en la lista principal.
+              </Text>
+
+              <Group justify="center" gap="md">
+                <Button 
+                  variant="light" 
+                  onClick={cancelarEliminacion}
+                  size="md"
+                  className="btn-cancelar"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  color="red" 
+                  onClick={() => eliminarCliente(clienteAEliminar?.id)}
+                  size="md"
+                  leftSection={<IconTrash size={16} />}
+                  className="btn-confirmar"
+                >
+                  Confirmar Eliminación
+                </Button>
+              </Group>
+            </div>
+          </Modal>
+        )}
       </Container>
     </div>
   );
