@@ -1,6 +1,8 @@
 import { 
   IconBell,
+  IconTrashOff,
   IconShoppingCart,
+  IconTrashX,
   IconShoppingCartFilled,
   IconX
 } from '@tabler/icons-react';
@@ -146,33 +148,40 @@ function Inventario() {
           justify="center"
           mb="xl"
         >
-          <div style={{ width: '100%', maxWidth: '500px' }}>
-            <Buscador
-              placeholder="Buscar por nombre o código..."
-              value={busqueda}
-              onChange={setBusqueda} 
-              results={resultadosParaBuscador}
-              onResultSelect={handleResultSelect} 
-            />
-          </div>
         </Flex>
 
         
         {/* Switch para mostrar productos sin stock */}
-        <Flex justify="space-between" gap="md" >
+        <Flex justify="space-between" gap="md" mb="xl">
+          
           <Switch
             checked={mostrarSinStock}
             onChange={(event) => setMostrarSinStock(event.currentTarget.checked)}
             color="red"
             size="md"
-            label={mostrarSinStock && (
-              <Badge color="red" variant="light">
-                {productosFiltrados.length} Eliminados
-              </Badge>
-            )}
+            label={
+              <Text>
+                {mostrarSinStock ? 
+                <Badge size ="lg" color="red" variant="light" >
+                  <IconTrashX size={20}/>
+                </Badge>
+                :
+                <Badge size ="lg" color="gray" variant="light" >
+                  <IconTrashOff size={20}/>
+                </Badge>
+                }
+              </Text>
+            }
           />
           
-
+          <Buscador
+              placeholder="Buscar por nombre o código..."
+              value={busqueda}
+              onChange={setBusqueda} 
+              results={resultadosParaBuscador}
+              onResultSelect={handleResultSelect} 
+              maxWidth = '600px'
+            />
           {/* Carrito alineado a la derecha */}
           <ActionIcon 
             variant="subtle" 
