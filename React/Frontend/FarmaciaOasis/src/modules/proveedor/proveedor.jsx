@@ -15,7 +15,7 @@ import { IconPlus, IconX, IconTruck } from '@tabler/icons-react';
 import { useProveedores } from './hooks/useProveedores';
 import { ProveedorList } from './components/ProveedorList';
 import { ProveedorForm } from './components/ProveedorForm';
-import { Buscador } from '../global/components/buscador/buscador';
+import { Buscador } from '../global/components/buscador/Buscador';
 import './proveedor.css';
 
 export function ProveedorPage() {

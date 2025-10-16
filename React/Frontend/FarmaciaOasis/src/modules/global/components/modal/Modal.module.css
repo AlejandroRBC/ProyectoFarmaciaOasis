@@ -1,0 +1,225 @@
+/* MODALES*/
+.globModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.globModalContent {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 40px rgba(30, 136, 229, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.9);
+  max-width: 520px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(0);
+  animation: slideUp 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.globModalContent.grande {
+  max-width: 800px;
+}
+
+
+
+.globModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e1f5fe;
+  background: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.globModalTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  color: black;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btnCerrar {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.btnCerrar:hover {
+  background: linear-gradient(135deg, #c5cacf 0%, #00BCD4 100%) ;
+  transform: rotate(90deg);
+}
+
+.globModalBody {
+  padding: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FORMULARIOS */
+.mantine-form {
+  width: 100%;
+  background: white;
+}
+
+.mantine-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding: 2rem;
+}
+
+.mantine-form-simple {
+  padding: 2rem;
+}
+
+.mantine-form-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+
+.mantine-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.mantine-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.mantine-form-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: black;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mantine-form-group label::before {
+  content: "•";
+  color: #0288d1;
+  font-weight: bold;
+}
+
+.mantine-form-group input,
+.mantine-form-group select,
+.mantine-form-group textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e1f5fe;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: #f8fdff;
+  color: #000000;
+}
+
+.mantine-form-group input:focus,
+.mantine-form-group select:focus,
+.mantine-form-group textarea:focus {
+  outline: none;
+  border-color: #0288d1;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1);
+  transform: translateY(-1px);
+  animation: glowBlue 0.5s ease;
+}
+
+.mantine-form-group input:hover,
+.mantine-form-group select:hover {
+  border-color: #b3e5fc;
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #000000 ; 
+  opacity: 1; 
+}
+.mantine-form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e1f5fe;
+  background: #f0f9ff;
+  border-radius: 0 0 16px 16px;
+}
+
+.glob-modal-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.btn-cancelar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(120, 144, 156, 0.3);
+  background: linear-gradient(135deg, #00BCD4 0%, #1871c1 100%);
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%) ;
+}
+
+/*FORMULARIO LABORATORIO */
+.laboratorio-form {
+  padding: 2rem;
+}
+
+.laboratorio-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.laboratorio-form .form-group:last-child {
+  margin-bottom: 0;
+}
+
+
+/* EFECTO GLOW AZUL*/
+@keyframes glowBlue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(2, 136, 209, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(2, 136, 209, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(2, 136, 209, 0);
+  }
+}
+

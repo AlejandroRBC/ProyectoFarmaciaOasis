@@ -1,39 +1,67 @@
-/* ingresos-egresos.css */
+/* Contenedor principal */
 .ingresos-egresos-container {
-  padding: 20px;
-  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* antes era center o flex-start */
+  justify-content: flex-start;
+  padding: 40px 20px;
+  margin: 0 auto;
+  max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
+
 
 /* Título con gradiente */
 .gradient-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
-/* Icono del título */
 .title-icon {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
-  border-radius: 10px;
-  padding: 8px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
+  border-radius: 10px;
+  padding: 6px;
+  margin-right: 10px;
 }
 
 .title-icon svg {
   color: white;
+  width: 50px;
+  height: 50px;
 }
 
-/* Estadísticas mejoradas */
+/* Contenedor de estadísticas */
+.stats-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+/* Tarjetas de estadísticas */
 .stat-card {
   border-radius: 12px;
   transition: all 0.2s ease;
+  margin: 0 auto;
+  text-align: center;
+  min-width: 200px;
 }
 
 .stat-card:hover {
@@ -41,40 +69,32 @@
 }
 
 /* Iconos de estadísticas */
-.stat-icon-total {
-  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
-  border-radius: 10px;
-  padding: 10px;
+.stat-icon-total,
+.stat-icon-ingreso,
+.stat-icon-egreso,
+.stat-icon-saldo {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 0 auto 0.5rem auto;
+}
+
+.stat-icon-total {
+  background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
 }
 
 .stat-icon-ingreso {
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .stat-icon-egreso {
   background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .stat-icon-saldo {
   background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .stat-icon-total svg,
@@ -85,12 +105,20 @@
 }
 
 /* Números con gradiente */
+.number-total,
+.number-ingreso,
+.number-egreso,
+.number-saldo {
+  font-weight: 800;
+  text-align: center;
+  display: block;
+}
+
 .number-total {
   background: linear-gradient(135deg, #1871c1 0%, #00BCD4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: 800;
 }
 
 .number-ingreso {
@@ -98,7 +126,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: 800;
 }
 
 .number-egreso {
@@ -106,7 +133,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: 800;
 }
 
 .number-saldo {
@@ -114,24 +140,17 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: 800;
 }
 
-/* Botón de Excel */
-.excel-button {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  border: none;
-  font-weight: 600;
-}
-
-.excel-button:hover {
-  background: linear-gradient(135deg, #218838 0%, #1e9e8a 100%);
-}
-
-/* Buscador más largo */
-.buscador-largo {
-  min-width: 400px !important;
-  flex: 1;
+/* Contenedor de controles */
+.controls-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
 }
 
 /* Filtro por tipo centrado */
@@ -143,41 +162,100 @@
 /* Contenedor de filtros derecho */
 .filtros-derecho {
   display: flex;
-  align-items: flex-end;
+  justify-content: center;
+  align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Botón de Excel */
+.excel-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.excel-button:hover {
+  background: linear-gradient(135deg, #218838 0%, #1e9e8a 100%);
+}
+
+/* Estilos para los inputs de fecha en el modal */
+.date-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.date-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.date-field label {
+  font-weight: 600;
+  color: #1e88e5;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.date-picker {
+  padding: 0.75rem;
+  border: 2px solid #e3f2fd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.date-picker:focus {
+  outline: none;
+  border-color: #1e88e5;
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .ingresos-egresos-container {
-    padding: 10px;
+    padding: 20px 10px;
   }
   
   .gradient-title {
     font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   
-  .title-icon {
-    padding: 6px;
+  .stats-container {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .title-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .buscador-largo {
-    min-width: 100% !important;
-  }
-  
-  .filtro-tipo-centrado {
-    min-width: 100%;
-    margin: 0;
+  .controls-container {
+    flex-direction: column;
   }
   
   .filtros-derecho {
+    justify-content: center;
+  }
+  
+  .date-inputs {
     flex-direction: column;
-    width: 100%;
-    gap: 12px;
+    align-items: center;
+  }
+  
+  .date-field {
+    max-width: 100%;
   }
 }

@@ -15,7 +15,7 @@ import { IconPlus, IconX, IconUsers } from '@tabler/icons-react';
 import { useClientes } from './hooks/useClientes';
 import { ClienteList } from './components/ClienteList';
 import { ClienteForm } from './components/ClienteForm';
-import { Buscador } from '../global/components/buscador/buscador';
+import { Buscador } from '../global/components/buscador/Buscador';
 import { useMediaQuery } from 'react-responsive';
 import './cliente.css';
 

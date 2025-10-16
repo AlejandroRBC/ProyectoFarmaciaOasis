@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useVentas } from './hooks/useVentas';
 import VentasList from './components/VentasList';
-import { Buscador } from '../global/components/buscador/buscador';
-import { Select as MantineSelect, Button, Modal, Group, Stack, Text } from '@mantine/core';
+import { Buscador } from '../global/components/buscador/Buscador';
+import Modal from '../global/components/modal/Modal';
+import { Select as MantineSelect, Button,Group, Stack, Text } from '@mantine/core';
 import { IconCalendar, IconDownload } from '@tabler/icons-react';
 import { IconCurrencyDollar } from '@tabler/icons-react';
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import './historial-ventas.css';
 
 function HistorialVentas() {
@@ -31,24 +34,94 @@ function HistorialVentas() {
     setFiltroTipo(value);
   };
 
-  const handleGenerarReporte = () => {
-    const data = {
-      tipo: filtroTipo,
-      fechaInicio: dateRange.start,
-      fechaFin: dateRange.end,
-      totalVentas: ventas.length,
-      ventas: ventas
+  const handleGenerarReporte = async () => {
+  if (!ventas || ventas.length === 0) {
+    alert("No hay datos de ventas para generar el reporte.");
+    return;
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("Historial de Ventas");
+
+  // Título grande
+  worksheet.mergeCells("A1:I1");
+  const titulo = worksheet.getCell("A1");
+  titulo.value = "Reporte de Ventas";
+  titulo.font = { bold: true, size: 18 };
+  titulo.alignment = { horizontal: "center", vertical: "middle" };
+
+  //  Encabezados
+  const encabezados = [
+    "Nro",
+    "ID Venta",
+    "Fecha",
+    "Hora",
+    "Nombre del Cliente",
+    "CI/NIT",
+    "Método de Pago",
+    "Productos Vendidos",
+    "Total (Bs)"
+  ];
+  worksheet.addRow([]);
+  const headerRow = worksheet.addRow(encabezados);
+
+  // Estilo para encabezados
+  headerRow.eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "70E2FA" },
     };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { 
-      type: 'application/json' 
+    cell.font = { bold: true, color: { argb: "FFFFFF" } };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.border = {
+      top: { style: "thin" },
+      left: { style: "thin" },
+      bottom: { style: "thin" },
+      right: { style: "thin" },
+    };
+  });
+
+  //  Agregar los datos
+  ventas.forEach((v, i) => {
+    const row = worksheet.addRow([
+      i + 1,
+      v.id_venta,
+      v.fecha,
+      v.hora,
+      v.nombre_cliente,
+      v.ci_nit,
+      v.metodo_pago,
+      v.productos,
+      v.total?.toFixed(2) || "0.00",
+    ]);
+
+    // Aplicar bordes a cada celda
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+      cell.alignment = { vertical: "middle", wrapText: true };
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `reporte-ventas-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-  };
+  });
+
+  //  Ajustar anchos de columnas
+  const anchos = [5, 12, 12, 10, 25, 12, 15, 45, 12];
+  anchos.forEach((width, i) => {
+    worksheet.getColumn(i + 1).width = width;
+  });
+
+  //  Guardar el archivo
+  const buffer = await workbook.xlsx.writeBuffer();
+  const fechaActual = new Date().toISOString().split("T")[0];
+  saveAs(new Blob([buffer]), `reporte-ventas-${fechaActual}.xlsx`);
+};
+
+
+
 
   const handleAplicarIntervalo = (fechaInicio, fechaFin) => {
     setDateRange({ start: fechaInicio, end: fechaFin });
@@ -76,26 +149,25 @@ function HistorialVentas() {
 
   return (
     <div className="historial-ventas-container">
-      <h1>
+      <h1 className="historial-header">
         <div className="historial-icon-container">
-          <IconCurrencyDollar size={32} /> {/* Ajusta el tamaño según necesites */}
+          <IconCurrencyDollar size={30} /> 
         </div>
-        Historial de Ventas
+  <     span className="historial-titulo">Historial de Ventas</span>
       
       </h1>
       
       <div className="historial-controles-container">
         <div className="historial-busqueda-container">
           <Buscador
-            placeholder="Buscar por ID de venta y nombre producto"
+            placeholder="Buscar por ID de venta y nombre producto..."
             value={busqueda}
             onChange={handleBusquedaChange}
-            style={{ width: '600px' }}
+            style={{ width: '400px' }}
           />
         </div>
-        
         <div className="historial-filtros-container">
-          <Group gap="md">
+          <Group gap="md" align="flex-end">
             <MantineSelect
               label="Periodo del Reporte"
               value={filtroTipo}
@@ -105,49 +177,55 @@ function HistorialVentas() {
               style={{ minWidth: '250px' }}
               placeholder="Seleccionar período"
             />
-            
-            <Button
-              variant={dateRange.start ? "filled" : "outline"}
-              leftSection={<IconCalendar size={16} />}
-              onClick={() => setIsModalOpen(true)}
-            >
-              Intervalo {dateRange.start && '✓'}
-            </Button>
 
-            {dateRange.start && (
+            <Stack spacing="xs">
               <Button
-                variant="subtle"
-                color="red"
-                onClick={handleLimpiarIntervalo}
+                variant={dateRange.start ? "filled" : "outline"}
+                leftSection={<IconCalendar size={16} />}
+                onClick={() => setIsModalOpen(true)}
+                size="sm"
               >
-                Limpiar
-              </Button>
-            )}
+                Intervalo {dateRange.start && '✓'}
+              </Button> 
+            </Stack>  
 
-            <Button
-              variant="filled"
-              leftSection={<IconDownload size={16} />}
-              onClick={handleGenerarReporte}
-              disabled={ventas.length === 0}
-            >
-              Generar Reporte Excel 
-            </Button>
+            {/* NUEVO contenedor vertical para Limpiar + Generar Reporte */}
+            <div className="botones-derecha">
+              {dateRange.start && (
+                <Button
+                  className='btn-limpiarHV'
+                  variant="subtle"
+                  color="red"
+                  onClick={handleLimpiarIntervalo}
+                  size="sm"
+                >
+                  Limpiar
+                </Button>
+              )}
+              <Button
+                variant="filled"
+                leftSection={<IconDownload size={16} />}
+                onClick={handleGenerarReporte}
+                disabled={ventas.length === 0}
+                size="sm"
+              >
+                Generar Reporte Excel
+              </Button>
+            </div>
+
           </Group>
         </div>
+
+
       </div>
 
       <VentasList ventas={ventas} />
 
       <Modal
-        title="Seleccionar Intervalo de Fechas"
-        opened={isModalOpen}
+        titulo="Seleccionar Intervalo de Fechas"        
         onClose={() => setIsModalOpen(false)}
         size="md"
-        classNames={{
-          content: 'mantine-modal-content',
-          header: 'mantine-modal-header',
-          title: 'mantine-modal-title',
-        }}
+        opened={isModalOpen}
       >
         <DateRangeModal 
           onApply={handleAplicarIntervalo}
@@ -201,7 +279,7 @@ function DateRangeModal({ onApply, onCancel }) {
         </Text>
       )}
       
-      <Group justify="flex-end" gap="sm">
+      <Group justify="center" gap="sm">
         <Button variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
