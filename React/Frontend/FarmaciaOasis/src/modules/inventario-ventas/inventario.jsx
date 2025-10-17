@@ -3,10 +3,12 @@ import {
   IconTrashOff,
   IconShoppingCart,
   IconTrashX,
+  IconTrash,
   IconShoppingCartFilled,
   IconX
 } from '@tabler/icons-react';
 import { 
+  Center,
   ThemeIcon,
   Stack,
   Switch,
@@ -389,10 +391,22 @@ function Inventario() {
         {/* Modal de confirmación para desactivar producto */}
       {modalConfirmacionDesactivar.abierto && (
         <Modal 
-          titulo="Confirmar Desactivación"
+          titulo={
+            <span className="titulo-gradiente">Confirmar Eliminación</span>
+          }
           onClose={cerrarModalConfirmacionDesactivar}
         >
-          <div style={{ padding: '2rem' }}>
+          <div style={{ padding: '1rem' }}>
+            <Center>
+              <ActionIcon 
+                      variant="subtle" 
+                      color="red" 
+                      size="xxl" 
+                      
+                  >
+                    <IconTrash size={60}/> 
+              </ActionIcon>
+            </Center>
             <Text size="lg" mb="md">
               ¿Estás seguro de que deseas desactivar el producto?
             </Text>
