@@ -1,3 +1,4 @@
+//Backend/index.js
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
@@ -126,9 +127,6 @@ BEGIN
 END;`);
 
 
-
-
-
 // ----------------------
 // ENDPOINTS PARA CLIENTES
 // ----------------------
@@ -229,6 +227,136 @@ app.delete("/api/clientes/:id", (req, res) => {
 app.get("/", (req, res) => {
   res.redirect("/api/clientes");
 });
+
+
+// JOIN PARA EL DETALLE
+app.get("/api/ventas-detalle", (req, res) => {
+  const sql = `
+    SELECT 
+      v.id_venta,
+      v.fecha,
+      v.hora,
+      c.nombre AS cliente,
+      c.ci_nit,
+      v.metodo_pago,
+      v.total,
+      GROUP_CONCAT(p.nombre_prod || ' x' || dv.cantidad, ', ') AS productos
+    FROM venta v
+    LEFT JOIN cliente c ON v.id_cliente = c.cod_cli
+    INNER JOIN detalle_venta dv ON dv.id_venta = v.id_venta
+    INNER JOIN producto p ON dv.id_producto = p.id_producto
+    GROUP BY v.id_venta, v.fecha, v.hora, c.nombre, c.ci_nit, v.metodo_pago, v.total
+    ORDER BY v.fecha DESC, v.hora DESC
+  `;
+  
+  db.all(sql, [], (err, rows) => {
+    if(err){
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
+
+// -------------------------
+// ENDPOINTS PARA LABORATORIO
+// -------------------------
+
+// GET Obtener todos los laboratorios
+app.get("/api/laboratorios", (req, res) => {
+  const sql = "SELECT * FROM laboratorio";
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
+// GET Obtener un laboratorio por ID
+app.get("/api/laboratorios/:id", (req, res) => {
+  const sql = "SELECT * FROM laboratorio WHERE id_lab = ?";
+  db.get(sql, [req.params.id], (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// POST crear un nuevo laboratorio
+app.post("/api/laboratorios", (req, res) => {
+  const { nombre_labo, direccion } = req.body;
+
+  if (!nombre_labo || !direccion) {
+    res.status(400).json({ error: "Todos los campos son obligatorios" });
+    return;
+  }
+
+  const sql = `INSERT INTO laboratorio (nombre_labo, direccion)
+               VALUES (?, ?)`;
+
+  db.run(sql, [nombre_labo, direccion], function (err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      data: {
+        id_lab: this.lastID,
+        nombre_labo,
+        direccion,
+      },
+    });
+  });
+});
+
+// PUT actualizar laboratorio
+app.put("/api/laboratorios/:id", (req, res) => {
+  const { nombre_labo, direccion } = req.body;
+
+  const sql = `UPDATE laboratorio 
+               SET nombre_labo = ?, direccion = ?
+               WHERE id_lab = ?`;
+
+  db.run(sql, [nombre_labo, direccion, req.params.id], function (err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+
+    db.get("SELECT * FROM laboratorio WHERE id_lab = ?", [req.params.id], (err, row) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({ data: row });
+    });
+  });
+});
+
+// DELETE laboratorio
+app.delete("/api/laboratorios/:id", (req, res) => {
+  const sql = "DELETE FROM laboratorio WHERE id_lab = ?";
+
+  db.run(sql, [req.params.id], function (err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+
+    res.json({
+      data: {
+        message: "Laboratorio eliminado correctamente",
+        changes: this.changes,
+      },
+    });
+  });
+});
+
 
 // Iniciar servidor
 const PORT = 4000;

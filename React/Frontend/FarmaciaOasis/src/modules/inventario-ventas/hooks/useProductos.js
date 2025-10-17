@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import inventarioService from '../services/InventarioService';
+=======
+import InventarioService from '../services/InventarioService';
+>>>>>>> ramaVictorMOD
 
 export const useProductos = () => {
   const [productos, setProductos] = useState([]);
