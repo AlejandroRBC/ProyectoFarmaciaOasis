@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import inventarioService from '../services/InventarioService';
-=======
+
 import InventarioService from '../services/InventarioService';
->>>>>>> ramaVictorMOD
+
 
 export const useProductos = () => {
   const [productos, setProductos] = useState([]);
@@ -19,7 +17,7 @@ export const useProductos = () => {
   const cargarProductos = async () => {
     setCargando(true);
     try {
-      const datos = await inventarioService.obtenerProductos();
+      const datos = await InventarioService.obtenerProductos();
       // Mapear los datos de la base de datos al formato esperado por el frontend
       const productosMapeados = datos.map(producto => ({
         id: producto.id_producto,
@@ -49,7 +47,7 @@ export const useProductos = () => {
 
   const cargarLaboratorios = async () => {
     try {
-      const datos = await inventarioService.obtenerLaboratorios();
+      const datos = await InventarioService.obtenerLaboratorios();
       setLaboratorios(datos);
     } catch (error) {
       console.error('Error cargando laboratorios:', error);
@@ -78,7 +76,7 @@ export const useProductos = () => {
         id_proveedor: 1
       };
   
-      const productoGuardado = await inventarioService.crearProducto(productoData);
+      const productoGuardado = await InventarioService.crearProducto(productoData);
       
       const productoFrontend = {
         id: productoGuardado.id_producto,
@@ -120,7 +118,7 @@ export const useProductos = () => {
         id_proveedor: 1
       };
   
-      const productoActualizado = await inventarioService.actualizarProducto(id, productoData);
+      const productoActualizado = await InventarioService.actualizarProducto(id, productoData);
       
       setProductos(prev => prev.map(p => 
         p.id === id ? { 
@@ -141,7 +139,7 @@ export const useProductos = () => {
 
   const desactivarProducto = async (id) => {
     try {
-      await inventarioService.eliminarProducto(id);
+      await InventarioService.eliminarProducto(id);
       setProductos(prev => prev.map(p => 
         p.id === id ? { ...p, estado: 'desactivado' } : p
       ));
@@ -155,7 +153,7 @@ export const useProductos = () => {
     try {
       const producto = productos.find(p => p.id === id);
       if (producto) {
-        await inventarioService.actualizarProducto(id, {
+        await InventarioService.actualizarProducto(id, {
           nombre_prod: producto.nombre,
           lote: producto.lote,
           fecha_exp: producto.fecha_expiracion,
@@ -182,7 +180,7 @@ export const useProductos = () => {
 
   const agregarLaboratorio = async (nuevoLab) => {
     try {
-      const laboratorioGuardado = await inventarioService.crearLaboratorio(nuevoLab);
+      const laboratorioGuardado = await InventarioService.crearLaboratorio(nuevoLab);
       setLaboratorios(prev => [...prev, laboratorioGuardado]);
       return laboratorioGuardado;
     } catch (error) {
