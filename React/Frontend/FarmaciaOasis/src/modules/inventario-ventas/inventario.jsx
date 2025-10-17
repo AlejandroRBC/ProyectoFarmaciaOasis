@@ -263,21 +263,25 @@ function Inventario() {
               }}
             >
               INVENTARIO
+              
             </Text>
           )}
         </Flex>
 
-        {/* Barra de controles responsive */}
-        <Flex 
-          justify="space-between" 
-          align={isMobile ? "stretch" : "center"} 
-          gap="md" 
-          mb="xl" 
-          direction={isMobile ? "column" : "row"}
-          wrap="wrap"
+        <br />
+
+
+        {/* Barra de búsqueda centrada */}
+        <Flex
+          justify="center"
+          mb="xl"
         >
-          {/* Switch para mostrar desactivados */}
-          <Flex justify={isMobile ? "center" : "flex-start"} align="center">
+        </Flex>
+
+
+        {/* Switch para mostrar productos sin stock */}
+          <Flex justify="space-between" align="center" gap="md" mb="xl" wrap="wrap">
+            {/* Switch a la izquierda */}
             <Switch
               checked={mostrarDesactivados}
               onChange={(event) => setMostrarDesactivados(event.currentTarget.checked)}
@@ -297,30 +301,26 @@ function Inventario() {
                 </Text>
               }
             />
-          </Flex>
-          
-          {/* Buscador con tamaño responsive */}
-          <Buscador
-            placeholder="Buscar por nombre o código..."
-            value={busqueda}
-            onChange={setBusqueda} 
-            results={resultadosParaBuscador}
-            onResultSelect={handleResultSelect}
-            width={isMobile ? "100%" : isTablet ? "400px" : "500px"}
-            maxWidth={isMobile ? "100%" : "500px"}
-            size={isMobile ? "sm" : "md"}
-          />
-          
-          {/* Carrito */}
-          <Flex justify={isMobile ? "center" : "flex-end"}>
+            
+            {/* Buscador en el centro */}
+            <Buscador
+              placeholder="Buscar por nombre o código..."
+              value={busqueda}
+              onChange={setBusqueda} 
+              results={resultadosParaBuscador}
+              onResultSelect={handleResultSelect}
+              style={{ width: '500px', marginLeft: '-80px' }}
+            />
+            
+            {/* Carrito alineado a la derecha */}
             <ActionIcon 
               variant="subtle" 
               color="blue" 
-              size={isMobile ? "lg" : "xl"}
+              size="xl" 
               onClick={() => setSidebarAbierto(true)}
               style={{ position: 'relative', cursor: 'pointer' }}
             >
-              <IconShoppingCart size={isMobile ? 24 : 32} />
+              <IconShoppingCart size={32} />
               {cantidadCarrito > 0 && (
                 <Badge 
                   size="sm" 
@@ -337,8 +337,7 @@ function Inventario() {
               )}
             </ActionIcon>
           </Flex>
-        </Flex>
-                  
+          
         {/* Tabla de productos */}
         <ProductoList 
           productos={productosFiltrados}
