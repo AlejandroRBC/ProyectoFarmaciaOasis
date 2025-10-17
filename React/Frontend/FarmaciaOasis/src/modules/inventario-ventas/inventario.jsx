@@ -32,6 +32,8 @@ import ProductoForm from './components/ProductoForm';
 import LaboratorioForm from './components/LaboratorioForm';
 import VentaForm from './components/VentaForm';
 import Modal from '../global/components/modal/Modal.jsx';
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 
 
@@ -111,6 +113,96 @@ function Inventario() {
   };
   
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
+  // Reporte excel
+  const generarReporteExcel = async () => {
+    // Filtrar productos con stock > 0
+    const productosConStock = productosFiltrados.filter(p => p.stock > 0);
+
+    if (!productosConStock || productosConStock.length === 0) {
+      alert("No hay productos con stock para generar el reporte.");
+      return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Inventario");
+
+    // Título
+    worksheet.mergeCells("A1:K1");
+    const titulo = worksheet.getCell("A1");
+    titulo.value = "Reporte de Inventario";
+    titulo.font = { bold: true, size: 16 };
+    titulo.alignment = { horizontal: "center" };
+
+    // Encabezados
+    worksheet.addRow([]);
+    const encabezados = [
+      "N°",
+      "Código",
+      "Lote",
+      "Nombre",
+      "Presentación",
+      "Precio Base (Bs)",
+      "Precio Venta (Bs)",
+      "Stock",
+      "Fecha de Expiración",
+      "Laboratorio",
+      "% Ganancia"
+    ];
+    const headerRow = worksheet.addRow(encabezados);
+
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "70E2FA" } 
+      };
+      cell.font = { bold: true, color: { argb: "000000" } };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
+      cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+      };
+    });
+
+    // Filas de datos
+    productosConStock.forEach((p, i) => {
+      const row = worksheet.addRow([
+        i + 1,
+        p.codigo,
+        p.lote,
+        p.nombre,
+        p.presentacion,
+        p.precio_base?.toFixed(2) || "0.00",
+        p.precio_venta?.toFixed(2) || "0.00",
+        p.stock,
+        p.fecha_expiracion,
+        p.laboratorio,
+        p.porcentaje_g + "%"
+      ]);
+
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" }
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+      });
+    });
+
+    // Ajustar anchos de columna
+    const widths = [5, 15, 15, 25, 20, 15, 15, 10, 18, 20, 12];
+    widths.forEach((w, i) => worksheet.getColumn(i + 1).width = w);
+
+    // Guardar archivo
+    const buffer = await workbook.xlsx.writeBuffer();
+    const fechaActual = new Date().toISOString().split("T")[0];
+    saveAs(new Blob([buffer]), `reporte-inventario-${fechaActual}.xlsx`);
+  };
+
 
   return (
     <>
@@ -230,26 +322,39 @@ function Inventario() {
           gap="lg"
           justify="center"
           align="center"
-          direction="row"
+          direction="column" 
           wrap="wrap"
           p="md"
         >
-          <Button 
-            size="md"
-            variant="light"
-            onClick={() => abrirModalProducto()}
-          >
-            Registrar Nuevo Producto
-          </Button>
-          
-          <Button 
-            size="md" 
-            variant="light"
-            onClick={abrirModalLaboratorio}
-          >
-            Registrar Nuevo Laboratorio
-          </Button>
+          <Flex gap="lg" justify="center" align="center">
+            <Button 
+              size="md"
+              variant="light"
+              onClick={() => abrirModalProducto()}
+            >
+              Registrar Nuevo Producto
+            </Button>
+            
+            <Button 
+              size="md" 
+              variant="light"
+              onClick={abrirModalLaboratorio}
+            >
+              Registrar Nuevo Laboratorio
+            </Button>
+          </Flex>
+
+          <Flex mt="md" justify="center">
+            <Button 
+              size="md" 
+              variant="light"
+              onClick={generarReporteExcel}
+            >
+              Generar Reporte Excel
+            </Button>
+          </Flex>
         </Flex>
+
 
         {/* Modal Agregar/Editar Producto */}
         {modalProducto.abierto && (
