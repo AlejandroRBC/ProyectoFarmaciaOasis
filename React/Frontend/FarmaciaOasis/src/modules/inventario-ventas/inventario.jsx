@@ -44,7 +44,8 @@ function Inventario() {
     laboratorios,
     agregarProducto,
     actualizarProducto,
-    eliminarProducto,
+    desactivarProducto,
+    reactivarProducto,
     agregarLaboratorio
   } = useProductos();
 
@@ -69,7 +70,35 @@ function Inventario() {
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [mostrarDesactivados, setMostrarDesactivados] = useState(false); // Cambio: ahora es para desactivados
-
+  //Estado para el modal de confirmación de desactivación
+  const [modalConfirmacionDesactivar, setModalConfirmacionDesactivar] = useState({
+    abierto: false,
+    producto: null
+  });
+  //Función para abrir modal de confirmación de desactivación
+  const abrirModalConfirmacionDesactivar = (producto) => {
+    setModalConfirmacionDesactivar({
+      abierto: true,
+      producto
+    });
+  };
+  //Función para confirmar desactivación
+  const confirmarDesactivarProducto = () => {
+    if (modalConfirmacionDesactivar.producto) {
+      desactivarProducto(modalConfirmacionDesactivar.producto.id);
+      setModalConfirmacionDesactivar({
+        abierto: false,
+        producto: null
+      });
+    }
+  };
+  //Función para cerrar modal de confirmación
+  const cerrarModalConfirmacionDesactivar = () => {
+    setModalConfirmacionDesactivar({
+      abierto: false,
+      producto: null
+    });
+  };
   const handleRealizarVenta = (datosCliente) => {
     console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
   };
@@ -313,8 +342,9 @@ function Inventario() {
           productos={productosFiltrados}
           onAgregarCarrito={agregarAlCarrito}
           onEditar={abrirModalProducto} 
-          onEliminar={eliminarProducto}
-          mostrarDesactivados={mostrarDesactivados} // Cambio: paso el nuevo prop
+          onDesactivar={abrirModalConfirmacionDesactivar} 
+          onReactivar={reactivarProducto} 
+          mostrarDesactivados={mostrarDesactivados}
         />
         
         {/* Botones de acción */}
@@ -356,7 +386,44 @@ function Inventario() {
           </Flex>
         </Flex>
 
-
+        {/* Modal de confirmación para desactivar producto */}
+      {modalConfirmacionDesactivar.abierto && (
+        <Modal 
+          titulo="Confirmar Desactivación"
+          onClose={cerrarModalConfirmacionDesactivar}
+        >
+          <div style={{ padding: '2rem' }}>
+            <Text size="lg" mb="md">
+              ¿Estás seguro de que deseas desactivar el producto?
+            </Text>
+            <Text size="sm" color="dimmed" mb="xl">
+              Producto: <strong>{modalConfirmacionDesactivar.producto?.nombre}</strong>
+              <br />
+              Código: <strong>{modalConfirmacionDesactivar.producto?.codigo}</strong>
+              <br />
+              <br />
+              El producto se moverá a la lista de productos desactivados y no estará disponible para ventas.
+            </Text>
+            
+            <div className="mantine-form-actions">
+              <Button 
+                color="red" 
+                onClick={confirmarDesactivarProducto}
+                className="btn-agregar"
+              >
+                Sí, Desactivar
+              </Button>
+              <Button 
+                variant="light" 
+                onClick={cerrarModalConfirmacionDesactivar}
+                className="btn-cancelar"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
         {/* Modal Agregar/Editar Producto */}
         {modalProducto.abierto && (
           <Modal 
