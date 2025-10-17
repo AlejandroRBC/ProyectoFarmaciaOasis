@@ -127,35 +127,7 @@ END;`);
 
 
 
-// ----------------------
-// Insertar datos de ejemplo
-// ----------------------
-db.serialize(() => {
-  db.run(`INSERT INTO laboratorio (nombre_labo, direccion) VALUES 
-    ('Laboratorio FarmaPlus', 'Av. Bolívar 123'),
-    ('Laboratorio SaludVida', 'Calle Sucre 456')`);
 
-  db.run(`INSERT INTO proveedor (nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado) VALUES
-    ('Distribuidora ABC', '111222333', 50, 'Paracetamol', 2.5, 125, 'activo'),
-    ('Suministros XYZ', '444555666', 30, 'Ibuprofeno', 3.0, 90, 'activo')`);
-
-  db.run(`INSERT INTO cliente (nombre, ci_nit, descuento, estado) VALUES
-    ('Juan Pérez', '1234567', 5, 'activo'),
-    ('María García', '7654321', 10, 'activo')`);
-
-  db.run(`INSERT INTO producto (nombre_prod, lote, fecha_exp, porcentaje_g, stock, presentacion, precio_venta, precio_compra, valor_medida, estado, id_lab, id_proveedor) VALUES
-    ('Paracetamol 500mg', 'L001', '2026-05-01', 500, 100, 'Caja x 10', 3.0, 2.5, 500, 'activo', 1, 1),
-    ('Ibuprofeno 400mg', 'L002', '2026-12-01', 400, 50, 'Caja x 10', 4.0, 3.0, 400, 'activo', 2, 2)`);
-
-  db.run(`INSERT INTO venta (total, metodo_pago, id_cliente) VALUES
-    (30.0, 'efectivo', 1),
-    (40.0, 'tarjeta', 2)`);
-
-  db.run(`INSERT INTO detalle_venta (id_venta, id_producto, cantidad, subtotal) VALUES
-    (1, 1, 5, 15.0),
-    (1, 2, 3, 12.0),
-    (2, 1, 10, 30.0)`);
-});
 
 // ----------------------
 // ENDPOINTS PARA CLIENTES
@@ -170,6 +142,84 @@ app.get("/api/clientes", (req, res) => {
       return;
     }
     res.json({ data: rows });
+  });
+});
+// GET cliente por ID
+app.get("/api/clientes/:id", (req, res) => {
+  const sql = "SELECT * FROM cliente WHERE cod_cli = ?";
+  db.get(sql, [req.params.id], (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// POST crear cliente
+app.post("/api/clientes", (req, res) => {
+  const { nombre, ci_nit, descuento } = req.body;
+  const estado = 'activo';
+  
+  const sql = `INSERT INTO cliente (nombre, ci_nit, descuento, estado) 
+               VALUES (?, ?, ?, ?)`;
+  
+  db.run(sql, [nombre, ci_nit, descuento, estado], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      data: { 
+        cod_cli: this.lastID, 
+        nombre, 
+        ci_nit, 
+        descuento, 
+        estado 
+      }
+    });
+  });
+});
+
+// PUT actualizar cliente
+app.put("/api/clientes/:id", (req, res) => {
+  const { nombre, ci_nit, descuento, estado } = req.body;
+  
+  const sql = `UPDATE cliente 
+               SET nombre = ?, ci_nit = ?, descuento = ?, estado = ? 
+               WHERE cod_cli = ?`;
+  
+  db.run(sql, [nombre, ci_nit, descuento, estado, req.params.id], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    
+    db.get("SELECT * FROM cliente WHERE cod_cli = ?", [req.params.id], (err, row) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({ data: row });
+    });
+  });
+});
+
+// DELETE cliente
+app.delete("/api/clientes/:id", (req, res) => {
+  const sql = "UPDATE cliente SET estado = 'inactivo' WHERE cod_cli = ?";
+  
+  db.run(sql, [req.params.id], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ 
+      data: { 
+        message: 'Cliente desactivado correctamente',
+        changes: this.changes 
+      } 
+    });
   });
 });
 
