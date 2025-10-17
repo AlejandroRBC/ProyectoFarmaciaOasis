@@ -251,12 +251,11 @@ app.get("/api/proveedores/:id", (req, res) => {
 // POST crear proveedor
 app.post("/api/proveedores", (req, res) => {
   const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total } = req.body;
-  const estado = 'activo';
   
-  const sql = `INSERT INTO proveedor (nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado) 
-               VALUES (?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO proveedor (nombre, telefono, cantidad, concepto, precio_unitario, precio_total) 
+               VALUES (?, ?, ?, ?, ?, ?)`;
   
-  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado], function(err) {
+  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total], function(err) {
     if (err) {
       res.status(400).json({ error: err.message });
       return;
@@ -269,8 +268,7 @@ app.post("/api/proveedores", (req, res) => {
         cantidad, 
         concepto, 
         precio_unitario, 
-        precio_total, 
-        estado 
+        precio_total
       }
     });
   });
@@ -278,14 +276,14 @@ app.post("/api/proveedores", (req, res) => {
 
 // PUT actualizar proveedor
 app.put("/api/proveedores/:id", (req, res) => {
-  const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado } = req.body;
+  const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total } = req.body;
   
   const sql = `UPDATE proveedor 
                SET nombre = ?, telefono = ?, cantidad = ?, concepto = ?, 
-                   precio_unitario = ?, precio_total = ?, estado = ? 
+                   precio_unitario = ?, precio_total = ?
                WHERE id_proveedor = ?`;
   
-  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado, req.params.id], function(err) {
+  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total, req.params.id], function(err) {
     if (err) {
       res.status(400).json({ error: err.message });
       return;
@@ -300,6 +298,7 @@ app.put("/api/proveedores/:id", (req, res) => {
     });
   });
 });
+
 
 
 
