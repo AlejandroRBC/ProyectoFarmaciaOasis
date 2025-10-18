@@ -32,8 +32,7 @@ db.run(`CREATE TABLE IF NOT EXISTS proveedor (
   cantidad INTEGER,
   concepto TEXT,
   precio_unitario REAL,
-  precio_total REAL,
-  estado TEXT
+  precio_total REAL
 )`);
 
 // CLIENTE
@@ -221,11 +220,92 @@ app.delete("/api/clientes/:id", (req, res) => {
   });
 });
 
+// ----------------------
+// ENDPOINTS PARA PROVEEDORES
+// ----------------------
+
+// GET todos los proveedores
+app.get("/api/proveedores", (req, res) => {
+  const sql = "SELECT * FROM proveedor";
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
+// GET proveedor por ID
+app.get("/api/proveedores/:id", (req, res) => {
+  const sql = "SELECT * FROM proveedor WHERE id_proveedor = ?";
+  db.get(sql, [req.params.id], (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// POST crear proveedor
+app.post("/api/proveedores", (req, res) => {
+  const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total } = req.body;
+  
+  const sql = `INSERT INTO proveedor (nombre, telefono, cantidad, concepto, precio_unitario, precio_total) 
+               VALUES (?, ?, ?, ?, ?, ?)`;
+  
+  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      data: { 
+        id_proveedor: this.lastID, 
+        nombre, 
+        telefono, 
+        cantidad, 
+        concepto, 
+        precio_unitario, 
+        precio_total
+      }
+    });
+  });
+});
+
+// PUT actualizar proveedor
+app.put("/api/proveedores/:id", (req, res) => {
+  const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total } = req.body;
+  
+  const sql = `UPDATE proveedor 
+               SET nombre = ?, telefono = ?, cantidad = ?, concepto = ?, 
+                   precio_unitario = ?, precio_total = ?
+               WHERE id_proveedor = ?`;
+  
+  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total, req.params.id], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    
+    db.get("SELECT * FROM proveedor WHERE id_proveedor = ?", [req.params.id], (err, row) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({ data: row });
+    });
+  });
+});
+
+
+
 
 
 // Redirigir "/" a "/api/clientes"
 app.get("/", (req, res) => {
-  res.redirect("/api/clientes");
+  res.redirect("/api/proveedores");
 });
 
 
@@ -361,3 +441,168 @@ app.delete("/api/laboratorios/:id", (req, res) => {
 // Iniciar servidor
 const PORT = 4000;
 app.listen(PORT, () => console.log(`Servidor backend en http://localhost:${PORT}`));
+
+// ----------------------
+// ENDPOINTS PARA PRODUCTOS
+// ----------------------
+
+// GET todos los productos
+app.get("/api/productos", (req, res) => {
+  const sql = `
+    SELECT 
+      p.*,
+      l.nombre_labo as laboratorio_nombre,
+      pr.nombre as proveedor_nombre
+    FROM producto p
+    LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
+    LEFT JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor
+  `;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
+// GET producto por ID
+app.get("/api/productos/:id", (req, res) => {
+  const sql = `
+    SELECT 
+      p.*,
+      l.nombre_labo as laboratorio_nombre,
+      pr.nombre as proveedor_nombre
+    FROM producto p
+    LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
+    LEFT JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor
+    WHERE p.id_producto = ?
+  `;
+  db.get(sql, [req.params.id], (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// POST crear producto
+app.post("/api/productos", (req, res) => {
+  const {
+    nombre_prod,
+    lote,
+    fecha_exp,
+    porcentaje_g,
+    stock,
+    presentacion,
+    precio_venta,
+    precio_compra,
+    valor_medida,
+    id_lab,
+    id_proveedor
+  } = req.body;
+  
+  const estado = 'activo';
+  
+  const sql = `
+    INSERT INTO producto (
+      nombre_prod, lote, fecha_exp, porcentaje_g, stock, 
+      presentacion, precio_venta, precio_compra, valor_medida, 
+      estado, id_lab, id_proveedor
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  
+  db.run(sql, [
+    nombre_prod, lote, fecha_exp, porcentaje_g, stock,
+    presentacion, precio_venta, precio_compra, valor_medida,
+    estado, id_lab, id_proveedor
+  ], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      data: { 
+        id_producto: this.lastID,
+        nombre_prod, lote, fecha_exp, porcentaje_g, stock,
+        presentacion, precio_venta, precio_compra, valor_medida,
+        estado, id_lab, id_proveedor
+      }
+    });
+  });
+});
+
+// PUT actualizar producto
+app.put("/api/productos/:id", (req, res) => {
+  const {
+    nombre_prod,
+    lote,
+    fecha_exp,
+    porcentaje_g,
+    stock,
+    presentacion,
+    precio_venta,
+    precio_compra,
+    valor_medida,
+    estado,
+    id_lab,
+    id_proveedor
+  } = req.body;
+  
+  const sql = `
+    UPDATE producto 
+    SET 
+      nombre_prod = ?, lote = ?, fecha_exp = ?, porcentaje_g = ?, 
+      stock = ?, presentacion = ?, precio_venta = ?, precio_compra = ?, 
+      valor_medida = ?, estado = ?, id_lab = ?, id_proveedor = ?
+    WHERE id_producto = ?
+  `;
+  
+  db.run(sql, [
+    nombre_prod, lote, fecha_exp, porcentaje_g, stock,
+    presentacion, precio_venta, precio_compra, valor_medida,
+    estado, id_lab, id_proveedor, req.params.id
+  ], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    
+    // Obtener el producto actualizado
+    db.get(`
+      SELECT 
+        p.*,
+        l.nombre_labo as laboratorio_nombre,
+        pr.nombre as proveedor_nombre
+      FROM producto p
+      LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
+      LEFT JOIN proveedor pr ON p.id_proveedor = pr.id_proveedor
+      WHERE p.id_producto = ?
+    `, [req.params.id], (err, row) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({ data: row });
+    });
+  });
+});
+
+// DELETE producto (eliminación suave)
+app.delete("/api/productos/:id", (req, res) => {
+  const sql = "UPDATE producto SET estado = 'desactivado' WHERE id_producto = ?";
+  
+  db.run(sql, [req.params.id], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ 
+      data: { 
+        message: 'Producto desactivado correctamente',
+        changes: this.changes 
+      } 
+    });
+  });
+});

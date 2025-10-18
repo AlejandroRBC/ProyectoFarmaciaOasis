@@ -21,7 +21,6 @@ export function useVentas() {
         .split('x')[0] 
         .split('=')[0]  
         .trim();
-      
       return nombreMedicamento.includes(textoBusqueda);
     });
   };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { Paper, Text, Group, LoadingOverlay, Alert, Button, Stack } from '@mantine/core';
+import { Paper, Text, Group, Button, Stack } from '@mantine/core';
 import { IconTrendingUp, IconTrendingDown, IconArrowsExchange, IconFilter, IconDownload, IconCalendar, IconChartBar } from '@tabler/icons-react';
 import { useMovimientos } from './hooks/useMovimientos';
 import MovimientosList from './components/MovimientosList';
@@ -18,6 +18,7 @@ function IngresosEgresos() {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [filtroRapido, setFiltroRapido] = useState('general');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   // Media queries para responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
