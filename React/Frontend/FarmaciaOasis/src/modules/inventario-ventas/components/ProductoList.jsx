@@ -27,13 +27,13 @@ mostrarDesactivados = false
 
 const getBadgeColor = (metodo) => {
     
-    if (metodo <= 10 ) {
+    if (metodo <= 5 ) {
         return '#FF0000';
     }
-    if (metodo > 10 && metodo < 30) {
+    if (metodo > 5 && metodo < 11) {
         return '#FF8000';
     }
-    if (metodo >= 30 ) {
+    if (metodo >= 11 ) {
         return '#28a745';
     }
     return'#6c757d';

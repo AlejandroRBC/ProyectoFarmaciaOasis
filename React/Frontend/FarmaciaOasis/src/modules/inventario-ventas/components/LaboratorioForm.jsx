@@ -1,6 +1,10 @@
 import { Button, Alert } from '@mantine/core';
 import { useState } from 'react';
+<<<<<<< HEAD
 import { IconAlertCircle } from '@tabler/icons-react';
+=======
+import { IconAlertCircle, IconLock } from '@tabler/icons-react';
+>>>>>>> main
 
 function LaboratorioForm({ onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -11,6 +15,31 @@ function LaboratorioForm({ onSubmit, onCancel }) {
   const [errores, setErrores] = useState({});
   const [tocado, setTocado] = useState({});
 
+<<<<<<< HEAD
+=======
+  // Función para verificar si el formulario es válido
+  const esFormularioValido = () => {
+    const { nombre, direccion } = formData;
+    
+    // Campos obligatorios no vacíos
+    if (!nombre.trim() || !direccion.trim()) {
+      return false;
+    }
+    
+    // Sin errores de validación
+    if (Object.keys(errores).length > 0) {
+      return false;
+    }
+    
+    // Longitudes mínimas
+    if (nombre.length < 2 || direccion.length < 5) {
+      return false;
+    }
+    
+    return true;
+  };
+
+>>>>>>> main
   // Función de validación
   const validarCampo = (nombre, valor) => {
     const nuevosErrores = { ...errores };
@@ -76,7 +105,11 @@ function LaboratorioForm({ onSubmit, onCancel }) {
       validarCampo(key, formData[key]);
     });
 
+<<<<<<< HEAD
     return Object.keys(errores).length === 0;
+=======
+    return Object.keys(errores).length === 0 && esFormularioValido();
+>>>>>>> main
   };
 
   const handleSubmit = (e) => {
@@ -93,6 +126,10 @@ function LaboratorioForm({ onSubmit, onCancel }) {
   };
 
   const hayErrores = Object.keys(errores).length > 0;
+<<<<<<< HEAD
+=======
+  const formularioValido = esFormularioValido();
+>>>>>>> main
 
   return (
     <form onSubmit={handleSubmit} className="mantine-form">
@@ -142,7 +179,12 @@ function LaboratorioForm({ onSubmit, onCancel }) {
         <Button 
           type="submit" 
           className="btn-agregar"
+<<<<<<< HEAD
           disabled={hayErrores}
+=======
+          disabled={!formularioValido}
+          leftSection={!formularioValido ? <IconLock size={16} /> : null}
+>>>>>>> main
         >
           Agregar Laboratorio
         </Button>

@@ -131,13 +131,40 @@ function Inventario() {
     return coincideBusqueda && p.estado === 'activado';
   });
   
-  const resultadosParaBuscador = productosFiltrados.map(p => ({
-    id: p.id,
-    codigo: p.codigo.toUpperCase(),
-    name: p.nombre, 
-    value: p.precio_venta,
-    label: p.laboratorio, 
-  }));
+  // 1. En la transformación de resultados, agrega los campos que necesita la estructura:
+const resultadosParaBuscador = productosFiltrados.map(p => ({
+  id: p.id,
+  label: p.nombre,                    
+  nombre: p.nombre,                   
+  codigo: p.codigo.toUpperCase(),     
+  precio_venta: p.precio_venta,       
+  laboratorio: p.laboratorio,  
+  lote: p.lote,       
+  category: 'Producto',              
+  stock: p.stock,                     
+  data: p                             
+}));
+
+// 2. La función renderizarResultado (igual a la de clientes):
+const renderizarResultado = (resultado) => {
+  return (
+    <Group justify="space-between" w="100%">
+      <div>
+        <Text size="sm" fw={500}>
+          {resultado.label}
+        </Text>
+        <Text size="xs" c="dimmed">
+          Lote: {resultado.lote} • Stock: {resultado.stock}
+        </Text>
+      </div>
+      <Text size="xs" c="blue" className="result-category">
+        {resultado.category}
+      </Text>
+    </Group>
+  );
+};
+
+
   
   const handleResultSelect = (result) => {
     console.log("Producto seleccionado:", result);
@@ -308,6 +335,10 @@ function Inventario() {
               value={busqueda}
               onChange={setBusqueda} 
               results={resultadosParaBuscador}
+<<<<<<< HEAD
+=======
+               renderResult={renderizarResultado}
+>>>>>>> main
               onResultSelect={handleResultSelect}
               style={{ width: '500px', marginLeft: '-80px' }}
             />
