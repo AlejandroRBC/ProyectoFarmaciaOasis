@@ -78,11 +78,11 @@ function IngresosEgresos() {
             {resultado.nombre}
           </Text>
           <Text size="xs" c="dimmed">
-            {resultado.laboratorio} • Bs.{precio}
+            {resultado.lote} • Bs.{precio}
           </Text>
         </div>
         <Text size="xs" c="blue" className="result-category">
-          {resultado.tipo === 'ingreso' ? 'Ingreso' : 'Egreso'}
+          Movimiento
         </Text>
       </Group>
     );
@@ -121,6 +121,7 @@ function IngresosEgresos() {
     nombre: m.nombre,
     laboratorio: m.laboratorio,
     precio_venta: m.precio_venta,
+    lote:m.lote,
     tipo: m.tipo,
   }));
 
