@@ -85,8 +85,7 @@ export function useVentas() {
     const resultado = ventas.filter(venta => {
       // 1. Filtro de búsqueda
       const textoBusqueda = busqueda.toLowerCase().trim();
-      const coincideBusqueda = 
-        busqueda === '' ||
+      const coincideBusqueda = busqueda === '' ||
         (venta.id && venta.id.toString() === busqueda) ||
         (venta.id_venta && venta.id_venta.toString() === busqueda) ||
         buscarSoloMedicamentos(venta.productos, textoBusqueda);
