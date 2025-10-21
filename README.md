@@ -147,4 +147,4 @@ React/
 
 ---
 
-👨‍💻 Desarrollado por **[Tu Nombre]**
+👨‍💻 Desarrollado por **Alejandro,Victor,Gael**
