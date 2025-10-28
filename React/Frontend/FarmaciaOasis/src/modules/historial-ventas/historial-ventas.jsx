@@ -30,7 +30,6 @@ function HistorialVentas() {
   // Media queries para responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
-  const isDesktop = useMediaQuery({ minWidth: 1025 });
 
   const handleBusquedaChange = (valor) => {
     setBusqueda(valor);
@@ -129,7 +128,17 @@ function HistorialVentas() {
 
   const handleAplicarIntervalo = (fechaInicio, fechaFin) => {
     console.log('Aplicando intervalo:', fechaInicio, 'a', fechaFin);
-    setDateRange({ start: fechaInicio, end: fechaFin });
+    
+    // Validar y formatear fechas correctamente
+    const start = fechaInicio ? new Date(fechaInicio) : null;
+    const end = fechaFin ? new Date(fechaFin) : null;
+    
+    if (start && end && start > end) {
+      console.error('Fecha de inicio no puede ser mayor que fecha fin');
+      return;
+    }
+    
+    setDateRange({ start, end });
     setIsModalOpen(false);
   };
 
