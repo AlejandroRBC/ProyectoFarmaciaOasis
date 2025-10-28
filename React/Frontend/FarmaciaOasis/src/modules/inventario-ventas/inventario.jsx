@@ -335,10 +335,7 @@ const renderizarResultado = (resultado) => {
               value={busqueda}
               onChange={setBusqueda} 
               results={resultadosParaBuscador}
-<<<<<<< HEAD
-=======
                renderResult={renderizarResultado}
->>>>>>> main
               onResultSelect={handleResultSelect}
               style={{ width: '500px', marginLeft: '-80px' }}
             />

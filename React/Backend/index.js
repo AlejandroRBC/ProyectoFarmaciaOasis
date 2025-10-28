@@ -223,7 +223,6 @@ app.delete("/api/clientes/:id", (req, res) => {
 // ----------------------
 // ENDPOINTS PARA PROVEEDORES
 // ----------------------
-<<<<<<< HEAD
 
 // GET todos los proveedores
 app.get("/api/proveedores", (req, res) => {
@@ -307,19 +306,6 @@ app.put("/api/proveedores/:id", (req, res) => {
 // Redirigir "/" a "/api/clientes"
 app.get("/", (req, res) => {
   res.redirect("/api/proveedores");
-=======
-
-// GET todos los proveedores
-app.get("/api/proveedores", (req, res) => {
-  const sql = "SELECT * FROM proveedor";
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      res.status(400).json({ error: err.message });
-      return;
-    }
-    res.json({ data: rows });
-  });
->>>>>>> main
 });
 
 // GET proveedor por ID
@@ -861,7 +847,6 @@ app.get("/", (req, res) => {
 // Iniciar servidor
 const PORT = 4000;
 app.listen(PORT, () => console.log(`Servidor backend en http://localhost:${PORT}`));
-<<<<<<< HEAD
 
 // ----------------------
 // ENDPOINTS PARA PRODUCTOS
@@ -1027,5 +1012,3 @@ app.delete("/api/productos/:id", (req, res) => {
     });
   });
 });
-=======
->>>>>>> main

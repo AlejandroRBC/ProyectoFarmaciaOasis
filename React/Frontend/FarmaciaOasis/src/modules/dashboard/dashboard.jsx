@@ -69,7 +69,7 @@ function Dashboard() {
 
       {/* MÉTRICAS CON DATOS REALES */}
       <Grid mt="xl">
-        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}>
+        <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}> {/* ✅ RESPONSIVE */}
           <MetricCard
             valor={metricas.totalHoy}
             etiqueta="Total de Hoy"

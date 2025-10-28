@@ -96,12 +96,8 @@ export function useVentas() {
 
     if (busqueda) {
       const textoBusqueda = busqueda.toLowerCase().trim();
-<<<<<<< HEAD
-      const coincideBusqueda = busqueda === '' ||
-=======
       resultado = resultado.filter(venta =>
         busqueda === '' ||
->>>>>>> main
         (venta.id && venta.id.toString() === busqueda) ||
         (venta.id_venta && venta.id_venta.toString() === busqueda) ||
         buscarSoloMedicamentos(venta.productos, textoBusqueda)
@@ -124,7 +120,7 @@ export function useVentas() {
           break;
         
         case 'semana':
-          const lunesSemana = obtenerLunesSemanaActual(ahora);
+          { const lunesSemana = obtenerLunesSemanaActual(ahora);
           lunesSemana.setHours(0, 0, 0, 0);
           
           const domingoSemana = obtenerDomingoSemanaActual(ahora);
@@ -134,10 +130,10 @@ export function useVentas() {
             const fechaVenta = parsearFecha(venta.fecha);
             return fechaVenta && fechaVenta >= lunesSemana && fechaVenta <= domingoSemana;
           });
-          break;
+          break; }
         
         case 'mes':
-          const añoActual = ahora.getFullYear();
+          { const añoActual = ahora.getFullYear();
           const mesActual = ahora.getMonth();
           
           resultado = resultado.filter(venta => {
@@ -151,10 +147,10 @@ export function useVentas() {
             
             return añoVenta === añoActual && mesVenta === mesActual;
           });
-          break;
+          break; }
         
         case 'año':
-          const año = ahora.getFullYear();
+          { const año = ahora.getFullYear();
           resultado = resultado.filter(venta => {
             if (!venta.fecha) return false;
             
@@ -164,7 +160,7 @@ export function useVentas() {
             const añoVenta = parseInt(match[1]);
             return añoVenta === año;
           });
-          break;
+          break; }
         
         default:
           break;

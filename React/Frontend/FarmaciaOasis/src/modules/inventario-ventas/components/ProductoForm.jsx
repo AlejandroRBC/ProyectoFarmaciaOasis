@@ -1,10 +1,6 @@
 import { Button, NumberInput, Text, Group, Alert } from '@mantine/core';
 import { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { IconCalculator, IconAlertCircle } from '@tabler/icons-react';
-=======
 import { IconCalculator, IconAlertCircle, IconLock } from '@tabler/icons-react';
->>>>>>> main
 
 function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
@@ -23,8 +19,6 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   const [errores, setErrores] = useState({});
   const [tocado, setTocado] = useState({});
 
-<<<<<<< HEAD
-=======
   // Función para verificar si el formulario es válido
   const esFormularioValido = () => {
     const { codigo, lote, nombre, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
@@ -52,7 +46,6 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     return true;
   };
 
->>>>>>> main
   // Calcular precio de venta cuando cambien precio_compra o porcentaje_g
   useEffect(() => {
     calcularPrecioVenta();
@@ -214,11 +207,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
       validarCampo(key, formData[key]);
     });
 
-<<<<<<< HEAD
-    return Object.keys(errores).length === 0;
-=======
     return Object.keys(errores).length === 0 && esFormularioValido();
->>>>>>> main
   };
 
   const handleSubmit = (e) => {
@@ -241,10 +230,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   };
 
   const hayErrores = Object.keys(errores).length > 0;
-<<<<<<< HEAD
-=======
   const formularioValido = esFormularioValido();
->>>>>>> main
 
   return (
     <form onSubmit={handleSubmit} className="mantine-form">
@@ -260,10 +246,6 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
       )}
 
       <div className="mantine-form-grid">
-<<<<<<< HEAD
-        
-        
-=======
         {/* Código */}
         <div className="mantine-form-group">
           <label htmlFor="codigo">Código</label>
@@ -279,7 +261,6 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
           {errores.codigo && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.codigo}</span>}
         </div>
         
->>>>>>> main
         {/* Lote */}
         <div className="mantine-form-group">
           <label htmlFor="lote">Lote</label>
@@ -441,12 +422,8 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
         <Button 
           type="submit" 
           className="btn-agregar" 
-<<<<<<< HEAD
-          disabled={precioVentaCalculado <= 0 || hayErrores}
-=======
           disabled={!formularioValido}
           leftSection={!formularioValido ? <IconLock size={16} /> : null}
->>>>>>> main
         >
           {producto ? 'Guardar Cambios' : 'Agregar Producto'}
         </Button>
