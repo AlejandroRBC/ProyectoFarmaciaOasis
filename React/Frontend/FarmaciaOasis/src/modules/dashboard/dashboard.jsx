@@ -58,6 +58,7 @@ function Dashboard() {
 
       {/* 2. MÉTRICAS - RESPONSIVE */}
       <Grid mt="xl">
+      PARA VER EL MERGE
         <Grid.Col span={isMobile ? 12 : isTablet ? 6 : 4}> {/* ✅ RESPONSIVE */}
           <MetricCard
             valor={metricas.totalHoy}
