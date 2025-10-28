@@ -1,37 +1,57 @@
-// components/VentasChart.jsx - VERSIÓN CON MÉTRICAS EN HEADER
-import { useState } from 'react';
-import { Paper, Title, Text, Group, Badge, ThemeIcon, Button } from '@mantine/core';
+// components/VentasChart.jsx - VERSIÓN CON SELECTOR DE AÑOS
+import { useState, useMemo } from 'react';
+import { Paper, Title, Text, Group, Badge, ThemeIcon, Button, Select } from '@mantine/core';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { IconTrendingUp, IconCurrencyDollar, IconChartLine, IconPackage, IconReceipt } from '@tabler/icons-react';
+import { IconTrendingUp, IconCurrencyDollar, IconChartLine, IconPackage, IconReceipt, IconCalendar } from '@tabler/icons-react';
 import '../dashboard.css';
 
 function VentasChart({ data }) {
   const [tipoGrafica, setTipoGrafica] = useState('monto');
+  const [añoSeleccionado, setAñoSeleccionado] = useState('');
   
+  // ✅ Extraer años únicos de los datos
+  const añosDisponibles = useMemo(() => {
+    const años = [...new Set(data.map(item => item.año))].sort((a, b) => b - a);
+    return años.map(año => ({ value: año, label: año }));
+  }, [data]);
+
+  // ✅ Filtrar datos por año seleccionado (o usar todos si no hay selección)
+  const datosFiltrados = useMemo(() => {
+    if (!añoSeleccionado) return data;
+    return data.filter(item => item.año === añoSeleccionado);
+  }, [data, añoSeleccionado]);
+
+  // ✅ Establecer el año más reciente por defecto
+  useMemo(() => {
+    if (añosDisponibles.length > 0 && !añoSeleccionado) {
+      setAñoSeleccionado(añosDisponibles[0].value);
+    }
+  }, [añosDisponibles, añoSeleccionado]);
+
   // ✅ CORREGIDO: Manejar array vacío en todos los reduce
-  const totalVentas = data.reduce((sum, item) => sum + (item.ventas || 0), 0);
-  const totalProductos = data.reduce((sum, item) => sum + (item.productos || 0), 0);
-  const totalNroVentas = data.reduce((sum, item) => sum + (item.nroVentas || 0), 0);
-  const promedioVentas = data.length > 0 ? totalVentas / data.length : 0;
-  const promedioNroVentas = data.length > 0 ? totalNroVentas / data.length : 0;
+  const totalVentas = datosFiltrados.reduce((sum, item) => sum + (item.ventas || 0), 0);
+  const totalProductos = datosFiltrados.reduce((sum, item) => sum + (item.productos || 0), 0);
+  const totalNroVentas = datosFiltrados.reduce((sum, item) => sum + (item.nroVentas || 0), 0);
+  const promedioVentas = datosFiltrados.length > 0 ? totalVentas / datosFiltrados.length : 0;
+  const promedioNroVentas = datosFiltrados.length > 0 ? totalNroVentas / datosFiltrados.length : 0;
   
   // ✅ CORREGIDO: Manejar array vacío en tendencia
-  const crecimiento = data.length > 1 ? 
-    ((data[data.length - 1][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas'] - 
-      data[data.length - 2][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas']) / 
-     data[data.length - 2][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas'] * 100).toFixed(1) : 0;
+  const crecimiento = datosFiltrados.length > 1 ? 
+    ((datosFiltrados[datosFiltrados.length - 1][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas'] - 
+      datosFiltrados[datosFiltrados.length - 2][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas']) / 
+     datosFiltrados[datosFiltrados.length - 2][tipoGrafica === 'monto' ? 'ventas' : 'nroVentas'] * 100).toFixed(1) : 0;
   
   // ✅ CORREGIDO: Manejar array vacío en mejor/peor mes
-  const mejorMes = data.length > 0 
+  const mejorMes = datosFiltrados.length > 0 
     ? (tipoGrafica === 'monto' 
-        ? data.reduce((max, item) => (item.ventas || 0) > (max.ventas || 0) ? item : max, data[0])
-        : data.reduce((max, item) => (item.nroVentas || 0) > (max.nroVentas || 0) ? item : max, data[0]))
+        ? datosFiltrados.reduce((max, item) => (item.ventas || 0) > (max.ventas || 0) ? item : max, datosFiltrados[0])
+        : datosFiltrados.reduce((max, item) => (item.nroVentas || 0) > (max.nroVentas || 0) ? item : max, datosFiltrados[0]))
     : { mes: 'N/A', ventas: 0, nroVentas: 0 };
 
-  const peorMes = data.length > 0
+  const peorMes = datosFiltrados.length > 0
     ? (tipoGrafica === 'monto'
-        ? data.reduce((min, item) => (item.ventas || 0) < (min.ventas || 0) ? item : min, data[0])
-        : data.reduce((min, item) => (item.nroVentas || 0) < (min.nroVentas || 0) ? item : min, data[0]))
+        ? datosFiltrados.reduce((min, item) => (item.ventas || 0) < (min.ventas || 0) ? item : min, datosFiltrados[0])
+        : datosFiltrados.reduce((min, item) => (item.nroVentas || 0) < (min.nroVentas || 0) ? item : min, datosFiltrados[0]))
     : { mes: 'N/A', ventas: 0, nroVentas: 0 };
 
   const totalActual = tipoGrafica === 'monto' ? totalVentas : totalNroVentas;
@@ -39,8 +59,8 @@ function VentasChart({ data }) {
 
   // Datos para la gráfica según el tipo seleccionado
   const datosGrafica = tipoGrafica === 'monto' 
-    ? data.map(item => ({ ...item, valor: item.ventas || 0, nombre: 'Monto Ventas' }))
-    : data.map(item => ({ ...item, valor: item.nroVentas || 0, nombre: 'Número de Ventas' }));
+    ? datosFiltrados.map(item => ({ ...item, valor: item.ventas || 0, nombre: 'Monto Ventas' }))
+    : datosFiltrados.map(item => ({ ...item, valor: item.nroVentas || 0, nombre: 'Número de Ventas' }));
 
   const colorLinea = tipoGrafica === 'monto' ? '#034C8C' : '#8B5CF6';
 
@@ -57,7 +77,7 @@ function VentasChart({ data }) {
               Análisis de Ventas
             </Title>
             <Text size="sm" c="dimmed" className="ventas-chart-subtitle">
-              Tendencias mensuales y comportamiento comercial
+              {añoSeleccionado ? `Datos del año ${añoSeleccionado}` : 'Todos los años - Tendencias mensuales'}
             </Text>
           </div>
         </Group>
@@ -84,15 +104,39 @@ function VentasChart({ data }) {
             </Text>
           </div>
 
-          {/* Período */}
-          <div style={{ textAlign: 'center' }}>
-            <Badge color="grape" variant="light" size="sm" mb={4}>
-              PERÍODO
-            </Badge>
-            <Text fw={700} size="lg" c="grape.6">
-              {data.length}m
-            </Text>
-          </div>
+          {/* Selector de Años */}
+<div style={{ textAlign: 'center' }}>
+  <Badge color="grape" variant="light" size="sm" mb={4}>
+    AÑO
+  </Badge>
+  <Select
+    value={añoSeleccionado}
+    onChange={setAñoSeleccionado}
+    data={[
+      ...añosDisponibles
+    ]}
+    placeholder="Año"
+    styles={{
+      input: {
+        fontWeight: 700,
+        textAlign: 'center',
+        color: 'var(--mantine-color-grape-6)',
+        border: 'none',
+        background: 'transparent',
+        fontSize: '16px',
+        padding: '0 12px',
+        height: 'auto',
+        minHeight: '30px',
+        lineHeight: '1.2'
+      },
+      root: {
+        width: '100%',
+        maxWidth: '90px'
+      }
+    }}
+    size="xs"
+  />
+</div>
         </Group>
       </Group>
 

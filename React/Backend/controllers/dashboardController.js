@@ -96,37 +96,36 @@ const dashboardController = {
     });
   },
 
-  getVentasMensuales: (req, res) => {
-    const añoActual = new Date().getFullYear();
-    
-    const sql = `
-      SELECT 
-        strftime('%m', fecha) as mes_numero,
-        CASE strftime('%m', fecha)
-          WHEN '01' THEN 'Ene' WHEN '02' THEN 'Feb' WHEN '03' THEN 'Mar'
-          WHEN '04' THEN 'Abr' WHEN '05' THEN 'May' WHEN '06' THEN 'Jun'
-          WHEN '07' THEN 'Jul' WHEN '08' THEN 'Ago' WHEN '09' THEN 'Sep'
-          WHEN '10' THEN 'Oct' WHEN '11' THEN 'Nov' WHEN '12' THEN 'Dic'
-        END as mes,
-        COALESCE(SUM(total), 0) as ventas,
-        COALESCE(SUM(
-          (SELECT SUM(cantidad) FROM detalle_venta dv WHERE dv.id_venta = v.id_venta)
-        ), 0) as productos,
-        COUNT(*) as nroVentas
-      FROM venta v
-      WHERE strftime('%Y', fecha) = ?
-      GROUP BY strftime('%m', fecha)
-      ORDER BY mes_numero ASC
-    `;
+getVentasMensuales: (req, res) => {
+  const sql = `
+    SELECT 
+      strftime('%Y', fecha) as año,
+      strftime('%m', fecha) as mes_numero,
+      CASE strftime('%m', fecha)
+        WHEN '01' THEN 'Ene' WHEN '02' THEN 'Feb' WHEN '03' THEN 'Mar'
+        WHEN '04' THEN 'Abr' WHEN '05' THEN 'May' WHEN '06' THEN 'Jun'
+        WHEN '07' THEN 'Jul' WHEN '08' THEN 'Ago' WHEN '09' THEN 'Sep'
+        WHEN '10' THEN 'Oct' WHEN '11' THEN 'Nov' WHEN '12' THEN 'Dic'
+      END as mes,
+      COALESCE(SUM(total), 0) as ventas,
+      COALESCE(SUM(
+        (SELECT SUM(cantidad) FROM detalle_venta dv WHERE dv.id_venta = v.id_venta)
+      ), 0) as productos,
+      COUNT(*) as nroVentas
+    FROM venta v
+    GROUP BY año, mes_numero
+    ORDER BY año DESC, mes_numero ASC
+  `;
 
-    db.all(sql, [añoActual.toString()], (err, rows) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({ data: rows });
-    });
-  },
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+},
+
 
   getTopProductos: (req, res) => {
     const sql = `

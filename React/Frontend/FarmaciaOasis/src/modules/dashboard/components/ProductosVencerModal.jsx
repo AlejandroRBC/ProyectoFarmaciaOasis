@@ -50,7 +50,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
         <Table.Td className="vencer-product-cell">
           {/* ✅ CORREGIDO: producto.fechaVencimiento en lugar de producto.fecha_exp */}
           <Text fw={500} size="sm">
-            {new Date(producto.fechaVencimiento).toLocaleDateString('es-ES')}
+            {new Date(new Date(producto.fechaVencimiento).getTime() + 24 * 60 * 60 * 1000).toLocaleDateString('es-ES')}
 
 
           </Text>
