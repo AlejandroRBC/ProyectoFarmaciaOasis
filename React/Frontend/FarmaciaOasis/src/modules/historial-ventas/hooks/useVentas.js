@@ -9,113 +9,156 @@ export function useVentas() {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [loading, setLoading] = useState(true);
 
-  // Cargar ventas al inicializar
-  useEffect(() => {
-    cargarVentas();
-  }, []);
+  const buscarSoloMedicamentos = (nombre_prod, textoBusqueda) => {
+    if (!nombre_prod) return false;
+    
+    const textoProductos = nombre_prod.toLowerCase();
+    const medicamentos = textoProductos.split(',');
+    
+    return medicamentos.some(medicamento => {
+      const nombreMedicamento = medicamento
+        .split('x')[0] 
+        .split('=')[0]  
+        .trim();
+      return nombreMedicamento.includes(textoBusqueda);
+    });
+  };
 
-  const cargarVentas = async () => {
+  const obtenerLunesSemanaActual = (fecha) => {
+    const fechaCopy = new Date(fecha);
+    const dia = fechaCopy.getDay();
+    const diff = fechaCopy.getDate() - dia + (dia === 0 ? -6 : 1);
+    return new Date(fechaCopy.setDate(diff));
+  };
+
+  const obtenerDomingoSemanaActual = (fecha) => {
+    const lunes = obtenerLunesSemanaActual(fecha);
+    const domingo = new Date(lunes);
+    domingo.setDate(lunes.getDate() + 6);
+    return domingo;
+  };
+
+  const parsearFecha = (fechaString) => {
+    if (!fechaString) return null;
+    
     try {
-      setLoading(true);
-      setError(null);
-
-      const datos = await HistorialVentasService.obtenerVentasDetalle();
-      console.log('Datos recibidos del servicio:', datos);
-
-      if (!Array.isArray(datos)) {
-        setError('Formato de datos incorrecto del servidor');
-        setearVentas([]);
-        return;
+      if (fechaString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [año, mes, dia] = fechaString.split('-').map(Number);
+        return new Date(año, mes - 1, dia, 12, 0, 0, 0);
       }
-
-      // Procesar y normalizar datos
-      const ventasProcesadas = datos.map(venta => ({
-        id: venta.id || venta.id_venta,
-        id_venta: venta.id_venta || venta.id,
-        fecha: venta.fecha,
-        hora: venta.hora,
-        cliente: venta.cliente || venta.nombre_cliente || 'Cliente no especificado',
-        ci_nit: venta.ci_nit || venta.ci || venta.nit || 'N/A',
-        metodo_pago: venta.metodo_pago || venta.tipo_pago || 'No especificado',
-        total: parseFloat(venta.total) || 0,
-        productos: venta.productos || venta.detalle_productos || 'Productos no especificados'
-      }));
-
-      // Ordenar por fecha y hora (más reciente primero)
-      const ventasOrdenadas = ventasProcesadas.sort((a, b) => {
-        const fechaA = new Date(`${a.fecha}T${a.hora}`);
-        const fechaB = new Date(`${b.fecha}T${b.hora}`);
-        return fechaB - fechaA;
-      });
-
-      setearVentas(ventasOrdenadas);
-    } catch (err) {
-      console.error('Error completo:', err);
-      setError(`Error al cargar el historial de ventas: ${err.message}`);
-      setearVentas([]);
-    } finally {
-      setLoading(false);
+      
+      if (fechaString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [dia, mes, año] = fechaString.split('/').map(Number);
+        return new Date(año, mes - 1, dia, 12, 0, 0, 0);
+      }
+      
+      const fecha = new Date(fechaString);
+      return isNaN(fecha.getTime()) ? null : fecha;
+    } catch {
+      return null;
     }
   };
 
-  // Filtrar ventas por búsqueda
+  useEffect(() => {
+    const cargarVentas = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const datos = await HistorialVentasService.obtenerVentasDetalle();
+
+        if (!Array.isArray(datos)) {
+          setError('Formato de datos incorrecto');
+          setearVentas([]);
+          return;
+        }
+
+        const ventasOrdenadas = datos.sort((a, b) => {
+          const fechaA = new Date(`${a.fecha} ${a.hora}`);
+          const fechaB = new Date(`${b.fecha} ${b.hora}`);
+          return fechaB - fechaA;
+        });
+
+        setearVentas(ventasOrdenadas);
+      } catch (err) {
+        setError(`Error al cargar el historial de ventas: ${err.message}`);
+        setearVentas([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarVentas();
+  }, []);
+
   const ventasFiltradas = useMemo(() => {
     let resultado = [...ventas];
 
-    // Aplicar filtro de búsqueda
-    if (busqueda.trim()) {
-      const termino = busqueda.toLowerCase().trim();
+    if (busqueda) {
+      const textoBusqueda = busqueda.toLowerCase().trim();
       resultado = resultado.filter(venta =>
-        venta.id_venta.toString().includes(termino) ||
-        venta.cliente.toLowerCase().includes(termino) ||
-        venta.productos.toLowerCase().includes(termino) ||
-        venta.ci_nit.toLowerCase().includes(termino)
+        busqueda === '' ||
+        (venta.id && venta.id.toString() === busqueda) ||
+        (venta.id_venta && venta.id_venta.toString() === busqueda) ||
+        buscarSoloMedicamentos(venta.productos, textoBusqueda)
       );
     }
 
-    // Aplicar filtro de tipo (período)
     if (filtroTipo !== 'general') {
       const ahora = new Date();
       
       switch (filtroTipo) {
         case 'hoy':
-          { const hoy = new Date();
-          hoy.setHours(0, 0, 0, 0);
-          const manana = new Date(hoy);
-          manana.setDate(manana.getDate() + 1);
-          
           resultado = resultado.filter(venta => {
-            const fechaVenta = new Date(venta.fecha);
-            return fechaVenta >= hoy && fechaVenta < manana;
+            const fechaVenta = parsearFecha(venta.fecha);
+            const hoy = new Date();
+            return fechaVenta && 
+              fechaVenta.getDate() === hoy.getDate() &&
+              fechaVenta.getMonth() === hoy.getMonth() &&
+              fechaVenta.getFullYear() === hoy.getFullYear();
           });
-          break; }
+          break;
         
         case 'semana':
-          { const inicioSemana = new Date();
-          inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
-          inicioSemana.setHours(0, 0, 0, 0);
+          { const lunesSemana = obtenerLunesSemanaActual(ahora);
+          lunesSemana.setHours(0, 0, 0, 0);
+          
+          const domingoSemana = obtenerDomingoSemanaActual(ahora);
+          domingoSemana.setHours(23, 59, 59, 999);
           
           resultado = resultado.filter(venta => {
-            const fechaVenta = new Date(venta.fecha);
-            return fechaVenta >= inicioSemana;
+            const fechaVenta = parsearFecha(venta.fecha);
+            return fechaVenta && fechaVenta >= lunesSemana && fechaVenta <= domingoSemana;
           });
           break; }
         
         case 'mes':
-          { const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+          { const añoActual = ahora.getFullYear();
+          const mesActual = ahora.getMonth();
           
           resultado = resultado.filter(venta => {
-            const fechaVenta = new Date(venta.fecha);
-            return fechaVenta >= inicioMes;
+            if (!venta.fecha) return false;
+            
+            const match = venta.fecha.match(/^(\d{4})-(\d{2})-/);
+            if (!match) return false;
+            
+            const añoVenta = parseInt(match[1]);
+            const mesVenta = parseInt(match[2]) - 1;
+            
+            return añoVenta === añoActual && mesVenta === mesActual;
           });
           break; }
         
         case 'año':
-          { const inicioAño = new Date(ahora.getFullYear(), 0, 1);
-          
+          { const año = ahora.getFullYear();
           resultado = resultado.filter(venta => {
-            const fechaVenta = new Date(venta.fecha);
-            return fechaVenta >= inicioAño;
+            if (!venta.fecha) return false;
+            
+            const match = venta.fecha.match(/^(\d{4})-/);
+            if (!match) return false;
+            
+            const añoVenta = parseInt(match[1]);
+            return añoVenta === año;
           });
           break; }
         
@@ -124,7 +167,6 @@ export function useVentas() {
       }
     }
 
-    // Aplicar filtro de rango de fechas
     if (dateRange.start && dateRange.end) {
       const inicio = new Date(dateRange.start);
       inicio.setHours(0, 0, 0, 0);
@@ -133,8 +175,8 @@ export function useVentas() {
       fin.setHours(23, 59, 59, 999);
       
       resultado = resultado.filter(venta => {
-        const fechaVenta = new Date(venta.fecha);
-        return fechaVenta >= inicio && fechaVenta <= fin;
+        const fechaVenta = parsearFecha(venta.fecha);
+        return fechaVenta && fechaVenta >= inicio && fechaVenta <= fin;
       });
     }
 
@@ -151,7 +193,6 @@ export function useVentas() {
     dateRange,
     setBusqueda,
     setFiltroTipo,
-    setDateRange,
-    recargarVentas: cargarVentas
+    setDateRange
   };
 }
