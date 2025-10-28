@@ -32,8 +32,7 @@ db.run(`CREATE TABLE IF NOT EXISTS proveedor (
   cantidad INTEGER,
   concepto TEXT,
   precio_unitario REAL,
-  precio_total REAL,
-  estado TEXT
+  precio_total REAL
 )`);
 
 // CLIENTE
@@ -221,11 +220,93 @@ app.delete("/api/clientes/:id", (req, res) => {
   });
 });
 
+// ----------------------
+// ENDPOINTS PARA PROVEEDORES
+// ----------------------
+
+// GET todos los proveedores
+app.get("/api/proveedores", (req, res) => {
+  const sql = "SELECT * FROM proveedor";
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: rows });
+  });
+});
+
+// GET proveedor por ID
+app.get("/api/proveedores/:id", (req, res) => {
+  const sql = "SELECT * FROM proveedor WHERE id_proveedor = ?";
+  db.get(sql, [req.params.id], (err, row) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({ data: row });
+  });
+});
+
+// POST crear proveedor
+app.post("/api/proveedores", (req, res) => {
+  const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total } = req.body;
+  const estado = 'activo';
+  
+  const sql = `INSERT INTO proveedor (nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado) 
+               VALUES (?, ?, ?, ?, ?, ?, ?)`;
+  
+  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      data: { 
+        id_proveedor: this.lastID, 
+        nombre, 
+        telefono, 
+        cantidad, 
+        concepto, 
+        precio_unitario, 
+        precio_total, 
+        estado 
+      }
+    });
+  });
+});
+
+// PUT actualizar proveedor
+app.put("/api/proveedores/:id", (req, res) => {
+  const { nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado } = req.body;
+  
+  const sql = `UPDATE proveedor 
+               SET nombre = ?, telefono = ?, cantidad = ?, concepto = ?, 
+                   precio_unitario = ?, precio_total = ?, estado = ? 
+               WHERE id_proveedor = ?`;
+  
+  db.run(sql, [nombre, telefono, cantidad, concepto, precio_unitario, precio_total, estado, req.params.id], function(err) {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    
+    db.get("SELECT * FROM proveedor WHERE id_proveedor = ?", [req.params.id], (err, row) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({ data: row });
+    });
+  });
+});
+
+
 
 
 // Redirigir "/" a "/api/clientes"
 app.get("/", (req, res) => {
-  res.redirect("/api/clientes");
+  res.redirect("/api/proveedores");
 });
 
 
