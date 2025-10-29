@@ -31,9 +31,10 @@ hayStockDisponible
         if (mostrarDesactivados) return false;
         if (producto.estado !== 'activado') return false;
         
-        // Usar hayStockDisponible para validar
-        return hayStockDisponible ? hayStockDisponible(producto) : (producto.stock > 0);
-    };
+        // ✅ SOLO impedir cuando el stock disponible sea 0
+        const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
+        return stockDisponible > 0;
+      };
     const getTooltipMessage = (producto) => {
         if (mostrarDesactivados) return "Producto desactivado";
         if (producto.estado !== 'activado') return "Producto inactivo";
@@ -44,20 +45,27 @@ hayStockDisponible
         return "Agregar al carrito";
       };
 
-    const getBadgeColor = (producto) => {
+
+
+      
+      const getBadgeColor = (producto) => {
         const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
         
-        if (stockDisponible <= 3) {
-          return '#FF0000'; // Rojo - stock crítico
+        if (stockDisponible === 0) {
+          return '#FF0000'; // Rojo - sin stock
         }
-        if (stockDisponible <= 10) {
-          return '#FF8000'; // Naranja - stock bajo
+        if (stockDisponible <= 5) {
+          return '#FF8000'; // Naranja - stock bajo (1-5)
         }
-        return '#28a745'; // Verde - stock bueno
+        if (stockDisponible <= 15) {
+          return '#FFD700'; // Amarillo - stock medio (6-15)
+        }
+        return '#28a745'; // Verde - stock bueno (16+)
       };
     
     
-    if (productos.length === 0) {
+    
+      if (productos.length === 0) {
     return (
         <div >
             <p>No hay productos registrados.</p>
