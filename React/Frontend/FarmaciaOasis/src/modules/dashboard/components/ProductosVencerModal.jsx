@@ -1,9 +1,13 @@
-// components/ProductosVencerModal.jsx
 import { Modal, Table, Badge, Text, Group, Paper, Title, Alert, ScrollArea, Box, ActionIcon } from '@mantine/core';
 import { IconCalendarExclamation, IconCalendar, IconAlertTriangle, IconCheck, IconX } from '@tabler/icons-react';
 import '../dashboard.css';
 
+/**
+ * Modal para mostrar productos próximos a vencer
+ * Clasifica por niveles de urgencia y muestra días restantes
+ */
 function ProductosVencerModal({ productos, opened, onClose }) {
+  // Sistema de colores según días restantes para vencimiento
   const getBadgeColor = (dias) => {
     if (dias <= 7) return 'red';
     if (dias <= 30) return 'orange';
@@ -14,16 +18,19 @@ function ProductosVencerModal({ productos, opened, onClose }) {
     return dias <= 7 ? 'filled' : 'light';
   };
 
+  // Estadísticas de productos por nivel de urgencia
   const productosCriticos = productos.filter(p => p.diasRestantes <= 7).length;
   const productosAdvertencia = productos.filter(p => p.diasRestantes > 7 && p.diasRestantes <= 30).length;
   const productosNecesitanAtencion = productosCriticos + productosAdvertencia;
 
+  // Colores de borde según urgencia
   const getBorderColor = (dias) => {
     if (dias <= 7) return '#ff6b6b';
     if (dias <= 30) return '#ffa94d';
     return '#51cf66';
   };
 
+  // Filas de la tabla con productos próximos a vencer
   const rows = productos.map((producto) => {
     const badgeColor = getBadgeColor(producto.diasRestantes);
     const borderColor = getBorderColor(producto.diasRestantes);
@@ -38,7 +45,6 @@ function ProductosVencerModal({ productos, opened, onClose }) {
           <Group gap="sm">
             <IconCalendar size={16} color={badgeColor} />
             <div>
-              {/* ✅ CORREGIDO: producto.nombre en lugar de producto.nombre_prod */}
               <Text fw={600} size="sm" c="dark.8">{producto.nombre}</Text>
               <Text size="xs" c="dimmed">ID: {producto.id}</Text>
             </div>
@@ -48,11 +54,14 @@ function ProductosVencerModal({ productos, opened, onClose }) {
           <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
-          {/* ✅ CORREGIDO: producto.fechaVencimiento en lugar de producto.fecha_exp */}
+          {/* Formateo de fecha con ajuste para zona horaria de Bolivia */}
           <Text fw={500} size="sm">
-            {new Date(new Date(producto.fechaVencimiento).getTime() + 24 * 60 * 60 * 1000).toLocaleDateString('es-ES')}
-
-
+            {new Date(
+              new Date(producto.fechaVencimiento).getFullYear(),
+              new Date(producto.fechaVencimiento).getMonth(),
+              new Date(producto.fechaVencimiento).getDate() + 1,
+              23, 59, 0
+            ).toLocaleDateString('es-BO', { timeZone: 'America/La_Paz' })}
           </Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
@@ -106,6 +115,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
       withCloseButton={false}
       scrollAreaComponent={ScrollArea.Autosize}
     >
+      {/* Botón de cierre personalizado */}
       <ActionIcon 
         variant="subtle" 
         color="gray" 
@@ -117,12 +127,14 @@ function ProductosVencerModal({ productos, opened, onClose }) {
         <IconX size={20} />
       </ActionIcon>
 
+      {/* Estado vacío o con productos por vencer */}
       {productos.length === 0 ? (
         <Alert color="green" title="Todo en orden" icon={<IconCalendar size={16} />} radius="md">
           No hay productos por vencer en los próximos 30 días.
         </Alert>
       ) : (
         <>
+          {/* Alerta de productos que necesitan atención */}
           <Box className="vencer-alert-container">
             <Alert 
               color="blue" 
@@ -135,6 +147,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
             </Alert>
           </Box>
 
+          {/* Tabla de productos por vencer */}
           <Paper withBorder radius="md" className="vencer-table-paper">
             <Table verticalSpacing={2} highlightOnHover>
               <Table.Thead>
@@ -149,6 +162,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
             </Table>
           </Paper>
 
+          {/* Resumen de estadísticas */}
           <Group justify="space-between" mt="md">
             <Group gap="xs">
               <Text size="sm" c="dimmed">
