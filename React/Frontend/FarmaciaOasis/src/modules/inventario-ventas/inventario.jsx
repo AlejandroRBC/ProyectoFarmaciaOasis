@@ -56,15 +56,7 @@ function Inventario() {
     abrirModalLaboratorio,
     cerrarModalLaboratorio,
   } = useModales();
-  const probarRecarga = async () => {
-    try {
-      console.log('Probando recarga de productos...');
-      await recargarProductos();
-      console.log('Productos recargados exitosamente');
-    } catch (error) {
-      console.error('Error al recargar productos:', error);
-    }
-  };
+  
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [mostrarDesactivados, setMostrarDesactivados] = useState(false);

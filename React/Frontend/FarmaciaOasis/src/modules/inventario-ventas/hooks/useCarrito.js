@@ -76,7 +76,6 @@ export const useCarrito = (productos, actualizarStockProducto,recargarProductos)
   };
 
   
-  // ✅ Función mejorada para realizar venta
   const realizarVenta = async (datosCliente) => {
     try {
       // Preparar datos para el backend
@@ -89,30 +88,37 @@ export const useCarrito = (productos, actualizarStockProducto,recargarProductos)
           precio: item.precio_venta
         }))
       };
-
+  
       console.log('Enviando venta al backend:', ventaData);
-
+  
       // Llamar al servicio
       const resultado = await ventasService.crearVenta(ventaData);
       
-      // ✅ CRÍTICO: Recargar productos desde la base de datos
+      // ✅ GUARDAR LOS DATOS COMPLETOS DE LA VENTA PARA EL PDF
+      const ventaCompleta = {
+        ...resultado,
+        datosCliente: datosCliente,
+        productosVendidos: carrito.map(item => ({
+          ...item,
+          subtotal: item.precio_venta * item.cantidad
+        }))
+      };
+      
+      // Recargar productos desde la base de datos
       if (recargarProductos) {
         console.log('Recargando productos desde BD...');
         await recargarProductos();
-      } else {
-        console.warn('recargarProductos no está disponible');
       }
       
       // Vaciar carrito después de venta exitosa
       vaciarCarrito();
       
-      console.log('Venta realizada exitosamente:', resultado);
-      return resultado;
+      console.log('Venta realizada exitosamente:', ventaCompleta);
+      return ventaCompleta; // ✅ Retornar datos completos
       
     } catch (error) {
       console.error('Error al realizar venta:', error);
       
-      // ✅ Si hay error de stock, recargar productos para actualizar vista
       if (error.message.includes('stock') || error.message.includes('Stock')) {
         if (recargarProductos) {
           console.log('Error de stock, recargando productos...');

@@ -1,32 +1,10 @@
 
 import { useState } from 'react';
 import { 
-  ScrollArea, 
-  Box, 
-  Group, 
-  Text, 
-  Button, 
-  ActionIcon,
-  Flex, 
-  ThemeIcon,
-  Badge,
-  Stack,
-  Modal,
-  TextInput, 
-  Select,
-  Alert
+  ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert
 } from '@mantine/core';
 import { 
-  IconPlus, 
-  IconMinus, 
-  IconTrash, 
-  IconUser,
-  IconShoppingCartExclamation,
-  IconReceiptDollar,
-  IconInvoice,
-  IconDownload,
-  IconPrinter,
-  IconCheck
+  IconPlus, IconMinus, IconTrash, IconUser,IconShoppingCartExclamation,IconReceiptDollar,IconInvoice,IconDownload,IconPrinter,IconCheck
 } from '@tabler/icons-react';
 import { generarPDFVenta,
   imprimirComprobante } from '../utils/generarPDF';
@@ -40,6 +18,7 @@ function VentaForm({
   onRealizarVenta, 
   onCancel
 }) {
+  const [detallesVentaReal, setDetallesVentaReal] = useState(null);
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
   const [datosVentaConfirmada, setDatosVentaConfirmada] = useState(null);
@@ -50,6 +29,77 @@ function VentaForm({
     metodo_pago: 'efectivo'
   });
 
+  // En handleSubmit:
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (carrito.length === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
+  
+  try {
+    // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA Y CAPTURAR LOS DATOS COMPLETOS
+    const ventaRealizada = await onRealizarVenta(datosCliente);
+    
+    // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO LOCAL
+    const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada({
+      ...datosCliente,
+      ventaId: ventaRealizada.id_venta
+    });
+    
+    // ✅ GUARDAR LOS DETALLES COMPLETOS DE LA VENTA
+    setDetallesVentaReal(ventaRealizada);
+    
+    setModalExitoAbierto(true);
+    setModalClienteAbierto(false);
+    
+    setDatosCliente({
+      nombre: '',
+      ci_nit: '',
+      metodo_pago: 'efectivo'
+    });
+  } catch (error) {
+    alert('Error al realizar la venta: ' + error.message);
+  }
+};
+
+// En handleVentaRapida:
+const handleVentaRapida = async () => {
+  if (carrito.length === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
+  
+  try {
+    const datosVentaRapida = {
+      nombre: 'S/N',
+      ci_nit: '00000',
+      metodo_pago: 'efectivo'
+    };
+    
+    // ✅ CAPTURAR DATOS COMPLETOS DE LA VENTA
+    const ventaRealizada = await onRealizarVenta(datosVentaRapida);
+    
+    const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada({
+      ...datosVentaRapida,
+      ventaId: ventaRealizada.id_venta
+    });
+    
+    // ✅ GUARDAR LOS DETALLES COMPLETOS
+    setDetallesVentaReal(ventaRealizada);
+    
+    setModalExitoAbierto(true);
+  } catch (error) {
+    alert('Error al realizar la venta rápida: ' + error.message);
+  }
+};
+
+// ✅ AGREGAR ESTADO PARA LOS DETALLES REALES DE LA VENTA
+
   const handleChange = (name, value) => {
     setDatosCliente(prev => ({
       ...prev,
@@ -57,32 +107,6 @@ function VentaForm({
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (carrito.length === 0) {
-      alert('El carrito está vacío');
-      return;
-    }
-    
-    try {
-      // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA DEL HOOK
-      const ventaRealizada = await onRealizarVenta(datosCliente);
-      
-      const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
-      setNumeroVentaGenerado(numeroVenta);
-      setDatosVentaConfirmada(datosCliente);
-      setModalExitoAbierto(true);
-      setModalClienteAbierto(false);
-      
-      setDatosCliente({
-        nombre: '',
-        ci_nit: '',
-        metodo_pago: 'efectivo'
-      });
-    } catch (error) {
-      alert('Error al realizar la venta: ' + error.message);
-    }
-  };
 
   const abrirModalVenta = () => {
     if (carrito.length === 0) {
@@ -91,37 +115,43 @@ function VentaForm({
     }
     setModalClienteAbierto(true);
   };
-
-  const handleVentaRapida = async () => {
-    if (carrito.length === 0) {
-      alert('El carrito está vacío');
-      return;
-    }
-    
-    try {
-      const datosVentaRapida = {
-        nombre: 'S/N',
-        ci_nit: '00000',
-        metodo_pago: 'efectivo'
-      };
-      
-      // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA
-      const ventaRealizada = await onRealizarVenta(datosVentaRapida);
-      
-      const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
-      setNumeroVentaGenerado(numeroVenta);
-      setDatosVentaConfirmada(datosVentaRapida);
-      setModalExitoAbierto(true);
-    } catch (error) {
-      alert('Error al realizar la venta rápida: ' + error.message);
-    }
-  };
+  
 
   const cerrarModalExito = () => {
     setModalExitoAbierto(false);
     onVaciarCarrito();
     onCancel();
   };
+  // ✅ FUNCIÓN MEJORADA PARA GENERAR PDF CON DATOS REALES
+const generarPDFConDatosReales = () => {
+  if (!detallesVentaReal) {
+    console.error('No hay detalles de venta disponibles');
+    return;
+  }
+
+  // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO
+  generarPDFVenta(
+    datosVentaConfirmada,
+    detallesVentaReal.productosVendidos || carrito, // ✅ Priorizar datos reales
+    detallesVentaReal.total || totalVenta, // ✅ Priorizar total real
+    numeroVentaGenerado
+  );
+};
+
+// ✅ FUNCIÓN MEJORADA PARA IMPRIMIR CON DATOS REALES
+const imprimirConDatosReales = () => {
+  if (!detallesVentaReal) {
+    console.error('No hay detalles de venta disponibles');
+    return;
+  }
+
+  imprimirComprobante(
+    datosVentaConfirmada,
+    detallesVentaReal.productosVendidos || carrito, // ✅ Priorizar datos reales
+    detallesVentaReal.total || totalVenta, // ✅ Priorizar total real
+    numeroVentaGenerado
+  );
+};
 
   if (carrito.length === 0 && !datosVentaConfirmada) {
     return (
@@ -369,7 +399,7 @@ function VentaForm({
             <Group grow>
               <Button
                 leftSection={<IconDownload size={16} />}
-                onClick={() => generarPDFVenta(datosVentaConfirmada, carrito, totalVenta, numeroVentaGenerado)}
+                onClick={generarPDFConDatosReales}
               >
                 Descargar PDF
               </Button>
@@ -377,7 +407,7 @@ function VentaForm({
               <Button
                 leftSection={<IconPrinter size={16} />}
                 variant="light"
-                onClick={() => imprimirComprobante(datosVentaConfirmada, carrito, totalVenta, numeroVentaGenerado)}
+                onClick={imprimirConDatosReales}
               >
                 Imprimir
               </Button>
