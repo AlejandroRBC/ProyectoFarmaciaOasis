@@ -77,7 +77,7 @@ const ventasController = {
     });
   },
 
-  // Crear nueva venta
+ 
   create: (req, res) => {
     const { cliente, metodo_pago, productos } = req.body;
     
@@ -103,50 +103,87 @@ const ventasController = {
         const ventaId = this.lastID;
         const detalles = [];
         
-        // Insertar cada detalle de venta
-        let productosProcesados = 0;
-        
-        productos.forEach((producto, index) => {
-          const subtotal = producto.precio * producto.cantidad;
-          
-          const sqlDetalle = `
-            INSERT INTO detalle_venta (id_venta, id_producto, cantidad, subtotal)
-            VALUES (?, ?, ?, ?)
+        // ✅ FUNCIÓN PARA ACTUALIZAR STOCK
+        const actualizarStockProducto = (productoId, cantidad, callback) => {
+          const sqlActualizarStock = `
+            UPDATE producto 
+            SET stock = stock - ? 
+            WHERE id_producto = ? AND estado = 'activo'
           `;
           
-          db.run(sqlDetalle, [ventaId, producto.id, producto.cantidad, subtotal], function(err) {
+          db.run(sqlActualizarStock, [cantidad, productoId], function(err) {
             if (err) {
-              res.status(400).json({ error: err.message });
+              callback(err);
               return;
             }
             
-            detalles.push({
-              id_detalle: this.lastID,
-              id_producto: producto.id,
-              cantidad: producto.cantidad,
-              subtotal: subtotal
-            });
-            
-            productosProcesados++;
-            
-            // Cuando todos los productos han sido procesados
-            if (productosProcesados === productos.length) {
-              res.json({
-                data: {
-                  id_venta: ventaId,
-                  total,
-                  metodo_pago,
-                  id_cliente: cliente,
-                  detalles
-                }
-              });
+            if (this.changes === 0) {
+              callback(new Error(`Producto no encontrado o inactivo: ${productoId}`));
+              return;
             }
+            
+            callback(null);
+          });
+        };
+        
+        // Insertar cada detalle de venta y actualizar stock
+        let productosProcesados = 0;
+        let errorOcurrido = null;
+        
+        productos.forEach((producto) => {
+          const subtotal = producto.precio * producto.cantidad;
+          
+          // ✅ PRIMERO: Actualizar el stock del producto
+          actualizarStockProducto(producto.id, producto.cantidad, (err) => {
+            if (err) {
+              errorOcurrido = err;
+              return;
+            }
+            
+            // ✅ SEGUNDO: Insertar el detalle de venta
+            const sqlDetalle = `
+              INSERT INTO detalle_venta (id_venta, id_producto, cantidad, subtotal)
+              VALUES (?, ?, ?, ?)
+            `;
+            
+            db.run(sqlDetalle, [ventaId, producto.id, producto.cantidad, subtotal], function(err) {
+              if (err) {
+                errorOcurrido = err;
+                return;
+              }
+              
+              detalles.push({
+                id_detalle: this.lastID,
+                id_producto: producto.id,
+                cantidad: producto.cantidad,
+                subtotal: subtotal
+              });
+              
+              productosProcesados++;
+              
+              // Cuando todos los productos han sido procesados
+              if (productosProcesados === productos.length) {
+                if (errorOcurrido) {
+                  res.status(400).json({ error: errorOcurrido.message });
+                  return;
+                }
+                
+                res.json({
+                  data: {
+                    id_venta: ventaId,
+                    total,
+                    metodo_pago,
+                    id_cliente: cliente,
+                    detalles
+                  }
+                });
+              }
+            });
           });
         });
       });
     });
   },
-
   // Obtener historial de ingresos/egresos
   getHistorialIngresosEgresos: (req, res) => {
     const sql = `

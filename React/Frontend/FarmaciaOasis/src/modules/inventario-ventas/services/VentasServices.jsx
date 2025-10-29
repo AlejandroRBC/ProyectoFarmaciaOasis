@@ -4,13 +4,20 @@ const API_URL = 'http://localhost:4000/api';
 
 const ventasService = {
   // Crear nueva venta
+  
   crearVenta: async (ventaData) => {
     try {
       const response = await axios.post(`${API_URL}/ventas`, ventaData);
       return response.data.data;
     } catch (error) {
       console.error('Error al crear venta:', error);
-      throw error;
+      
+      // ✅ Mejor manejo de errores
+      if (error.response && error.response.data && error.response.data.error) {
+        throw new Error(error.response.data.error);
+      } else {
+        throw new Error('Error al procesar la venta. Intente nuevamente.');
+      }
     }
   },
 

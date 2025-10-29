@@ -157,12 +157,18 @@ function VentaForm({
                   backgroundColor: '#f8f9fa'
                 }}
               >
+                
                 <Group justify="space-between" mb="xs">
                   <Text fw={600} size="sm">{item.nombre}</Text>
                   <Badge color="blue" variant="light">
                     Bs {item.precio_venta}
                   </Badge>
                 </Group>
+
+                {/* ✅ Agregar información de stock */}
+                <Text size="xs" c="dimmed" mb="xs">
+                  Stock disponible: {item.stock - item.cantidad} {/* Esto sería mejor si pasamos la función */}
+                </Text>
                 
                 {item.presentacion && (
                   <Text size="xs" c="dimmed" mb="xs">

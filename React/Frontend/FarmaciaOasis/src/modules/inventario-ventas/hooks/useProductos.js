@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback } from 'react';
 import InventarioService from '../services/InventarioService';
 
 export const useProductos = () => {
@@ -6,13 +6,9 @@ export const useProductos = () => {
   const [laboratorios, setLaboratorios] = useState([]);
   const [cargando, setCargando] = useState(false);
 
-  // Cargar datos iniciales
-  useEffect(() => {
-    cargarProductos();
-    cargarLaboratorios();
-  }, []);
 
-  const cargarProductos = async () => {
+  
+  const cargarProductos = useCallback(async () => {
     setCargando(true);
     try {
       const datos = await InventarioService.obtenerProductos();
@@ -36,12 +32,11 @@ export const useProductos = () => {
       setProductos(productosMapeados);
     } catch (error) {
       console.error('Error cargando productos:', error);
-      // En caso de error, usar datos mock como fallback
       setProductos([]);
     } finally {
       setCargando(false);
     }
-  };
+  }, [])
 
   const cargarLaboratorios = async () => {
     try {
@@ -49,13 +44,13 @@ export const useProductos = () => {
       setLaboratorios(datos);
     } catch (error) {
       console.error('Error cargando laboratorios:', error);
-      // Datos mock como fallback
-      setLaboratorios([
-        { id: 1, nombre: 'Lab Farma', direccion: 'Av. Principal 123' },
-        { id: 2, nombre: 'Lab Salud', direccion: 'Calle Secundaria 456' }
-      ]);
+      setLaboratorios([]);
     }
   };
+  useEffect(() => {
+    cargarProductos();
+    cargarLaboratorios();
+  }, [cargarProductos]);
 
   const agregarProducto = async (nuevoProducto) => {
     try {
@@ -146,6 +141,12 @@ export const useProductos = () => {
       throw error;
     }
   };
+  
+  const actualizarStockProducto = (id, nuevoStock) => {
+    setProductos(prev => prev.map(p => 
+      p.id === id ? { ...p, stock: nuevoStock } : p
+    ));
+  };
 
   const reactivarProducto = async (id) => {
     try {
@@ -202,7 +203,8 @@ export const useProductos = () => {
     desactivarProducto,
     reactivarProducto,
     agregarLaboratorio,
-    recargarProductos: cargarProductos,
+    actualizarStockProducto,
+    recargarProductos: cargarProductos, 
     recargarLaboratorios: cargarLaboratorios
   };
 };
