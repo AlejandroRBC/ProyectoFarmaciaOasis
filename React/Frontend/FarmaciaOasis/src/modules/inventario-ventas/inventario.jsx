@@ -26,7 +26,7 @@ import {
 import { useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useProductos } from './hooks/useProductos';
-import { useCarrito } from './hooks/useCarrito';
+import { useCarrito} from './hooks/useCarrito';
 import { useModales } from './hooks/useModales'; 
 
 import { Buscador  } from "./../global/components/buscador/Buscador";
@@ -55,6 +55,7 @@ function Inventario() {
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
+    realizarVenta,
     totalVenta
   } = useCarrito();
 
@@ -104,9 +105,21 @@ function Inventario() {
     });
   };
 
-  const handleRealizarVenta = (datosCliente) => {
-    console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
-  };
+// En la función handleRealizarVenta, cambia a:
+const handleRealizarVenta = async (datosCliente) => {
+  try {
+    console.log('Realizando venta:', { datosCliente, carrito, totalVenta });
+    
+    // ✅ LLAMAR A LA FUNCIÓN DEL HOOK QUE CONECTA CON EL BACKEND
+    const resultado = await realizarVenta(datosCliente);
+    
+    console.log('Venta realizada exitosamente:', resultado);
+    return resultado; // ✅ IMPORTANTE: Retornar el resultado
+  } catch (error) {
+    console.error('Error en handleRealizarVenta:', error);
+    throw error; // ✅ Propagar el error
+  }
+};
 
   const handleSubmitProducto = (datos) => {
     if (modalProducto.producto) {

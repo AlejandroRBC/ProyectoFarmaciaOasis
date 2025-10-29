@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ventasService from '../services/VentasServices';
 
 export const useCarrito = () => {
   const [carrito, setCarrito] = useState([]);
@@ -38,6 +39,33 @@ export const useCarrito = () => {
     setCarrito([]);
   };
 
+  // ✅ NUEVA FUNCIÓN PARA REALIZAR VENTA EN BACKEND
+  const realizarVenta = async (datosCliente) => {
+    try {
+      // Preparar datos para el backend
+      const ventaData = {
+        cliente: datosCliente.ci_nit !== '00000' ? datosCliente.ci_nit : null,
+        metodo_pago: datosCliente.metodo_pago,
+        productos: carrito.map(item => ({
+          id: item.id,
+          cantidad: item.cantidad,
+          precio: item.precio_venta
+        }))
+      };
+
+      // Llamar al servicio
+      const resultado = await ventasService.crearVenta(ventaData);
+      
+      // Vaciar carrito después de venta exitosa
+      vaciarCarrito();
+      
+      return resultado;
+    } catch (error) {
+      console.error('Error al realizar venta:', error);
+      throw error;
+    }
+  };
+
   const totalVenta = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
 
   return {
@@ -46,6 +74,7 @@ export const useCarrito = () => {
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
+    realizarVenta, // ✅ Exportar la nueva función
     totalVenta
   };
 };

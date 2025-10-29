@@ -57,25 +57,31 @@ function VentaForm({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (carrito.length === 0) {
       alert('El carrito está vacío');
       return;
     }
     
-    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
-    setNumeroVentaGenerado(numeroVenta);
-    setDatosVentaConfirmada(datosCliente);
-    onRealizarVenta(datosCliente);
-    setModalExitoAbierto(true);
-    setModalClienteAbierto(false);
-    
-    setDatosCliente({
-      nombre: '',
-      ci_nit: '',
-      metodo_pago: 'efectivo'
-    });
+    try {
+      // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA DEL HOOK
+      const ventaRealizada = await onRealizarVenta(datosCliente);
+      
+      const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+      setNumeroVentaGenerado(numeroVenta);
+      setDatosVentaConfirmada(datosCliente);
+      setModalExitoAbierto(true);
+      setModalClienteAbierto(false);
+      
+      setDatosCliente({
+        nombre: '',
+        ci_nit: '',
+        metodo_pago: 'efectivo'
+      });
+    } catch (error) {
+      alert('Error al realizar la venta: ' + error.message);
+    }
   };
 
   const abrirModalVenta = () => {
@@ -86,23 +92,29 @@ function VentaForm({
     setModalClienteAbierto(true);
   };
 
-  const handleVentaRapida = () => {
+  const handleVentaRapida = async () => {
     if (carrito.length === 0) {
       alert('El carrito está vacío');
       return;
     }
     
-    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
-    const datosVentaRapida = {
-      nombre: 'S/N',
-      ci_nit: '00000',
-      metodo_pago: 'efectivo'
-    };
-    
-    setNumeroVentaGenerado(numeroVenta);
-    setDatosVentaConfirmada(datosVentaRapida);
-    onRealizarVenta(datosVentaRapida);
-    setModalExitoAbierto(true);
+    try {
+      const datosVentaRapida = {
+        nombre: 'S/N',
+        ci_nit: '00000',
+        metodo_pago: 'efectivo'
+      };
+      
+      // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA
+      const ventaRealizada = await onRealizarVenta(datosVentaRapida);
+      
+      const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+      setNumeroVentaGenerado(numeroVenta);
+      setDatosVentaConfirmada(datosVentaRapida);
+      setModalExitoAbierto(true);
+    } catch (error) {
+      alert('Error al realizar la venta rápida: ' + error.message);
+    }
   };
 
   const cerrarModalExito = () => {
