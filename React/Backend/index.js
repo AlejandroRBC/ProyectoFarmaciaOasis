@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const { createTables } = require("./models/databaseSetup");
+const { createTables, verificarProductosAlIniciar } = require("./models/databaseSetup");
+
 
 // Importar rutas
 const clientesRoutes = require("./routes/clientes");
@@ -18,6 +19,8 @@ app.use(express.json());
 
 // Crear tablas al iniciar
 createTables();
+// verificar tablas al iniciar
+verificarProductosAlIniciar()
 
 // Configurar rutas
 app.use("/api/clientes", clientesRoutes);
