@@ -79,11 +79,19 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     try {
       console.log('🔍 Datos del cliente recibidos:', datosCliente);
 
-      // ✅ BUSCAR O CREAR CLIENTE
+      // ✅ BUSCAR O CREAR CLIENTE (automáticamente reactiva si está inactivo)
       let idCliente = null;
+      let clienteReactivado = false;
       
       if (datosCliente.ci_nit && datosCliente.ci_nit !== '00000') {
         console.log('🔍 Buscando cliente con CI:', datosCliente.ci_nit);
+        
+        // ✅ Verificar si el cliente existe y está inactivo
+        const clienteExistente = await clienteService.obtenerClientePorCI(datosCliente.ci_nit);
+        if (clienteExistente && clienteExistente.estado === 'inactivo') {
+          clienteReactivado = true;
+        }
+        
         idCliente = await clienteService.buscarOCrearCliente(
           datosCliente.nombre,
           datosCliente.ci_nit
@@ -114,6 +122,7 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
       const ventaCompleta = {
         ...resultado,
         datosCliente: datosCliente,
+        clienteReactivado: clienteReactivado, // ✅ Información sobre reactivación
         productosVendidos: carrito.map(item => ({
           ...item,
           subtotal: item.precio_venta * item.cantidad
@@ -131,6 +140,12 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
       vaciarCarrito();
       
       console.log('✅ Venta realizada exitosamente:', ventaCompleta);
+      
+      // ✅ Mostrar mensaje si el cliente fue reactivado
+      if (clienteReactivado) {
+        console.log('🔔 Cliente reactivado durante la venta');
+      }
+      
       return ventaCompleta;
       
     } catch (error) {

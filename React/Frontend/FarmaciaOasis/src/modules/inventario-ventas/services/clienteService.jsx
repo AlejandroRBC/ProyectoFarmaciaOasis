@@ -16,14 +16,13 @@ const clienteService = {
     }
   },
 
-  // Buscar cliente por CI/NIT
+  // Buscar cliente por CI/NIT (incluye inactivos)
   obtenerClientePorCI: async (ci_nit) => {
     try {
       const response = await axios.get(`${API_URL}/clientes`);
       const clientes = response.data.data;
-      return clientes.find(cliente => 
-        cliente.ci_nit === ci_nit && cliente.estado === 'activo'
-      );
+      // ✅ Buscar cliente sin importar su estado
+      return clientes.find(cliente => cliente.ci_nit === ci_nit);
     } catch (error) {
       console.error('Error al buscar cliente por CI:', error);
       throw error;
@@ -41,6 +40,29 @@ const clienteService = {
     }
   },
 
+  // Reactivar cliente inactivo
+  reactivarCliente: async (idCliente) => {
+    try {
+      // Obtener datos actuales del cliente
+      const response = await axios.get(`${API_URL}/clientes/${idCliente}`);
+      const cliente = response.data.data;
+      
+      // Actualizar solo el estado a activo
+      const responseUpdate = await axios.put(`${API_URL}/clientes/${idCliente}`, {
+        nombre: cliente.nombre,
+        ci_nit: cliente.ci_nit,
+        descuento: cliente.descuento,
+        estado: 'activo'
+      });
+      
+      console.log('✅ Cliente reactivado:', responseUpdate.data.data);
+      return responseUpdate.data.data;
+    } catch (error) {
+      console.error('❌ Error al reactivar cliente:', error);
+      throw error;
+    }
+  },
+
   // Buscar o crear cliente (función auxiliar para ventas)
   buscarOCrearCliente: async (nombre, ci_nit) => {
     try {
@@ -49,11 +71,19 @@ const clienteService = {
         return null; // Permitir venta sin cliente
       }
 
-      // Buscar si el cliente ya existe
+      // Buscar si el cliente existe (activo o inactivo)
       const clienteExistente = await clienteService.obtenerClientePorCI(ci_nit);
       
       if (clienteExistente) {
         console.log('✅ Cliente encontrado:', clienteExistente);
+        
+        // ✅ Si el cliente está inactivo, reactivarlo
+        if (clienteExistente.estado === 'inactivo') {
+          console.log('🔄 Cliente inactivo detectado, reactivando...');
+          await clienteService.reactivarCliente(clienteExistente.cod_cli);
+          console.log('✅ Cliente reactivado exitosamente');
+        }
+        
         return clienteExistente.cod_cli;
       }
 
