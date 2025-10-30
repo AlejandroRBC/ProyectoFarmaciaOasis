@@ -1,32 +1,12 @@
 import { 
-  IconBell,
-  IconTrashOff,
-  IconShoppingCart,
-  IconTrashX,
-  IconTrash,
-  IconShoppingCartFilled,
-  IconX
+  IconBell,IconTrashOff,IconShoppingCart,IconTrashX,IconTrash,IconShoppingCartFilled,IconX
 } from '@tabler/icons-react';
 import { 
-  Center,
-  ThemeIcon,
-  Stack,
-  Switch,
-  Badge,
-  Text,
-  Container,
-  Flex,
-  ActionIcon,
-  Button,
-  Space,
-  Group,
-  Drawer,
-  AppShell
-} from '@mantine/core';
+  Center,ThemeIcon,Stack,Switch,Badge,Text,Container,Flex,ActionIcon,Button,Space,Group,Drawer,AppShell} from '@mantine/core';
 import { useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { useProductos } from './hooks/useProductos';
-import { useCarrito } from './hooks/useCarrito';
+import { useCarrito} from './hooks/useCarrito';
 import { useModales } from './hooks/useModales'; 
 
 import { Buscador  } from "./../global/components/buscador/Buscador";
@@ -45,8 +25,11 @@ function Inventario() {
     agregarProducto,
     actualizarProducto,
     desactivarProducto,
+    actualizarStockProducto,
     reactivarProducto,
-    agregarLaboratorio
+    agregarLaboratorio,
+    
+    recargarProductos 
   } = useProductos();
 
   const {
@@ -55,8 +38,15 @@ function Inventario() {
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
-    totalVenta
-  } = useCarrito();
+    realizarVenta,
+    totalVenta,
+    hayStockDisponible,
+    obtenerStockDisponible
+  } = useCarrito(
+    productos, 
+    actualizarStockProducto, 
+    recargarProductos 
+  );
 
   const {
     modalProducto,
@@ -66,6 +56,7 @@ function Inventario() {
     abrirModalLaboratorio,
     cerrarModalLaboratorio,
   } = useModales();
+  
   
   const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [mostrarDesactivados, setMostrarDesactivados] = useState(false);
@@ -104,9 +95,17 @@ function Inventario() {
     });
   };
 
-  const handleRealizarVenta = (datosCliente) => {
-    console.log('Venta realizada:', { datosCliente, carrito, totalVenta });
-  };
+// En la función handleRealizarVenta, cambia a:
+const handleRealizarVenta = async (datosCliente) => {
+  try {   
+    // ✅ LLAMAR A LA FUNCIÓN DEL HOOK QUE CONECTA CON EL BACKEND
+    const resultado = await realizarVenta(datosCliente);
+    return resultado; // ✅ IMPORTANTE: Retornar el resultado
+  } catch (error) {
+    console.error('Error en handleRealizarVenta:', error);
+    throw error; // ✅ Propagar el error
+  }
+};
 
   const handleSubmitProducto = (datos) => {
     if (modalProducto.producto) {
@@ -190,7 +189,7 @@ const renderizarResultado = (resultado) => {
     titulo.font = { bold: true, size: 16 };
     titulo.alignment = { horizontal: "center" };
 
-    // Encabezados
+    // Encabezadosz 
     worksheet.addRow([]);
     const encabezados = [
       "Nº",
@@ -374,7 +373,9 @@ const renderizarResultado = (resultado) => {
           onDesactivar={abrirModalConfirmacionDesactivar} 
           onReactivar={reactivarProducto} 
           mostrarDesactivados={mostrarDesactivados}
-          
+          obtenerStockDisponible={obtenerStockDisponible}
+          hayStockDisponible={hayStockDisponible} 
+
         />
         
         {/* Botones de acción responsive */}

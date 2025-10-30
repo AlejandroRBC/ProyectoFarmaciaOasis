@@ -1,32 +1,11 @@
 
+
 import { useState } from 'react';
 import { 
-  ScrollArea, 
-  Box, 
-  Group, 
-  Text, 
-  Button, 
-  ActionIcon,
-  Flex, 
-  ThemeIcon,
-  Badge,
-  Stack,
-  Modal,
-  TextInput, 
-  Select,
-  Alert
+  ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert
 } from '@mantine/core';
 import { 
-  IconPlus, 
-  IconMinus, 
-  IconTrash, 
-  IconUser,
-  IconShoppingCartExclamation,
-  IconReceiptDollar,
-  IconInvoice,
-  IconDownload,
-  IconPrinter,
-  IconCheck
+  IconPlus, IconMinus, IconTrash, IconUser,IconShoppingCartExclamation,IconReceiptDollar,IconInvoice,IconDownload,IconPrinter,IconCheck
 } from '@tabler/icons-react';
 import { generarPDFVenta,
   imprimirComprobante } from '../utils/generarPDF';
@@ -40,6 +19,8 @@ function VentaForm({
   onRealizarVenta, 
   onCancel
 }) {
+  
+  const [detallesVentaReal, setDetallesVentaReal] = useState(null);
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
   const [datosVentaConfirmada, setDatosVentaConfirmada] = useState(null);
@@ -50,24 +31,37 @@ function VentaForm({
     metodo_pago: 'efectivo'
   });
 
-  const handleChange = (name, value) => {
-    setDatosCliente(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (carrito.length === 0) {
-      alert('El carrito está vacío');
-      return;
+// En handleSubmit:
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (carrito.length === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
+  
+  try {
+    // ✅ LLAMAR A LA FUNCIÓN REALIZAR VENTA Y CAPTURAR LOS DATOS COMPLETOS
+    const ventaRealizada = await onRealizarVenta(datosCliente);
+    
+    // ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
+    if (ventaRealizada.clienteReactivado) {
+      alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
     }
     
-    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
+    // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO LOCAL
+    const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
     setNumeroVentaGenerado(numeroVenta);
-    setDatosVentaConfirmada(datosCliente);
-    onRealizarVenta(datosCliente);
+    setDatosVentaConfirmada({
+      ...datosCliente,
+      ventaId: ventaRealizada.id_venta
+    });
+    
+    // ✅ GUARDAR LOS DETALLES COMPLETOS DE LA VENTA INCLUYENDO EL TOTAL REAL
+    setDetallesVentaReal({
+      ...ventaRealizada,
+      totalReal: ventaRealizada.total
+    });
+    
     setModalExitoAbierto(true);
     setModalClienteAbierto(false);
     
@@ -76,7 +70,60 @@ function VentaForm({
       ci_nit: '',
       metodo_pago: 'efectivo'
     });
+  } catch (error) {
+    alert('Error al realizar la venta: ' + error.message);
+  }
+};
+// En handleVentaRapida:
+const handleVentaRapida = async () => {
+  if (carrito.length === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
+  
+  try {
+    const datosVentaRapida = {
+      nombre: 'S/N',
+      ci_nit: '123',
+      metodo_pago: 'efectivo'
+    };
+    
+    // ✅ CAPTURAR DATOS COMPLETOS DE LA VENTA
+    const ventaRealizada = await onRealizarVenta(datosVentaRapida);
+    
+    //  ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
+    // if (ventaRealizada.clienteReactivado) {
+    //   alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
+    // }
+    
+    const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
+    setNumeroVentaGenerado(numeroVenta);
+    setDatosVentaConfirmada({
+      ...datosVentaRapida,
+      ventaId: ventaRealizada.id_venta
+    });
+    
+    // ✅ GUARDAR LOS DETALLES COMPLETOS CON TOTAL REAL
+    setDetallesVentaReal({
+      ...ventaRealizada,
+      totalReal: ventaRealizada.total
+    });
+    
+    setModalExitoAbierto(true);
+  } catch (error) {
+    alert('Error al realizar la venta rápida: ' + error.message);
+  }
+};
+
+// ✅ AGREGAR ESTADO PARA LOS DETALLES REALES DE LA VENTA
+
+  const handleChange = (name, value) => {
+    setDatosCliente(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
+
 
   const abrirModalVenta = () => {
     if (carrito.length === 0) {
@@ -85,31 +132,43 @@ function VentaForm({
     }
     setModalClienteAbierto(true);
   };
-
-  const handleVentaRapida = () => {
-    if (carrito.length === 0) {
-      alert('El carrito está vacío');
-      return;
-    }
-    
-    const numeroVenta = `V${String(Math.floor(Math.random() * 100000)).padStart(6, '0')}`;
-    const datosVentaRapida = {
-      nombre: 'S/N',
-      ci_nit: '00000',
-      metodo_pago: 'efectivo'
-    };
-    
-    setNumeroVentaGenerado(numeroVenta);
-    setDatosVentaConfirmada(datosVentaRapida);
-    onRealizarVenta(datosVentaRapida);
-    setModalExitoAbierto(true);
-  };
+  
 
   const cerrarModalExito = () => {
     setModalExitoAbierto(false);
     onVaciarCarrito();
     onCancel();
   };
+  // ✅ FUNCIÓN MEJORADA PARA GENERAR PDF CON DATOS REALES
+const generarPDFConDatosReales = () => {
+  if (!detallesVentaReal) {
+    console.error('No hay detalles de venta disponibles');
+    return;
+  }
+
+  // ✅ USAR LOS DATOS REALES DE LA VENTA EN LUGAR DEL CARRITO
+  generarPDFVenta(
+    datosVentaConfirmada,
+    detallesVentaReal.productosVendidos || carrito,
+    detallesVentaReal.total || totalVenta,
+    numeroVentaGenerado
+  );
+};
+
+// ✅ FUNCIÓN MEJORADA PARA IMPRIMIR CON DATOS REALES
+const imprimirConDatosReales = () => {
+  if (!detallesVentaReal) {
+    console.error('No hay detalles de venta disponibles');
+    return;
+  }
+
+  imprimirComprobante(
+    datosVentaConfirmada,
+    detallesVentaReal.productosVendidos || carrito, // ✅ Priorizar datos reales
+    detallesVentaReal.total || totalVenta, // ✅ Priorizar total real
+    numeroVentaGenerado
+  );
+};
 
   if (carrito.length === 0 && !datosVentaConfirmada) {
     return (
@@ -145,12 +204,18 @@ function VentaForm({
                   backgroundColor: '#f8f9fa'
                 }}
               >
+                
                 <Group justify="space-between" mb="xs">
                   <Text fw={600} size="sm">{item.nombre}</Text>
                   <Badge color="blue" variant="light">
                     Bs {item.precio_venta}
                   </Badge>
                 </Group>
+
+                {/* ✅ Agregar información de stock */}
+                <Text size="xs" c="dimmed" mb="xs">
+                  Stock disponible: {item.stock - item.cantidad} {/* Esto sería mejor si pasamos la función */}
+                </Text>
                 
                 {item.presentacion && (
                   <Text size="xs" c="dimmed" mb="xs">
@@ -185,7 +250,7 @@ function VentaForm({
                   
                   <Group gap="xs">
                     <Text fw={600} size="sm">
-                      Bs {(item.precio_venta * item.cantidad).toFixed(2)}
+                      Bs {(item.precio_venta * item.cantidad)}
                     </Text>
                     <ActionIcon 
                       variant="subtle" 
@@ -206,7 +271,7 @@ function VentaForm({
           <Group justify="space-between" mb="md">
             <Text fw={700} size="lg">Total:</Text>
             <Text fw={700} size="xl" c="blue.6">
-              Bs {totalVenta.toFixed(2)}
+              Bs {totalVenta}
             </Text>
           </Group>
         </Box>
@@ -292,7 +357,7 @@ function VentaForm({
             <Group justify="space-between" mt="md">
               <Text fw={700} size="lg">Total a Pagar:</Text>
               <Text fw={700} size="xl" c="blue.6">
-                Bs {totalVenta.toFixed(2)}
+                Bs {totalVenta}
               </Text>
             </Group>
 
@@ -329,29 +394,31 @@ function VentaForm({
               <Text fw={600}>¡Venta Realizada!</Text>
             </Group>
           }
-          size="md"
+          size="auto" 
           centered
         >
           <Stack gap="md">
             
 
-            <Box
-              p="md"
-              style={{
-                border: '2px solid #1871c1',
-                borderRadius: '8px',
-                backgroundColor: '#f0f7ff'
-              }}
-            >
-              <Text fw={600} mb="xs">Comprobante: #{numeroVentaGenerado}</Text>
-              <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
-              <Text size="sm" c="dimmed">Total: Bs {totalVenta.toFixed(2)}</Text>
-            </Box>
+          <Box
+            p="md"
+            style={{
+              border: '2px solid #1871c1',
+              borderRadius: '8px',
+              backgroundColor: '#f0f7ff'
+            }}
+          >
+            <Text fw={600} mb="xs">Nro. Venta: #{numeroVentaGenerado}</Text>
+            <Text size="sm" c="dimmed">Cliente: {datosVentaConfirmada.nombre}</Text>
+            <Text size="sm" c="dimmed">
+              Total: Bs {detallesVentaReal?.totalReal?.toFixed(2) || totalVenta.toFixed(2)}
+            </Text>
+          </Box>
 
             <Group grow>
               <Button
                 leftSection={<IconDownload size={16} />}
-                onClick={() => generarPDFVenta(datosVentaConfirmada, carrito, totalVenta, numeroVentaGenerado)}
+                onClick={generarPDFConDatosReales}
               >
                 Descargar PDF
               </Button>
@@ -359,7 +426,7 @@ function VentaForm({
               <Button
                 leftSection={<IconPrinter size={16} />}
                 variant="light"
-                onClick={() => imprimirComprobante(datosVentaConfirmada, carrito, totalVenta, numeroVentaGenerado)}
+                onClick={imprimirConDatosReales}
               >
                 Imprimir
               </Button>
