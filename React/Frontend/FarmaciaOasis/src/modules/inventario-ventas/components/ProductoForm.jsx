@@ -24,7 +24,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     const { codigo, lote, nombre, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
     
     // Campos obligatorios no vacíos
-    if (!codigo.trim() || !lote.trim() || !nombre.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
+    if ( !lote.trim() || !nombre.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
       return false;
     }
     
