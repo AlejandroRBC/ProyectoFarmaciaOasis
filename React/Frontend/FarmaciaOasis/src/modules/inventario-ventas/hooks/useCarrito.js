@@ -77,14 +77,14 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
 
   const realizarVenta = async (datosCliente) => {
     try {
-      console.log('🔍 Datos del cliente recibidos:', datosCliente);
+      
 
       // ✅ BUSCAR O CREAR CLIENTE (automáticamente reactiva si está inactivo)
       let idCliente = null;
       let clienteReactivado = false;
       
       if (datosCliente.ci_nit && datosCliente.ci_nit !== '00000') {
-        console.log('🔍 Buscando cliente con CI:', datosCliente.ci_nit);
+
         
         // ✅ Verificar si el cliente existe y está inactivo
         const clienteExistente = await clienteService.obtenerClientePorCI(datosCliente.ci_nit);
@@ -96,9 +96,7 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
           datosCliente.nombre,
           datosCliente.ci_nit
         );
-        console.log('✅ ID Cliente obtenido:', idCliente);
-      } else {
-        console.log('ℹ️ Venta sin cliente (venta rápida)');
+        
       }
 
       // Preparar datos para el backend
@@ -112,7 +110,7 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
         }))
       };
 
-      console.log('📤 Enviando venta al backend:', ventaData);
+      
 
       // Llamar al servicio
       const resultado = await ventasService.crearVenta(ventaData);
@@ -132,28 +130,22 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
       
       // Recargar productos desde la base de datos
       if (recargarProductos) {
-        console.log('🔄 Recargando productos desde BD...');
         await recargarProductos();
       }
       
       // Vaciar carrito después de venta exitosa
       vaciarCarrito();
       
-      console.log('✅ Venta realizada exitosamente:', ventaCompleta);
+  
       
       // ✅ Mostrar mensaje si el cliente fue reactivado
-      if (clienteReactivado) {
-        console.log('🔔 Cliente reactivado durante la venta');
-      }
+      
       
       return ventaCompleta;
       
     } catch (error) {
-      console.error('❌ Error al realizar venta:', error);
-      
       if (error.message.includes('stock') || error.message.includes('Stock')) {
         if (recargarProductos) {
-          console.log('⚠️ Error de stock, recargando productos...');
           await recargarProductos();
         }
       }

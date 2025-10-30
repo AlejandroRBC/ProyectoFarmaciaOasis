@@ -91,10 +91,10 @@ const handleVentaRapida = async () => {
     // ✅ CAPTURAR DATOS COMPLETOS DE LA VENTA
     const ventaRealizada = await onRealizarVenta(datosVentaRapida);
     
-    // ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
-    if (ventaRealizada.clienteReactivado) {
-      alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
-    }
+    //  ✅ MOSTRAR NOTIFICACIÓN SI EL CLIENTE FUE REACTIVADO
+    // if (ventaRealizada.clienteReactivado) {
+    //   alert('ℹ️ El cliente estaba inactivo y ha sido reactivado automáticamente.');
+    // }
     
     const numeroVenta = `V${String(ventaRealizada.id_venta).padStart(6, '0')}`;
     setNumeroVentaGenerado(numeroVenta);

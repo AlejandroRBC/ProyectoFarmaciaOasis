@@ -55,7 +55,7 @@ const clienteService = {
         estado: 'activo'
       });
       
-      console.log('✅ Cliente reactivado:', responseUpdate.data.data);
+      
       return responseUpdate.data.data;
     } catch (error) {
       console.error('❌ Error al reactivar cliente:', error);
@@ -75,20 +75,16 @@ const clienteService = {
       const clienteExistente = await clienteService.obtenerClientePorCI(ci_nit);
       
       if (clienteExistente) {
-        console.log('✅ Cliente encontrado:', clienteExistente);
-        
+       
         // ✅ Si el cliente está inactivo, reactivarlo
         if (clienteExistente.estado === 'inactivo') {
-          console.log('🔄 Cliente inactivo detectado, reactivando...');
           await clienteService.reactivarCliente(clienteExistente.cod_cli);
-          console.log('✅ Cliente reactivado exitosamente');
         }
         
         return clienteExistente.cod_cli;
       }
 
       // Si no existe, crear nuevo cliente
-      console.log('ℹ️ Cliente no encontrado, creando nuevo...');
       const nuevoCliente = await clienteService.crearCliente({
         nombre: nombre || 'Cliente S/N',
         ci_nit: ci_nit,
@@ -96,7 +92,6 @@ const clienteService = {
         estado: 'activo'
       });
 
-      console.log('✅ Nuevo cliente creado:', nuevoCliente);
       return nuevoCliente.cod_cli;
     } catch (error) {
       console.error('❌ Error en buscarOCrearCliente:', error);
