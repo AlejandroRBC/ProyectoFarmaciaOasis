@@ -10,6 +10,8 @@ const productosRoutes = require("./routes/productos");
 const ventasRoutes = require("./routes/ventas");
 const dashboardRoutes = require("./routes/dashboard");
 
+const historialRoutes = require("./routes/historial");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -25,6 +27,8 @@ app.use("/api/productos", productosRoutes);
 app.use("/api/ventas", ventasRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
+app.use("/api/historial", historialRoutes); 
+
 // Ruta raíz
 app.get("/", (req, res) => {
   res.json({ 
@@ -35,7 +39,9 @@ app.get("/", (req, res) => {
       laboratorios: "/api/laboratorios",
       productos: "/api/productos",
       ventas: "/api/ventas",
-      dashboard: "/api/dashboard"
+      dashboard: "/api/dashboard",
+
+      historial: "/api/historial" 
     }
   });
 });

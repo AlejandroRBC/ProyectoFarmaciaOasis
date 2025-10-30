@@ -192,7 +192,9 @@ const ventasController = {
       }
       res.json({ data: rows });
     });
-  }
+  },
+
 };
+
 
 module.exports = ventasController;
