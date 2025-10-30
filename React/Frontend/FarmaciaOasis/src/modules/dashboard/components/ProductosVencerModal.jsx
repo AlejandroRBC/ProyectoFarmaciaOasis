@@ -7,6 +7,36 @@ import '../dashboard.css';
  * Clasifica por niveles de urgencia y muestra días restantes
  */
 function ProductosVencerModal({ productos, opened, onClose }) {
+  // Función para formatear fecha SUMANDO 1 día
+  const formatFecha = (fechaString) => {
+    const fecha = new Date(fechaString);
+    
+    const fechaB = new Date(fecha.getTime() + (24 * 60 * 60 * 1000));
+    
+    return fechaB.toLocaleDateString('es-BO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  // Función para calcular días restantes SUMANDO 1 día a la fecha de vencimiento
+  const calcularDiasRestantes = (fechaVencimiento) => {
+    const hoy = new Date();
+    const vencimiento = new Date(fechaVencimiento);
+    
+    // SUMAR 1 día a la fecha de vencimiento para el cálculo
+    const vencimientoCorregido = new Date(vencimiento.getTime() + (24 * 60 * 60 * 1000));
+    
+    const hoyNormalizado = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const vencimientoNormalizado = new Date(vencimientoCorregido.getFullYear(), vencimientoCorregido.getMonth(), vencimientoCorregido.getDate());
+    
+    const diferenciaMs = vencimientoNormalizado - hoyNormalizado;
+    const diasRestantes = Math.ceil(diferenciaMs / (1000 * 60 * 60 * 24));
+    
+    return diasRestantes;
+  };
+
   // Sistema de colores según días restantes para vencimiento
   const getBadgeColor = (dias) => {
     if (dias <= 7) return 'red';
@@ -18,9 +48,16 @@ function ProductosVencerModal({ productos, opened, onClose }) {
     return dias <= 7 ? 'filled' : 'light';
   };
 
+  // Procesar productos con fechas CORREGIDAS (+1 día)
+  const productosProcesados = productos.map(producto => ({
+    ...producto,
+    diasRestantes: calcularDiasRestantes(producto.fechaVencimiento),
+    fechaFormateada: formatFecha(producto.fechaVencimiento)
+  }));
+
   // Estadísticas de productos por nivel de urgencia
-  const productosCriticos = productos.filter(p => p.diasRestantes <= 7).length;
-  const productosAdvertencia = productos.filter(p => p.diasRestantes > 7 && p.diasRestantes <= 30).length;
+  const productosCriticos = productosProcesados.filter(p => p.diasRestantes <= 7).length;
+  const productosAdvertencia = productosProcesados.filter(p => p.diasRestantes > 7 && p.diasRestantes <= 30).length;
   const productosNecesitanAtencion = productosCriticos + productosAdvertencia;
 
   // Colores de borde según urgencia
@@ -31,7 +68,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
   };
 
   // Filas de la tabla con productos próximos a vencer
-  const rows = productos.map((producto) => {
+  const rows = productosProcesados.map((producto) => {
     const badgeColor = getBadgeColor(producto.diasRestantes);
     const borderColor = getBorderColor(producto.diasRestantes);
     
@@ -54,14 +91,8 @@ function ProductosVencerModal({ productos, opened, onClose }) {
           <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
-          {/* Formateo de fecha con ajuste para zona horaria de Bolivia */}
           <Text fw={500} size="sm">
-            {new Date(
-              new Date(producto.fechaVencimiento).getFullYear(),
-              new Date(producto.fechaVencimiento).getMonth(),
-              new Date(producto.fechaVencimiento).getDate() + 1,
-              23, 59, 0
-            ).toLocaleDateString('es-BO', { timeZone: 'America/La_Paz' })}
+            {producto.fechaFormateada}
           </Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
@@ -73,10 +104,16 @@ function ProductosVencerModal({ productos, opened, onClose }) {
               radius="sm"
               className="vencer-status-badge"
             >
-              {producto.diasRestantes} días
+              {producto.diasRestantes <= 0 
+                ? 'Vencido' 
+                : `${producto.diasRestantes} días`
+              }
             </Badge>
-            {producto.diasRestantes <= 7 && (
+            {producto.diasRestantes <= 7 && producto.diasRestantes > 0 && (
               <IconAlertTriangle size={14} color="#ff6b6b" />
+            )}
+            {producto.diasRestantes <= 0 && (
+              <IconAlertTriangle size={14} color="#ff0000" />
             )}
             {producto.diasRestantes > 30 && (
               <IconCheck size={14} color="#51cf66" />
@@ -155,7 +192,7 @@ function ProductosVencerModal({ productos, opened, onClose }) {
                   <Table.Th>PRODUCTO</Table.Th>
                   <Table.Th>LABORATORIO</Table.Th>
                   <Table.Th>FECHA VENCIMIENTO</Table.Th>
-                  <Table.Th>DÍAS RESTANTES</Table.Th>
+                  <Table.Th>ESTADO</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
