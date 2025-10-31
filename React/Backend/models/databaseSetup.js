@@ -72,6 +72,7 @@ const createTables = () => {
   // Historial Ingresos_Egresos
   db.run(`CREATE TABLE IF NOT EXISTS Historial_Ingresos_Egresos (
     id_hie INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_producto INTEGER,
     nombre TEXT,
     presentacion TEXT,
     lote TEXT,
@@ -83,125 +84,111 @@ const createTables = () => {
     laboratorio TEXT
   )`);
 
-  // TRIGGER
+  // TRIGGERS
   db.serialize(() => {
-  db.run(`DROP TRIGGER IF EXISTS registrar_movimiento_venta`);
-  db.run(`CREATE TRIGGER registrar_movimiento_venta
-    AFTER INSERT ON detalle_venta
-    FOR EACH ROW
-    BEGIN
-      -- Insertar movimiento en historial
-      INSERT INTO Historial_Ingresos_Egresos (
-        nombre,
-        presentacion,
-        lote,
-        precio_venta,
-        stock_antiguo,
-        stock_nuevo,
-        laboratorio,
-        fecha,
-        hora
-      )
-      VALUES (
-        (SELECT nombre_prod FROM producto WHERE id_producto = NEW.id_producto),
-        (SELECT presentacion FROM producto WHERE id_producto = NEW.id_producto),
-        (SELECT lote FROM producto WHERE id_producto = NEW.id_producto),
-        (SELECT precio_venta FROM producto WHERE id_producto = NEW.id_producto),
-        (SELECT stock FROM producto WHERE id_producto = NEW.id_producto),
-        (SELECT stock - NEW.cantidad FROM producto WHERE id_producto = NEW.id_producto),
-        (SELECT nombre_labo FROM laboratorio WHERE id_lab = (SELECT id_lab FROM producto WHERE id_producto = NEW.id_producto)),
-        DATE('now','localtime'),
-        TIME('now','localtime')
-      );
+    //Eliminar triggers antiguos para evitar duplicados
+    db.run(`DROP TRIGGER IF EXISTS registrar_movimiento_venta`);
+    db.run(`DROP TRIGGER IF EXISTS registrar_egreso_stock`);
+    db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_producto_nuevo`);
+    db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_actualizacion_stock`);
 
-      -- Actualizar stock
-      UPDATE producto
-      SET stock = stock - NEW.cantidad
-      WHERE id_producto = NEW.id_producto;
-    END;`
-      );
-  // trigger para los egresos (salida de productos)
-  db.run(`DROP TRIGGER IF EXISTS registrar_egreso_stock`);
-  db.run(`CREATE TRIGGER registrar_egreso_stock
-  AFTER UPDATE ON producto
-  FOR EACH ROW
-  WHEN NEW.stock < OLD.stock
-  BEGIN
-    INSERT INTO Historial_Ingresos_Egresos (
-      nombre,
-      presentacion,
-      lote,
-      precio_venta,
-      stock_antiguo,
-      stock_nuevo,
-      laboratorio,
-      fecha,
-      hora
-    )
-    VALUES (
-      NEW.nombre_prod,
-      NEW.presentacion,
-      NEW.lote,
-      NEW.precio_venta,
-      OLD.stock,
-      NEW.stock,
-      (SELECT nombre_labo FROM laboratorio WHERE id_lab = NEW.id_lab),
-      DATE('now','localtime'),
-      TIME('now','localtime')
-    );
-  END;`);
+    //trigger para registrar movimiento de venta (egreso)
+    db.run(`CREATE TRIGGER registrar_movimiento_venta
+      AFTER INSERT ON detalle_venta
+      FOR EACH ROW
+      BEGIN
+        INSERT INTO Historial_Ingresos_Egresos (
+          id_producto,
+          nombre,
+          presentacion,
+          lote,
+          precio_venta,
+          stock_antiguo,
+          stock_nuevo,
+          laboratorio,
+          fecha,
+          hora
+        )
+        SELECT
+          p.id_producto,
+          p.nombre_prod,
+          p.presentacion,
+          p.lote,
+          p.precio_venta,
+          p.stock,
+          p.stock - NEW.cantidad,
+          l.nombre_labo,
+          DATE('now','localtime'),
+          TIME('now','localtime')
+        FROM producto p
+        JOIN laboratorio l ON p.id_lab = l.id_lab
+        WHERE p.id_producto = NEW.id_producto;
 
+        UPDATE producto
+        SET stock = stock - NEW.cantidad
+        WHERE id_producto = NEW.id_producto
+        AND NEW.cantidad > 0;
+      END;
+    `);
+
+    //Trigger pararegistrar ingreso al agregar nuevo producto
+    db.run(`CREATE TRIGGER registrar_ingreso_producto_nuevo
+      AFTER INSERT ON producto
+      FOR EACH ROW
+      BEGIN
+        INSERT INTO Historial_Ingresos_Egresos (
+          id_producto,
+          nombre,
+          presentacion,
+          lote,
+          precio_venta,
+          stock_antiguo,
+          stock_nuevo,
+          laboratorio
+        )
+        SELECT
+          NEW.id_producto,
+          NEW.nombre_prod,
+          NEW.presentacion,
+          NEW.lote,
+          NEW.precio_venta,
+          0,
+          NEW.stock,
+          l.nombre_labo
+        FROM laboratorio l
+        WHERE l.id_lab = NEW.id_lab;
+      END;
+    `);
+
+    // Trigger para registrar ingreso al aumentar stock
+    db.run(`CREATE TRIGGER registrar_ingreso_actualizacion_stock
+      AFTER UPDATE ON producto
+      FOR EACH ROW
+      WHEN NEW.stock > OLD.stock
+      BEGIN
+        INSERT INTO Historial_Ingresos_Egresos (
+          id_producto,
+          nombre,
+          presentacion,
+          lote,
+          precio_venta,
+          stock_antiguo,
+          stock_nuevo,
+          laboratorio
+        )
+        SELECT
+          NEW.id_producto,
+          NEW.nombre_prod,
+          NEW.presentacion,
+          NEW.lote,
+          NEW.precio_venta,
+          OLD.stock,
+          NEW.stock,
+          l.nombre_labo
+        FROM laboratorio l
+        WHERE l.id_lab = NEW.id_lab;
+      END;
+    `);
   });
-
-    // Trigger para nuevo producto (ingreso)
-  db.run(`CREATE TRIGGER IF NOT EXISTS registrar_ingreso_producto_nuevo
-    AFTER INSERT ON producto
-    FOR EACH ROW
-    BEGIN
-      INSERT INTO Historial_Ingresos_Egresos (
-        nombre,
-        presentacion,
-        lote,
-        precio_venta,
-        stock_antiguo,
-        stock_nuevo,
-        laboratorio
-      )
-      VALUES (
-        NEW.nombre_prod,
-        NEW.presentacion,
-        NEW.lote,
-        NEW.precio_venta,
-        0,
-        NEW.stock,
-        (SELECT nombre_labo FROM laboratorio WHERE id_lab = NEW.id_lab)
-      );
-    END;`);
-
-  // Trigger para actualización de stock (solo aumentos) (ingreso)
-  db.run(`CREATE TRIGGER IF NOT EXISTS registrar_ingreso_actualizacion_stock
-    AFTER UPDATE ON producto
-    FOR EACH ROW
-    WHEN NEW.stock > OLD.stock
-    BEGIN
-      INSERT INTO Historial_Ingresos_Egresos (
-        nombre,
-        presentacion,
-        lote,
-        precio_venta,
-        stock_antiguo,
-        stock_nuevo,
-        laboratorio
-      )
-      VALUES (
-        NEW.nombre_prod,
-        NEW.presentacion,
-        NEW.lote,
-        NEW.precio_venta,
-        OLD.stock,
-        NEW.stock,
-        (SELECT nombre_labo FROM laboratorio WHERE id_lab = NEW.id_lab)
-      );
-    END;`);
 };
 module.exports = { createTables };
