@@ -30,10 +30,54 @@ function VentaForm({
     ci_nit: '',
     metodo_pago: 'efectivo'
   });
+  // Función mejorada para validar datos del cliente antes del envío
+const validarDatosCliente = (datos) => {
+  const errores = [];
+
+  // Validar nombre
+  if (!datos.nombre || datos.nombre.trim().length < 2) {
+    errores.push('El nombre debe tener al menos 2 caracteres');
+  }
+
+  if (datos.nombre && datos.nombre.length > 100) {
+    errores.push('El nombre no puede exceder 100 caracteres');
+  }
+
+  // Validar CI/NIT si se proporciona
+  if (datos.ci_nit && datos.ci_nit.trim() !== '') {
+    if (datos.ci_nit.length < 3) {
+      errores.push('El CI/NIT debe tener al menos 3 caracteres');
+    }
+    
+    if (datos.ci_nit.length > 15) {
+      errores.push('El CI/NIT no puede exceder 15 caracteres');
+    }
+
+    if (!/^[0-9a-zA-Z]+$/.test(datos.ci_nit)) {
+      errores.push('El CI/NIT solo puede contener números y letras');
+    }
+  }
+
+  // Validar método de pago
+  if (!datos.metodo_pago) {
+    errores.push('El método de pago es requerido');
+  }
+
+  return errores;
+};
+
 
 // En handleSubmit:
 const handleSubmit = async (e) => {
+  
   e.preventDefault();
+
+  // Validar datos antes de proceder
+  const erroresValidacion = validarDatosCliente(datosCliente);
+  if (erroresValidacion.length > 0) {
+    alert(`Errores de validación:\n${erroresValidacion.join('\n')}`);
+    return;
+  }
   if (carrito.length === 0) {
     alert('El carrito está vacío');
     return;
@@ -311,77 +355,137 @@ const imprimirConDatosReales = () => {
       </Box>
 
       {/* Modal Datos del Cliente */}
-      <Modal
-        opened={modalClienteAbierto}
-        onClose={() => setModalClienteAbierto(false)}
-        title={
-          <Group gap="sm">
-            <IconUser size={20} />
-            <Text fw={600}>Datos del Cliente</Text>
-          </Group>
+
+
+{/* Modal Datos del Cliente */}
+<Modal
+  opened={modalClienteAbierto}
+  onClose={() => setModalClienteAbierto(false)}
+  title={
+    <Group gap="sm">
+      <IconUser size={20} />
+      <Text fw={600}>Datos del Cliente</Text>
+    </Group>
+  }
+  size="md"
+  overlayProps={{ opacity: 0.5, blur: 4 }}
+  styles={{ content: { borderRadius: '12px' } }}
+>
+  <Box component="form" onSubmit={handleSubmit}>
+    <Stack gap="md">
+      <TextInput
+        label="Nombre del Cliente"
+        placeholder="Ingrese nombre completo"
+        value={datosCliente.nombre}
+        onChange={(e) => {
+          const valor = e.target.value;
+          // Validar solo letras, espacios y algunos caracteres especiales
+          if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]*$/.test(valor) && valor.length <= 100) {
+            handleChange('nombre', valor);
+          }
+        }}
+        onBlur={(e) => {
+          const valor = e.target.value.trim();
+          handleChange('nombre', valor);
+        }}
+        error={
+          datosCliente.nombre && datosCliente.nombre.length < 2 
+            ? 'El nombre debe tener al menos 2 caracteres' 
+            : null
         }
-        size="md"
-        overlayProps={{ opacity: 0.5, blur: 4 }}
-        styles={{ content: { borderRadius: '12px' } }}
-      >
-        <Box component="form" onSubmit={handleSubmit}>
-          <Stack gap="md">
-            <TextInput
-              label="Nombre del Cliente"
-              placeholder="Ingrese nombre completo"
-              value={datosCliente.nombre}
-              onChange={(e) => handleChange('nombre', e.target.value)}
-              required
-            />
-            
-            <TextInput
-              label="CI / NIT"
-              placeholder="Número de identificación"
-              value={datosCliente.ci_nit}
-              onChange={(e) => handleChange('ci_nit', e.target.value)}
-            />
-            
-            <Select
-              label="Método de Pago"
-              placeholder="Seleccione método"
-              data={[
-                { value: 'efectivo', label: 'Efectivo' },
-                { value: 'qr', label: 'QR' },
-                { value: 'mixto', label: 'Mixto' }
-              ]}
-              value={datosCliente.metodo_pago}
-              onChange={(value) => handleChange('metodo_pago', value)}
-              required
-            />
+        required
+      />
+      
+      <TextInput
+        label="CI / NIT"
+        placeholder="Número de identificación"
+        value={datosCliente.ci_nit}
+        onChange={(e) => {
+          const valor = e.target.value;
+          // Validar solo números y letras, máximo 15 caracteres
+          if (/^[0-9a-zA-Z]*$/.test(valor) && valor.length <= 15) {
+            handleChange('ci_nit', valor);
+          }
+        }}
+        onBlur={(e) => {
+          const valor = e.target.value.trim();
+          handleChange('ci_nit', valor);
+        }}
+        error={
+          datosCliente.ci_nit && datosCliente.ci_nit.length < 3 
+            ? 'El CI/NIT debe tener al menos 3 caracteres' 
+            : datosCliente.ci_nit && !/^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit)
+            ? 'Solo se permiten números y letras'
+            : null
+        }
+      />
+      
+      <Select
+        label="Método de Pago"
+        placeholder="Seleccione método"
+        data={[
+          { value: 'efectivo', label: 'Efectivo' },
+          { value: 'qr', label: 'QR' },
+          { value: 'mixto', label: 'Mixto' }
+        ]}
+        value={datosCliente.metodo_pago}
+        onChange={(value) => handleChange('metodo_pago', value)}
+        required
+      />
 
-            <Group justify="space-between" mt="md">
-              <Text fw={700} size="lg">Total a Pagar:</Text>
-              <Text fw={700} size="xl" c="blue.6">
-                Bs {totalVenta}
-              </Text>
-            </Group>
+      {/* Mostrar advertencias de validación */}
+      {datosCliente.nombre && datosCliente.nombre.length < 2 && (
+        <Alert variant="light" color="yellow" size="sm">
+          El nombre debe tener al menos 2 caracteres
+        </Alert>
+      )}
 
-            <Group grow mt="md">
-              <Button 
-                type="submit" 
-                color="green"
-                size="md"
-              >
-                Confirmar Venta
-              </Button>
-              
-              <Button 
-                variant="light" 
-                color="gray"
-                onClick={() => setModalClienteAbierto(false)}
-                size="md"
-              >
-                Cancelar
-              </Button>
-            </Group>
-          </Stack>
-        </Box>
-      </Modal>
+      {datosCliente.ci_nit && datosCliente.ci_nit.length < 3 && (
+        <Alert variant="light" color="yellow" size="sm">
+          El CI/NIT debe tener al menos 3 caracteres
+        </Alert>
+      )}
+
+      <Group justify="space-between" mt="md">
+        <Text fw={700} size="lg">Total a Pagar:</Text>
+        <Text fw={700} size="xl" c="blue.6">
+          Bs {totalVenta}
+        </Text>
+      </Group>
+
+      {/* Función para validar si el formulario está listo para enviar */}
+      {(() => {
+        const nombreValido = datosCliente.nombre && datosCliente.nombre.length >= 2;
+        const ciNitValido = !datosCliente.ci_nit || (datosCliente.ci_nit.length >= 3 && /^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit));
+        const metodoPagoValido = datosCliente.metodo_pago;
+        
+        const formularioValido = nombreValido && ciNitValido && metodoPagoValido;
+        
+        return (
+          <Group grow mt="md">
+            <Button 
+              type="submit" 
+              color="green"
+              size="md"
+              disabled={!formularioValido}
+            >
+              Confirmar Venta
+            </Button>
+            
+            <Button 
+              variant="light" 
+              color="gray"
+              onClick={() => setModalClienteAbierto(false)}
+              size="md"
+            >
+              Cancelar
+            </Button>
+          </Group>
+        );
+      })()}
+    </Stack>
+  </Box>
+</Modal>
 
       {/* Modal Éxito y Opciones */}
       {datosVentaConfirmada && (
