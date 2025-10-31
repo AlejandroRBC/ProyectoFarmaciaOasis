@@ -40,12 +40,10 @@ const createTables = () => {
     presentacion TEXT,
     precio_venta REAL,
     precio_compra REAL,
-    valor_medida REAL,
+    medida TEXT,
     estado TEXT,
     id_lab INTEGER,
-    id_proveedor INTEGER,
-    FOREIGN KEY (id_lab) REFERENCES laboratorio(id_lab),
-    FOREIGN KEY (id_proveedor) REFERENCES proveedor(id_proveedor)
+    FOREIGN KEY (id_lab) REFERENCES laboratorio(id_lab)
   )`);
 
   // VENTA

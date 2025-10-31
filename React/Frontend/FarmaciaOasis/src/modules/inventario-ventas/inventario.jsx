@@ -95,7 +95,7 @@ function Inventario() {
     });
   };
 
-// En la función handleRealizarVenta, cambia a:
+
 const handleRealizarVenta = async (datosCliente) => {
   try {   
     // ✅ LLAMAR A LA FUNCIÓN DEL HOOK QUE CONECTA CON EL BACKEND
