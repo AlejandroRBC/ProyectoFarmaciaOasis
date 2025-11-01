@@ -12,7 +12,8 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     porcentaje_g: '',
     stock: '',
     fecha_expiracion: '',
-    laboratorio: ''
+    laboratorio: '',
+    medida:'',
   });
 
   const [precioVentaCalculado, setPrecioVentaCalculado] = useState(0);

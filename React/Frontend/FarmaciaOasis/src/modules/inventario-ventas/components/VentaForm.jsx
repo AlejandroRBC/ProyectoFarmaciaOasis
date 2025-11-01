@@ -12,11 +12,15 @@ import clienteService from '../services/clienteService';
 function VentaForm({ 
   carrito, 
   totalVenta, 
+  totalSinDescuento,  // ✅ NUEVO
+  montoDescuento,     // ✅ NUEVO
+  descuentoCliente,   // ✅ NUEVO
   onModificarCantidad, 
   onEliminarItem, 
   onVaciarCarrito, 
   onRealizarVenta, 
-  onCancel
+  onCancel,
+  onActualizarDescuento 
 }) {
   
   const [detallesVentaReal, setDetallesVentaReal] = useState(null);
@@ -34,32 +38,42 @@ function VentaForm({
     metodo_pago: 'efectivo'
   });
 
-  // ✅ NUEVO: Función para buscar cliente automáticamente
-  const buscarClientePorCI = async (ci_nit) => {
-    if (!ci_nit || ci_nit.length < 3) {
-      return; // No buscar si el CI es muy corto
-    }
+  
+// ✅ NUEVO: Función para manejar la búsqueda de cliente con descuento
+const buscarClientePorCI = async (ci_nit) => {
+  if (!ci_nit || ci_nit.length < 3) {
+    return;
+  }
 
-    setBuscandoCliente(true);
-    try {
-      const cliente = await clienteService.buscarClientePorCIExacto(ci_nit);
-      if (cliente) {
-        // ✅ Autocompletar datos del cliente encontrado
-        setDatosCliente(prev => ({
-          ...prev,
-          nombre: cliente.nombre,
-          ci_nit: cliente.ci_nit
-        }));
-        
-        // Mostrar mensaje de éxito
-        console.log('Cliente encontrado:', cliente.nombre);
+  setBuscandoCliente(true);
+  try {
+    const cliente = await clienteService.buscarClientePorCIExacto(ci_nit);
+    if (cliente) {
+      // ✅ Autocompletar datos del cliente encontrado
+      setDatosCliente(prev => ({
+        ...prev,
+        nombre: cliente.nombre,
+        ci_nit: cliente.ci_nit
+      }));
+      
+      // ✅ Actualizar el descuento en el carrito
+      if (onActualizarDescuento) {
+        onActualizarDescuento(cliente.descuento || 0);
       }
-    } catch (error) {
-      console.error('Error al buscar cliente:', error);
-    } finally {
-      setBuscandoCliente(false);
+      
+      console.log('Cliente encontrado:', cliente.nombre, 'Descuento:', cliente.descuento + '%');
+    } else {
+      // ✅ Si no se encuentra cliente, resetear descuento
+      if (onActualizarDescuento) {
+        onActualizarDescuento(0);
+      }
     }
-  };
+  } catch (error) {
+    console.error('Error al buscar cliente:', error);
+  } finally {
+    setBuscandoCliente(false);
+  }
+};
 
   // ✅ NUEVO: useEffect para buscar automáticamente cuando cambia el CI
   useEffect(() => {
@@ -185,7 +199,12 @@ function VentaForm({
       datosVentaConfirmada,
       detallesVentaReal.productosVendidos || carrito,
       detallesVentaReal.total || totalVenta,
-      numeroVentaGenerado
+      numeroVentaGenerado,
+      {
+        totalSinDescuento: detallesVentaReal.total_sin_descuento || totalSinDescuento,
+        montoDescuento: detallesVentaReal.descuento_aplicado || montoDescuento,
+        porcentajeDescuento: detallesVentaReal.porcentaje_descuento || descuentoCliente
+      }
     );
   };
 
@@ -200,7 +219,12 @@ function VentaForm({
       datosVentaConfirmada,
       detallesVentaReal.productosVendidos || carrito,
       detallesVentaReal.total || totalVenta,
-      numeroVentaGenerado
+      numeroVentaGenerado,
+      {
+        totalSinDescuento: detallesVentaReal.total_sin_descuento || totalSinDescuento,
+        montoDescuento: detallesVentaReal.descuento_aplicado || montoDescuento,
+        porcentajeDescuento: detallesVentaReal.porcentaje_descuento || descuentoCliente
+      }
     );
   };
 
@@ -217,7 +241,7 @@ function VentaForm({
         </ActionIcon>
         <Text c="dimmed" mb="lg">El carrito está vacío</Text>
         <Button onClick={onCancel} variant="light">
-          Continuar Comprando
+          Continuar Vendiendo
         </Button>
       </Box>
     );
@@ -246,15 +270,15 @@ function VentaForm({
                   </Badge>
                 </Group>
 
+                {item.presentacion && (
+                  <Text size="xs" c="dimmed" mb="xs">
+                    {item.presentacion} - {item.medida}
+                  </Text>
+                )}
                 <Text size="xs" c="dimmed" mb="xs">
                   Stock disponible: {item.stock - item.cantidad}
                 </Text>
                 
-                {item.presentacion && (
-                  <Text size="xs" c="dimmed" mb="xs">
-                    {item.presentacion}
-                  </Text>
-                )}
                 
                 <Group justify="space-between">
                   <Group gap="xs">
@@ -486,14 +510,26 @@ function VentaForm({
         styles={{ content: { borderRadius: '12px' } }}
       >
         <Stack gap="lg">
-          <Box>
-            <Text fw={600} size="lg" ta="center" c="blue.6">
-              Total: Bs {totalVenta}
-            </Text>
-            <Text size="sm" c="dimmed" ta="center">
-              {carrito.length} producto(s) en el carrito
-            </Text>
-          </Box>
+        <Box py="md" style={{ borderTop: '2px solid #e9ecef' }}>
+    {descuentoCliente > 0 && (
+      <>
+        <Group justify="space-between" mb="xs">
+          <Text size="sm" c="dimmed">Subtotal:</Text>
+          <Text size="sm" c="dimmed">Bs {totalSinDescuento?.toFixed(2)}</Text>
+        </Group>
+        <Group justify="space-between" mb="xs">
+          <Text size="sm" c="green">Descuento ({descuentoCliente}%):</Text>
+          <Text size="sm" c="green">- Bs {montoDescuento?.toFixed(2)}</Text>
+        </Group>
+      </>
+    )}
+    <Group justify="space-between" mb="md">
+      <Text fw={700} size="lg">Total:</Text>
+      <Text fw={700} size="xl" c="blue.6">
+        Bs {totalVenta?.toFixed(2)}
+      </Text>
+    </Group>
+  </Box>
 
           <Radio.Group
             value={metodoPagoRapido}
