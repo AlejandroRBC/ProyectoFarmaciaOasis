@@ -85,18 +85,21 @@ const createTables = () => {
   )`);
 
   // TRIGGERS
+  // TRIGGERS
   db.serialize(() => {
-    //Eliminar triggers antiguos para evitar duplicados
+    // Eliminar triggers antiguos
     db.run(`DROP TRIGGER IF EXISTS registrar_movimiento_venta`);
     db.run(`DROP TRIGGER IF EXISTS registrar_egreso_stock`);
     db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_producto_nuevo`);
     db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_actualizacion_stock`);
 
-    //trigger para registrar movimiento de venta (egreso)
-    db.run(`CREATE TRIGGER registrar_movimiento_venta
+    // ✅ TRIGGER PARA VENTAS - SOLO REGISTRA, NO ACTUALIZA STOCK
+    // El controlador ya actualiza el stock manualmente
+    db.run(`CREATE TRIGGER IF NOT EXISTS registrar_movimiento_venta
       AFTER INSERT ON detalle_venta
       FOR EACH ROW
       BEGIN
+        -- Registrar el movimiento (solo registro, no actualiza stock)
         INSERT INTO Historial_Ingresos_Egresos (
           id_producto,
           nombre,
@@ -115,23 +118,36 @@ const createTables = () => {
           p.presentacion,
           p.lote,
           p.precio_venta,
-          p.stock,
-          p.stock - NEW.cantidad,
+          p.stock + NEW.cantidad,  -- stock antes de la venta
+          p.stock,                 -- stock actual (ya reducido)
           l.nombre_labo,
           DATE('now','localtime'),
           TIME('now','localtime')
         FROM producto p
-        JOIN laboratorio l ON p.id_lab = l.id_lab
+        LEFT JOIN laboratorio l ON p.id_lab = l.id_lab
         WHERE p.id_producto = NEW.id_producto;
-
-        UPDATE producto
-        SET stock = stock - NEW.cantidad
-        WHERE id_producto = NEW.id_producto
-        AND NEW.cantidad > 0;
+    
+       
       END;
     `);
+    // 🔹 Trigger para eliminar duplicado reciente de egreso (venta)
+db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_venta
+  AFTER INSERT ON Historial_Ingresos_Egresos
+  FOR EACH ROW
+  WHEN NEW.stock_nuevo < NEW.stock_antiguo  -- Solo egresos (ventas)
+  BEGIN
+    DELETE FROM Historial_Ingresos_Egresos
+    WHERE id_hie < NEW.id_hie
+      AND id_producto = NEW.id_producto
+      AND stock_antiguo = NEW.stock_antiguo
+      AND stock_nuevo = NEW.stock_nuevo
+      AND ABS(strftime('%s', datetime(fecha || ' ' || hora)) - strftime('%s', datetime('now','localtime'))) <= 2;
+  END;
+`);
 
-    //Trigger pararegistrar ingreso al agregar nuevo producto
+    
+
+    // ✅ TRIGGER PARA NUEVO PRODUCTO (INGRESO)
     db.run(`CREATE TRIGGER registrar_ingreso_producto_nuevo
       AFTER INSERT ON producto
       FOR EACH ROW
@@ -160,11 +176,12 @@ const createTables = () => {
       END;
     `);
 
-    // Trigger para registrar ingreso al aumentar stock
-    db.run(`CREATE TRIGGER registrar_ingreso_actualizacion_stock
+    // ✅ TRIGGER PARA MODIFICACIONES DE STOCK (INGRESOS Y EGRESOS MANUALES)
+    // Este se ejecuta cuando se modifica el stock desde el inventario
+    db.run(`CREATE TRIGGER IF NOT EXISTS registrar_cambio_stock
       AFTER UPDATE ON producto
       FOR EACH ROW
-      WHEN NEW.stock > OLD.stock
+      WHEN NEW.stock != OLD.stock 
       BEGIN
         INSERT INTO Historial_Ingresos_Egresos (
           id_producto,
@@ -189,49 +206,44 @@ const createTables = () => {
         WHERE l.id_lab = NEW.id_lab;
       END;
     `);
-        // Trigger para desactivar producto cuando stock llega a 0
-  db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_stock_cero
-    AFTER UPDATE ON producto
-    FOR EACH ROW
-    WHEN NEW.stock = 0 AND OLD.stock > 0 AND NEW.estado = 'activo'
-    BEGIN
-      UPDATE producto 
-      SET estado = 'desactivado' 
-      WHERE id_producto = NEW.id_producto;
-    END;`);
+    // ✅ TRIGGER 4: LIMPIAR DUPLICADOS DE VENTAS (NUEVO)
+    // Este trigger elimina el último registro duplicado cuando se hace una venta
+    // db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_hist
+    //   AFTER INSERT ON Historial_Ingresos_Egresos
+    //   FOR EACH ROW
+    //   BEGIN
+    //     DELETE FROM Historial_Ingresos_Egresos
+    //     WHERE id_hie NOT IN (
+    //       SELECT MAX(id_hie)
+    //       FROM Historial_Ingresos_Egresos
+    //       WHERE id_producto = NEW.id_producto
+    //         AND datetime(fecha || ' ' || hora) > datetime('now', '-2 seconds')
+    //         AND stock_nuevo < stock_antiguo
+    //     )
+    //     AND id_producto = NEW.id_producto
+    //     AND datetime(fecha || ' ' || hora) > datetime('now', '-2 seconds')
+    //     AND stock_nuevo < stock_antiguo;
+    //   END;
+    // `);
+    
 
-  // Trigger para desactivar producto cuando vence
-  db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_vencido
-    AFTER UPDATE ON producto
-    FOR EACH ROW
-    WHEN NEW.fecha_exp IS NOT NULL 
-      AND DATE(NEW.fecha_exp) < DATE('now','localtime') 
-      AND NEW.estado = 'activo'
-      AND (OLD.fecha_exp IS NULL OR DATE(OLD.fecha_exp) >= DATE('now','localtime'))
-    BEGIN
-      UPDATE producto 
-      SET estado = 'desactivado' 
-      WHERE id_producto = NEW.id_producto;
-    END;`);
-
-  // Trigger adicional: verificar productos vencidos al insertar
-  db.run(`CREATE TRIGGER IF NOT EXISTS verificar_vencimiento_al_insertar
-    AFTER INSERT ON producto
-    FOR EACH ROW
-    WHEN NEW.fecha_exp IS NOT NULL AND DATE(NEW.fecha_exp) < DATE('now','localtime')
-    BEGIN
-      UPDATE producto 
-      SET estado = 'desactivado' 
-      WHERE id_producto = NEW.id_producto;
-    END;`);
-
-
+    // ✅ TRIGGER PARA DESACTIVAR PRODUCTO CUANDO STOCK = 0
+    db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_stock_cero
+      AFTER UPDATE ON producto
+      FOR EACH ROW
+      WHEN NEW.stock = 0 AND OLD.stock > 0 AND NEW.estado = 'activo'
+      BEGIN
+        UPDATE producto 
+        SET estado = 'desactivado' 
+        WHERE id_producto = NEW.id_producto;
+      END;
+    `);
   });
 };
+
 const verificarProductosAlIniciar = () => {
   console.log('🔍 Verificando productos al iniciar servidor...');
   
-  // Verificar y desactivar productos con stock 0
   const sqlStockCero = `
     UPDATE producto 
     SET estado = 'desactivado' 
@@ -240,7 +252,6 @@ const verificarProductosAlIniciar = () => {
   
   db.run(sqlStockCero);
   
-  // Verificar y desactivar productos vencidos
   const sqlVencidos = `
     UPDATE producto 
     SET estado = 'desactivado' 
@@ -251,7 +262,6 @@ const verificarProductosAlIniciar = () => {
   
   db.run(sqlVencidos);
   
-  // Verificar productos próximos a vencer (opcional, para logging)
   const sqlProximosVencer = `
     SELECT COUNT(*) as count
     FROM producto 
