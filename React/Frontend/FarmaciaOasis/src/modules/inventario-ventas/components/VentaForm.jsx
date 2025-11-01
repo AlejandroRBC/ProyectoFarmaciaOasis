@@ -3,7 +3,7 @@ import {
   ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert, Radio
 } from '@mantine/core';
 import { 
-  IconPlus, IconMinus, IconTrash, IconUser,IconShoppingCartExclamation,IconReceiptDollar,IconInvoice,IconDownload,IconPrinter,IconCheck, IconQrcode, IconCash, IconCurrencyDollar
+  IconPlus, IconMinus, IconTrash, IconUser,IconShoppingCartExclamation,IconReceiptDollar,IconInvoice,IconDownload,IconPrinter,IconCheck, IconQrcode, IconCash, IconCurrencyDollar, IconLock,IconAlertCircle 
 } from '@tabler/icons-react';
 import { generarPDFVenta,
   imprimirComprobante } from '../utils/generarPDF';
@@ -12,15 +12,15 @@ import clienteService from '../services/clienteService';
 function VentaForm({ 
   carrito, 
   totalVenta, 
-  totalSinDescuento,  // ✅ NUEVO
-  montoDescuento,     // ✅ NUEVO
-  descuentoCliente,   // ✅ NUEVO
+  totalSinDescuento,
+  montoDescuento,
+  descuentoCliente,
   onModificarCantidad, 
   onEliminarItem, 
   onVaciarCarrito, 
   onRealizarVenta, 
-  onCancel,
-  onActualizarDescuento 
+  onActualizarDescuento,
+  onCancel
 }) {
   
   const [detallesVentaReal, setDetallesVentaReal] = useState(null);
@@ -32,48 +32,155 @@ function VentaForm({
   const [metodoPagoRapido, setMetodoPagoRapido] = useState('efectivo');
   const [buscandoCliente, setBuscandoCliente] = useState(false);
   
+  // ✅ NUEVO: Estado para manejar errores y campos tocados
+  const [errores, setErrores] = useState({});
+  const [tocado, setTocado] = useState({});
+  
   const [datosCliente, setDatosCliente] = useState({
     nombre: '',
     ci_nit: '',
     metodo_pago: 'efectivo'
   });
 
-  
-// ✅ NUEVO: Función para manejar la búsqueda de cliente con descuento
-const buscarClientePorCI = async (ci_nit) => {
-  if (!ci_nit || ci_nit.length < 3) {
-    return;
-  }
-
-  setBuscandoCliente(true);
-  try {
-    const cliente = await clienteService.buscarClientePorCIExacto(ci_nit);
-    if (cliente) {
-      // ✅ Autocompletar datos del cliente encontrado
-      setDatosCliente(prev => ({
-        ...prev,
-        nombre: cliente.nombre,
-        ci_nit: cliente.ci_nit
-      }));
-      
-      // ✅ Actualizar el descuento en el carrito
-      if (onActualizarDescuento) {
-        onActualizarDescuento(cliente.descuento || 0);
-      }
-      
-      console.log('Cliente encontrado:', cliente.nombre, 'Descuento:', cliente.descuento + '%');
-    } else {
-      // ✅ Si no se encuentra cliente, resetear descuento
-      if (onActualizarDescuento) {
-        onActualizarDescuento(0);
-      }
+  // ✅ NUEVO: Función para verificar si el formulario es válido
+  const esFormularioValido = () => {
+    const { nombre, ci_nit, metodo_pago } = datosCliente;
+    
+    // Campos obligatorios no vacíos
+    if (!nombre.trim() || !ci_nit.trim() || !metodo_pago) {
+      return false;
     }
-  } catch (error) {
-    console.error('Error al buscar cliente:', error);
-  } finally {
-    setBuscandoCliente(false);
-  }
-};
+    
+    // Sin errores de validación
+    if (Object.keys(errores).length > 0) {
+      return false;
+    }
+    
+    // Validaciones específicas
+    if (nombre.length < 2 || ci_nit.length < 3) {
+      return false;
+    }
+    
+    return true;
+  };
+
+  // ✅ NUEVO: Función de validación
+  const validarCampo = (nombre, valor) => {
+    const nuevosErrores = { ...errores };
+    
+    switch (nombre) {
+      case 'nombre':
+        if (!valor.trim()) {
+          nuevosErrores.nombre = 'El nombre del cliente es requerido';
+        } else if (valor.length < 2) {
+          nuevosErrores.nombre = 'El nombre debe tener al menos 2 caracteres';
+        } else if (valor.length > 100) {
+          nuevosErrores.nombre = 'El nombre no puede tener más de 100 caracteres';
+        } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]*$/.test(valor)) {
+          nuevosErrores.nombre = 'El nombre solo puede contener letras y espacios';
+        } else {
+          delete nuevosErrores.nombre;
+        }
+        break;
+
+      case 'ci_nit':
+        if (!valor.trim()) {
+          nuevosErrores.ci_nit = 'El CI/NIT es requerido';
+        } else if (valor.length < 3) {
+          nuevosErrores.ci_nit = 'El CI/NIT debe tener al menos 3 caracteres';
+        } else if (valor.length > 15) {
+          nuevosErrores.ci_nit = 'El CI/NIT no puede tener más de 15 caracteres';
+        } else if (!/^[0-9a-zA-Z]+$/.test(valor)) {
+          nuevosErrores.ci_nit = 'Solo se permiten números y letras';
+        } else {
+          delete nuevosErrores.ci_nit;
+        }
+        break;
+
+      case 'metodo_pago':
+        if (!valor) {
+          nuevosErrores.metodo_pago = 'El método de pago es requerido';
+        } else {
+          delete nuevosErrores.metodo_pago;
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setErrores(nuevosErrores);
+  };
+
+  // ✅ NUEVO: Función para manejar cambios en los campos
+  const handleChange = (name, value) => {
+    setDatosCliente(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Validar en tiempo real si el campo ya fue tocado
+    if (tocado[name]) {
+      validarCampo(name, value);
+    }
+  };
+
+  // ✅ NUEVO: Función para manejar blur de los campos
+  const handleBlur = (name, value) => {
+    setTocado(prev => ({ ...prev, [name]: true }));
+    validarCampo(name, value);
+  };
+
+  // ✅ NUEVO: Función para validar todo el formulario
+  const validarFormulario = () => {
+    const nuevosTocados = {};
+    Object.keys(datosCliente).forEach(key => {
+      nuevosTocados[key] = true;
+    });
+    setTocado(nuevosTocados);
+
+    Object.keys(datosCliente).forEach(key => {
+      validarCampo(key, datosCliente[key]);
+    });
+
+    return Object.keys(errores).length === 0 && esFormularioValido();
+  };
+
+  // ✅ NUEVO: Función para buscar cliente automáticamente
+  const buscarClientePorCI = async (ci_nit) => {
+    if (!ci_nit || ci_nit.length < 3) {
+      return;
+    }
+
+    setBuscandoCliente(true);
+    try {
+      const cliente = await clienteService.buscarClientePorCIExacto(ci_nit);
+      if (cliente) {
+        // ✅ Autocompletar datos del cliente encontrado
+        setDatosCliente(prev => ({
+          ...prev,
+          nombre: cliente.nombre,
+          ci_nit: cliente.ci_nit
+        }));
+        
+        // ✅ Actualizar el descuento en el carrito
+        if (onActualizarDescuento) {
+          onActualizarDescuento(cliente.descuento || 0);
+        }
+        
+        console.log('Cliente encontrado:', cliente.nombre, 'Descuento:', cliente.descuento + '%');
+      } else {
+        // ✅ Si no se encuentra cliente, resetear descuento
+        if (onActualizarDescuento) {
+          onActualizarDescuento(0);
+        }
+      }
+    } catch (error) {
+      console.error('Error al buscar cliente:', error);
+    } finally {
+      setBuscandoCliente(false);
+    }
+  };
 
   // ✅ NUEVO: useEffect para buscar automáticamente cuando cambia el CI
   useEffect(() => {
@@ -81,7 +188,7 @@ const buscarClientePorCI = async (ci_nit) => {
       if (datosCliente.ci_nit && datosCliente.ci_nit.length >= 3) {
         buscarClientePorCI(datosCliente.ci_nit);
       }
-    }, 800); // Esperar 800ms después de que el usuario deje de escribir
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [datosCliente.ci_nit]);
@@ -91,6 +198,11 @@ const buscarClientePorCI = async (ci_nit) => {
     e.preventDefault();
     if (carrito.length === 0) {
       alert('El carrito está vacío');
+      return;
+    }
+    
+    // ✅ NUEVO: Validar formulario antes de enviar
+    if (!validarFormulario()) {
       return;
     }
     
@@ -116,11 +228,14 @@ const buscarClientePorCI = async (ci_nit) => {
       setModalExitoAbierto(true);
       setModalClienteAbierto(false);
       
+      // ✅ NUEVO: Resetear formulario
       setDatosCliente({
         nombre: '',
         ci_nit: '',
         metodo_pago: 'efectivo'
       });
+      setErrores({});
+      setTocado({});
     } catch (error) {
       alert('Error al realizar la venta: ' + error.message);
     }
@@ -165,13 +280,6 @@ const buscarClientePorCI = async (ci_nit) => {
       alert('Error al realizar la venta rápida: ' + error.message);
       setModalPagoRapidoAbierto(false);
     }
-  };
-
-  const handleChange = (name, value) => {
-    setDatosCliente(prev => ({
-      ...prev,
-      [name]: value
-    }));
   };
 
   const abrirModalVenta = () => {
@@ -241,11 +349,14 @@ const buscarClientePorCI = async (ci_nit) => {
         </ActionIcon>
         <Text c="dimmed" mb="lg">El carrito está vacío</Text>
         <Button onClick={onCancel} variant="light">
-          Continuar Vendiendo
+          Continuar Comprando
         </Button>
       </Box>
     );
   }
+
+  const hayErrores = Object.keys(errores).length > 0;
+  const formularioValido = esFormularioValido();
 
   return (
     <>
@@ -270,15 +381,15 @@ const buscarClientePorCI = async (ci_nit) => {
                   </Badge>
                 </Group>
 
-                {item.presentacion && (
-                  <Text size="xs" c="dimmed" mb="xs">
-                    {item.presentacion} - {item.medida}
-                  </Text>
-                )}
                 <Text size="xs" c="dimmed" mb="xs">
                   Stock disponible: {item.stock - item.cantidad}
                 </Text>
                 
+                {item.presentacion && (
+                  <Text size="xs" c="dimmed" mb="xs">
+                    {item.presentacion}
+                  </Text>
+                )}
                 
                 <Group justify="space-between">
                   <Group gap="xs">
@@ -325,10 +436,22 @@ const buscarClientePorCI = async (ci_nit) => {
         </ScrollArea>
 
         <Box py="md" style={{ borderTop: '2px solid #e9ecef' }}>
+          {descuentoCliente > 0 && (
+            <>
+              <Group justify="space-between" mb="xs">
+                <Text size="sm" c="dimmed">Subtotal:</Text>
+                <Text size="sm" c="dimmed">Bs {totalSinDescuento?.toFixed(2)}</Text>
+              </Group>
+              <Group justify="space-between" mb="xs">
+                <Text size="sm" c="green">Descuento ({descuentoCliente}%):</Text>
+                <Text size="sm" c="green">- Bs {montoDescuento?.toFixed(2)}</Text>
+              </Group>
+            </>
+          )}
           <Group justify="space-between" mb="md">
             <Text fw={700} size="lg">Total:</Text>
             <Text fw={700} size="xl" c="blue.6">
-              Bs {totalVenta}
+              Bs {totalVenta?.toFixed(2)}
             </Text>
           </Group>
         </Box>
@@ -367,10 +490,14 @@ const buscarClientePorCI = async (ci_nit) => {
         </Stack>
       </Box>
 
-      {/* Modal Datos del Cliente (MEJORADO) */}
+      {/* Modal Datos del Cliente (ACTUALIZADO CON NUEVA VALIDACIÓN) */}
       <Modal
         opened={modalClienteAbierto}
-        onClose={() => setModalClienteAbierto(false)}
+        onClose={() => {
+          setModalClienteAbierto(false);
+          setErrores({});
+          setTocado({});
+        }}
         title={
           <Group gap="sm">
             <IconUser size={20} />
@@ -381,55 +508,53 @@ const buscarClientePorCI = async (ci_nit) => {
         overlayProps={{ opacity: 0.5, blur: 4 }}
         styles={{ content: { borderRadius: '12px' } }}
       >
-        <Box component="form" onSubmit={handleSubmit}>
-          <Stack gap="md">
-            <TextInput
-              label="CI / NIT"
-              placeholder="Ingrese CI o NIT del cliente"
-              value={datosCliente.ci_nit}
-              onChange={(e) => {
-                const valor = e.target.value;
-                if (/^[0-9a-zA-Z]*$/.test(valor) && valor.length <= 15) {
-                  handleChange('ci_nit', valor);
-                }
-              }}
-              onBlur={(e) => {
-                const valor = e.target.value.trim();
-                handleChange('ci_nit', valor);
-              }}
-              error={
-                datosCliente.ci_nit && datosCliente.ci_nit.length < 3 
-                  ? 'El CI/NIT debe tener al menos 3 caracteres' 
-                  : datosCliente.ci_nit && !/^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit)
-                  ? 'Solo se permiten números y letras'
-                  : null
-              }
-              required
-              rightSection={buscandoCliente ? <Text size="xs" c="blue">Buscando...</Text> : null}
-            />
-            
-            <TextInput
-              label="Nombre del Cliente"
-              placeholder="Se autocompletará si el cliente existe"
-              value={datosCliente.nombre}
-              onChange={(e) => {
-                const valor = e.target.value;
-                if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]*$/.test(valor) && valor.length <= 100) {
-                  handleChange('nombre', valor);
-                }
-              }}
-              onBlur={(e) => {
-                const valor = e.target.value.trim();
-                handleChange('nombre', valor);
-              }}
-              error={
-                datosCliente.nombre && datosCliente.nombre.length < 2 
-                  ? 'El nombre debe tener al menos 2 caracteres' 
-                  : null
-              }
-              required
-            />
-            <Radio.Group
+        <Box component="form" onSubmit={handleSubmit} className="mantine-form">
+          {hayErrores && (
+            <Alert 
+              icon={<IconAlertCircle size={16} />} 
+              title="Errores de validación" 
+              color="red" 
+              mb="md"
+            >
+              Por favor corrige los errores en el formulario antes de enviar.
+            </Alert>
+          )}
+
+          <div className="mantine-form-simple">
+            <div className="mantine-form-group">
+              <label htmlFor="ci_nit">CI / NIT *</label>
+              <input
+                id="ci_nit"
+                name="ci_nit"
+                value={datosCliente.ci_nit}
+                onChange={(e) => handleChange('ci_nit', e.target.value)}
+                onBlur={(e) => handleBlur('ci_nit', e.target.value)}
+                placeholder="Ingrese CI o NIT del cliente"
+                required
+              />
+              {errores.ci_nit && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.ci_nit}</span>}
+              {buscandoCliente && (
+                <Text size="xs" c="blue" mt={4}>Buscando cliente...</Text>
+              )}
+            </div>
+
+            <div className="mantine-form-group">
+              <label htmlFor="nombre">Nombre del Cliente *</label>
+              <input
+                id="nombre"
+                name="nombre"
+                value={datosCliente.nombre}
+                onChange={(e) => handleChange('nombre', e.target.value)}
+                onBlur={(e) => handleBlur('nombre', e.target.value)}
+                placeholder="Si existe ci se autocompletara"
+                required
+              />
+              {errores.nombre && <span style={{color: 'red', fontSize: '0.75rem'}}>{errores.nombre}</span>}
+            </div>
+
+            <div className="">
+              
+<Radio.Group
             value={datosCliente.metodo_pago}
             onChange={(value) => handleChange('metodo_pago', value)}
             
@@ -466,60 +591,44 @@ const buscarClientePorCI = async (ci_nit) => {
               />
             </Stack>
           </Radio.Group>
+            </div>
+          </div>
+            
+          <Group justify="space-between" mt="md" px="md">
+            <Text fw={700} size="lg">Total a Pagar:</Text>
+            <Text fw={700} size="xl" c="blue.6">
+              Bs {totalVenta.toFixed(2)}
+            </Text>
+          </Group>
 
-            {datosCliente.nombre && datosCliente.nombre.length < 2 && (
-              <Alert variant="light" color="yellow" size="sm">
-                El nombre debe tener al menos 2 caracteres
-              </Alert>
-            )}
-
-            {datosCliente.ci_nit && datosCliente.ci_nit.length < 3 && (
-              <Alert variant="light" color="yellow" size="sm">
-                El CI/NIT debe tener al menos 3 caracteres
-              </Alert>
-            )}
-
-            <Group justify="space-between" mt="md">
-              <Text fw={700} size="lg">Total a Pagar:</Text>
-              <Text fw={700} size="xl" c="blue.6">
-                Bs {totalVenta}
-              </Text>
-            </Group>
-
-            {(() => {
-              const nombreValido = datosCliente.nombre && datosCliente.nombre.length >= 2;
-              const ciNitValido = datosCliente.ci_nit && datosCliente.ci_nit.length >= 3 && /^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit);
-              const metodoPagoValido = datosCliente.metodo_pago;
-              
-              const formularioValido = nombreValido && ciNitValido && metodoPagoValido;
-              
-              return (
-                <Group grow mt="md">
-                  <Button 
-                    type="submit" 
-                    color="green"
-                    size="md"
-                    disabled={!formularioValido}
-                  >
-                    Confirmar Venta
-                  </Button>
-                  
-                  <Button 
-                    variant="light" 
-                    color="gray"
-                    onClick={() => setModalClienteAbierto(false)}
-                    size="md"
-                  >
-                    Cancelar
-                  </Button>
-                </Group>
-              );
-            })()}
-          </Stack>
+          <div className="mantine-form-actions">
+            <Button 
+              type="submit" 
+              color="green"
+              size="md"
+              disabled={!formularioValido}
+              leftSection={!formularioValido ? <IconLock size={16} /> : null}
+            >
+              Confirmar Venta
+            </Button>
+            
+            <Button 
+              variant="light" 
+              color="gray"
+              onClick={() => {
+                setModalClienteAbierto(false);
+                setErrores({});
+                setTocado({});
+              }}
+              size="md"
+            >
+              Cancelar
+            </Button>
+          </div>
         </Box>
       </Modal>
 
-      {/* Modal para Selección de Pago en Venta Rápida */}
+      {/* Resto del código permanece igual (Modal Venta Rápida y Modal Éxito) */}
       <Modal
         opened={modalPagoRapidoAbierto}
         onClose={() => setModalPagoRapidoAbierto(false)}
@@ -534,26 +643,14 @@ const buscarClientePorCI = async (ci_nit) => {
         styles={{ content: { borderRadius: '12px' } }}
       >
         <Stack gap="lg">
-        <Box py="md" style={{ borderTop: '2px solid #e9ecef' }}>
-    {descuentoCliente > 0 && (
-      <>
-        <Group justify="space-between" mb="xs">
-          <Text size="sm" c="dimmed">Subtotal:</Text>
-          <Text size="sm" c="dimmed">Bs {totalSinDescuento?.toFixed(2)}</Text>
-        </Group>
-        <Group justify="space-between" mb="xs">
-          <Text size="sm" c="green">Descuento ({descuentoCliente}%):</Text>
-          <Text size="sm" c="green">- Bs {montoDescuento?.toFixed(2)}</Text>
-        </Group>
-      </>
-    )}
-    <Group justify="space-between" mb="md">
-      <Text fw={700} size="lg">Total:</Text>
-      <Text fw={700} size="xl" c="blue.6">
-        Bs {totalVenta?.toFixed(2)}
-      </Text>
-    </Group>
-  </Box>
+          <Box>
+            <Text fw={600} size="lg" ta="center" c="blue.6">
+              Total: Bs {totalVenta}
+            </Text>
+            <Text size="sm" c="dimmed" ta="center">
+              {carrito.length} producto(s) en el carrito
+            </Text>
+          </Box>
 
           <Radio.Group
             value={metodoPagoRapido}
@@ -615,7 +712,6 @@ const buscarClientePorCI = async (ci_nit) => {
         </Stack>
       </Modal>
 
-      {/* Modal Éxito y Opciones */}
       {datosVentaConfirmada && (
         <Modal
           opened={modalExitoAbierto}
@@ -685,3 +781,6 @@ const buscarClientePorCI = async (ci_nit) => {
 }
 
 export default VentaForm;
+
+
+
