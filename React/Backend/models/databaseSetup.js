@@ -189,6 +189,43 @@ const createTables = () => {
         WHERE l.id_lab = NEW.id_lab;
       END;
     `);
+        // Trigger para desactivar producto cuando stock llega a 0
+  db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_stock_cero
+    AFTER UPDATE ON producto
+    FOR EACH ROW
+    WHEN NEW.stock = 0 AND OLD.stock > 0 AND NEW.estado = 'activo'
+    BEGIN
+      UPDATE producto 
+      SET estado = 'desactivado' 
+      WHERE id_producto = NEW.id_producto;
+    END;`);
+
+  // Trigger para desactivar producto cuando vence
+  db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_vencido
+    AFTER UPDATE ON producto
+    FOR EACH ROW
+    WHEN NEW.fecha_exp IS NOT NULL 
+      AND DATE(NEW.fecha_exp) < DATE('now','localtime') 
+      AND NEW.estado = 'activo'
+      AND (OLD.fecha_exp IS NULL OR DATE(OLD.fecha_exp) >= DATE('now','localtime'))
+    BEGIN
+      UPDATE producto 
+      SET estado = 'desactivado' 
+      WHERE id_producto = NEW.id_producto;
+    END;`);
+
+  // Trigger adicional: verificar productos vencidos al insertar
+  db.run(`CREATE TRIGGER IF NOT EXISTS verificar_vencimiento_al_insertar
+    AFTER INSERT ON producto
+    FOR EACH ROW
+    WHEN NEW.fecha_exp IS NOT NULL AND DATE(NEW.fecha_exp) < DATE('now','localtime')
+    BEGIN
+      UPDATE producto 
+      SET estado = 'desactivado' 
+      WHERE id_producto = NEW.id_producto;
+    END;`);
+
+
   });
 };
 const verificarProductosAlIniciar = () => {
