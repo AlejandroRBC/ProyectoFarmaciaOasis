@@ -75,6 +75,9 @@ function VentasList({ ventas }) {
           </Badge>
         </Table.Td>
         <Table.Td className="mantine-Table-td">
+          {venta.descuento.toFixed(2)}
+        </Table.Td>
+        <Table.Td className="mantine-Table-td">
           {venta.total.toFixed(2)}
         </Table.Td>
         <Table.Td className="mantine-Table-td">
@@ -112,6 +115,7 @@ function VentasList({ ventas }) {
                 <Table.Th className="mantine-Table-th">Cliente</Table.Th>
                 <Table.Th className="mantine-Table-th">CI/NIT</Table.Th>
                 <Table.Th className="mantine-Table-th">Método Pago</Table.Th>
+                <Table.Th className="mantine-Table-th">Descuento</Table.Th>
                 <Table.Th className="mantine-Table-th">Total(Bs.)</Table.Th>
                 <Table.Th className="mantine-Table-th">Productos</Table.Th>
               </Table.Tr>
