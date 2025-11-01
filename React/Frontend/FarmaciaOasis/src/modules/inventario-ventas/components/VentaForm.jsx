@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   ScrollArea, Box, Group, Text, Button, ActionIcon,Flex, ThemeIcon,Badge,Stack,Modal,TextInput, Select,Alert, Radio
 } from '@mantine/core';
@@ -7,6 +7,7 @@ import {
 } from '@tabler/icons-react';
 import { generarPDFVenta,
   imprimirComprobante } from '../utils/generarPDF';
+import clienteService from '../services/clienteService';
 
 function VentaForm({ 
   carrito, 
@@ -21,16 +22,55 @@ function VentaForm({
   const [detallesVentaReal, setDetallesVentaReal] = useState(null);
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false);
   const [modalExitoAbierto, setModalExitoAbierto] = useState(false);
-  const [modalPagoRapidoAbierto, setModalPagoRapidoAbierto] = useState(false); // ✅ NUEVO MODAL
+  const [modalPagoRapidoAbierto, setModalPagoRapidoAbierto] = useState(false);
   const [datosVentaConfirmada, setDatosVentaConfirmada] = useState(null);
   const [numeroVentaGenerado, setNumeroVentaGenerado] = useState('');
-  const [metodoPagoRapido, setMetodoPagoRapido] = useState('efectivo'); // ✅ ESTADO PARA MÉTODO DE PAGO RÁPIDO
+  const [metodoPagoRapido, setMetodoPagoRapido] = useState('efectivo');
+  const [buscandoCliente, setBuscandoCliente] = useState(false);
   
   const [datosCliente, setDatosCliente] = useState({
     nombre: '',
     ci_nit: '',
     metodo_pago: 'efectivo'
   });
+
+  // ✅ NUEVO: Función para buscar cliente automáticamente
+  const buscarClientePorCI = async (ci_nit) => {
+    if (!ci_nit || ci_nit.length < 3) {
+      return; // No buscar si el CI es muy corto
+    }
+
+    setBuscandoCliente(true);
+    try {
+      const cliente = await clienteService.buscarClientePorCIExacto(ci_nit);
+      if (cliente) {
+        // ✅ Autocompletar datos del cliente encontrado
+        setDatosCliente(prev => ({
+          ...prev,
+          nombre: cliente.nombre,
+          ci_nit: cliente.ci_nit
+        }));
+        
+        // Mostrar mensaje de éxito
+        console.log('Cliente encontrado:', cliente.nombre);
+      }
+    } catch (error) {
+      console.error('Error al buscar cliente:', error);
+    } finally {
+      setBuscandoCliente(false);
+    }
+  };
+
+  // ✅ NUEVO: useEffect para buscar automáticamente cuando cambia el CI
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (datosCliente.ci_nit && datosCliente.ci_nit.length >= 3) {
+        buscarClientePorCI(datosCliente.ci_nit);
+      }
+    }, 800); // Esperar 800ms después de que el usuario deje de escribir
+
+    return () => clearTimeout(timer);
+  }, [datosCliente.ci_nit]);
 
   // En handleSubmit:
   const handleSubmit = async (e) => {
@@ -79,7 +119,6 @@ function VentaForm({
       return;
     }
     
-    // ✅ ABRIR MODAL DE SELECCIÓN DE PAGO EN LUGAR DE PROCESAR DIRECTAMENTE
     setModalPagoRapidoAbierto(true);
   };
 
@@ -107,7 +146,7 @@ function VentaForm({
       });
       
       setModalExitoAbierto(true);
-      setModalPagoRapidoAbierto(false); // ✅ CERRAR MODAL DE PAGO
+      setModalPagoRapidoAbierto(false);
     } catch (error) {
       alert('Error al realizar la venta rápida: ' + error.message);
       setModalPagoRapidoAbierto(false);
@@ -282,7 +321,7 @@ function VentaForm({
             </Button>
 
             <Button 
-              onClick={handleVentaRapida} // ✅ AHORA ABRE EL MODAL DE PAGO
+              onClick={handleVentaRapida}
               size="md"
               fullWidth
               variant="light"
@@ -304,7 +343,7 @@ function VentaForm({
         </Stack>
       </Box>
 
-      {/* Modal Datos del Cliente (EXISTENTE) */}
+      {/* Modal Datos del Cliente (MEJORADO) */}
       <Modal
         opened={modalClienteAbierto}
         onClose={() => setModalClienteAbierto(false)}
@@ -321,30 +360,8 @@ function VentaForm({
         <Box component="form" onSubmit={handleSubmit}>
           <Stack gap="md">
             <TextInput
-              label="Nombre del Cliente"
-              placeholder="Ingrese nombre completo"
-              value={datosCliente.nombre}
-              onChange={(e) => {
-                const valor = e.target.value;
-                if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]*$/.test(valor) && valor.length <= 100) {
-                  handleChange('nombre', valor);
-                }
-              }}
-              onBlur={(e) => {
-                const valor = e.target.value.trim();
-                handleChange('nombre', valor);
-              }}
-              error={
-                datosCliente.nombre && datosCliente.nombre.length < 2 
-                  ? 'El nombre debe tener al menos 2 caracteres' 
-                  : null
-              }
-              required
-            />
-            
-            <TextInput
               label="CI / NIT"
-              placeholder="Número de identificación"
+              placeholder="Ingrese CI o NIT del cliente"
               value={datosCliente.ci_nit}
               onChange={(e) => {
                 const valor = e.target.value;
@@ -363,6 +380,30 @@ function VentaForm({
                   ? 'Solo se permiten números y letras'
                   : null
               }
+              required
+              rightSection={buscandoCliente ? <Text size="xs" c="blue">Buscando...</Text> : null}
+            />
+            
+            <TextInput
+              label="Nombre del Cliente"
+              placeholder="Se autocompletará si el cliente existe"
+              value={datosCliente.nombre}
+              onChange={(e) => {
+                const valor = e.target.value;
+                if (/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]*$/.test(valor) && valor.length <= 100) {
+                  handleChange('nombre', valor);
+                }
+              }}
+              onBlur={(e) => {
+                const valor = e.target.value.trim();
+                handleChange('nombre', valor);
+              }}
+              error={
+                datosCliente.nombre && datosCliente.nombre.length < 2 
+                  ? 'El nombre debe tener al menos 2 caracteres' 
+                  : null
+              }
+              required
             />
             
             <Select
@@ -399,7 +440,7 @@ function VentaForm({
 
             {(() => {
               const nombreValido = datosCliente.nombre && datosCliente.nombre.length >= 2;
-              const ciNitValido = !datosCliente.ci_nit || (datosCliente.ci_nit.length >= 3 && /^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit));
+              const ciNitValido = datosCliente.ci_nit && datosCliente.ci_nit.length >= 3 && /^[0-9a-zA-Z]+$/.test(datosCliente.ci_nit);
               const metodoPagoValido = datosCliente.metodo_pago;
               
               const formularioValido = nombreValido && ciNitValido && metodoPagoValido;
@@ -430,7 +471,7 @@ function VentaForm({
         </Box>
       </Modal>
 
-      {/* ✅ NUEVO MODAL PARA SELECCIÓN DE PAGO EN VENTA RÁPIDA */}
+      {/* Modal para Selección de Pago en Venta Rápida */}
       <Modal
         opened={modalPagoRapidoAbierto}
         onClose={() => setModalPagoRapidoAbierto(false)}
@@ -514,7 +555,7 @@ function VentaForm({
         </Stack>
       </Modal>
 
-      {/* Modal Éxito y Opciones (EXISTENTE) */}
+      {/* Modal Éxito y Opciones */}
       {datosVentaConfirmada && (
         <Modal
           opened={modalExitoAbierto}

@@ -54,6 +54,7 @@ const createTables = () => {
     total REAL,
     metodo_pago TEXT,
     id_cliente INTEGER,
+    descuento REAL,
     FOREIGN KEY (id_cliente) REFERENCES cliente(cod_cli)
   )`);
 
