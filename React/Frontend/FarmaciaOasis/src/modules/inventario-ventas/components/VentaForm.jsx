@@ -429,19 +429,43 @@ const buscarClientePorCI = async (ci_nit) => {
               }
               required
             />
+            <Radio.Group
+            value={datosCliente.metodo_pago}
+            onChange={(value) => handleChange('metodo_pago', value)}
             
-            <Select
-              label="Método de Pago"
-              placeholder="Seleccione método"
-              data={[
-                { value: 'efectivo', label: 'Efectivo' },
-                { value: 'qr', label: 'QR' },
-                { value: 'mixto', label: 'Mixto' }
-              ]}
-              value={datosCliente.metodo_pago}
-              onChange={(value) => handleChange('metodo_pago', value)}
-              required
-            />
+            label="Seleccione el método de pago:"
+            withAsterisk
+          >
+            <Stack mt="xs" gap="sm">
+              <Radio 
+                value="efectivo" 
+                label={
+                  <Group gap="sm">
+                    <IconCash size={18} color="green" />
+                    <Text>Efectivo</Text>
+                  </Group>
+                } 
+              />
+              <Radio 
+                value="qr" 
+                label={
+                  <Group gap="sm">
+                    <IconQrcode size={18} color="blue" />
+                    <Text>QR</Text>
+                  </Group>
+                } 
+              />
+              <Radio 
+                value="mixto" 
+                label={
+                  <Group gap="sm">
+                    <IconCurrencyDollar size={18} color="orange" />
+                    <Text>Mixto</Text>
+                  </Group>
+                } 
+              />
+            </Stack>
+          </Radio.Group>
 
             {datosCliente.nombre && datosCliente.nombre.length < 2 && (
               <Alert variant="light" color="yellow" size="sm">
