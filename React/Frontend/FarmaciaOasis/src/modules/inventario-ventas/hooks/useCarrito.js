@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import ventasService from '../services/VentasServices';
 import clienteService from '../services/clienteService';
+import { saleSound } from '../utils/sounds'; 
+
 
 export const useCarrito = (productos, actualizarStockProducto, recargarProductos) => {
   const [carrito, setCarrito] = useState([]);
@@ -23,7 +25,7 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     const stockDisponible = obtenerStockDisponible(producto.id);
     
     if (stockDisponible < 1) {
-      alert(`❌ No hay stock disponible de ${producto.nombre}`);
+      
       return;
     }
 
@@ -32,7 +34,7 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
       if (existe) {
         const nuevoStockDisponible = obtenerStockDisponible(producto.id);
         if (nuevoStockDisponible < 1) {
-          alert(`❌ No hay más stock disponible de ${producto.nombre}`);
+      
           return prev;
         }
         return prev.map(item =>
@@ -57,7 +59,7 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
           const producto = productos.find(p => p.id === id);
           
           if (nuevaCantidad > (item.cantidad) && stockDisponible < 1) {
-            alert(`❌ No hay más stock disponible de ${producto.nombre}`);
+            
             return item;
           }
           
@@ -120,6 +122,8 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
 
       // Llamar al servicio
       const resultado = await ventasService.crearVenta(ventaData);
+          saleSound.play();
+
       
       const ventaCompleta = {
         ...resultado,
