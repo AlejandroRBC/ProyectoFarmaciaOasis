@@ -13,6 +13,7 @@ const historialController = {
         id_producto,
         nombre,
         presentacion,
+        medida,
         lote,
         precio_venta,
         stock_antiguo,

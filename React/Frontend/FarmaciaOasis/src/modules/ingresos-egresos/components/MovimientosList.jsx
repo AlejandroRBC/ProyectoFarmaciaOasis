@@ -55,6 +55,7 @@ function MovimientosList({ movimientos }) {
         <Table.Td>PROOD {movimiento.id_producto}</Table.Td>
         <Table.Td>{movimiento.nombre}</Table.Td>
         <Table.Td>{movimiento.presentacion}</Table.Td>
+        <Table.Td>{movimiento.medida}</Table.Td>
         <Table.Td>{movimiento.lote}</Table.Td>
         <Table.Td>{movimiento.precio_venta.toFixed(2)} Bs</Table.Td>
         <Table.Td>{movimiento.stock_antiguo}</Table.Td>
@@ -95,6 +96,7 @@ function MovimientosList({ movimientos }) {
                 <Table.Th>ID Producto</Table.Th>
                 <Table.Th>Nombre</Table.Th>
                 <Table.Th>Presentación</Table.Th>
+                <Table.Th>Medida</Table.Th>
                 <Table.Th>Lote</Table.Th>
                 <Table.Th>Precio Venta</Table.Th>
                 <Table.Th>Stock Antiguo</Table.Th>
