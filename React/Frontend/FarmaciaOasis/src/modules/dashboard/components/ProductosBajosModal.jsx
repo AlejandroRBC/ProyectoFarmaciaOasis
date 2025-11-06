@@ -58,13 +58,27 @@ function ProductosBajosModal({ productos, opened, onClose }) {
           </Group>
         </Table.Td>
         <Table.Td className="product-cell">
+          <Text size="sm" c="dark.6">{producto.presentacion || 'N/A'}</Text>
+        </Table.Td>
+        <Table.Td className="product-cell">
+          <Text size="sm" c="dark.6">{producto.lote || 'N/A'}</Text>
+        </Table.Td>
+        <Table.Td className="product-cell">
+          <Badge variant="outline" color="blue" size="sm">
+            {producto.medida || 'unidades'}
+          </Badge>
+        </Table.Td>
+        <Table.Td className="product-cell">
+          <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
+        </Table.Td>
+        <Table.Td className="product-cell">
           <Badge 
             color={badgeColor}
             variant={getBadgeVariant(producto.stock)}
             size="sm"
             radius="sm"
           >
-            {producto.stock} unidades
+            {producto.stock} 
           </Badge>
         </Table.Td>
         <Table.Td className="product-cell">
@@ -85,9 +99,6 @@ function ProductosBajosModal({ productos, opened, onClose }) {
               <IconCheck size={14} color="#51cf66" />
             )}
           </Group>
-        </Table.Td>
-        <Table.Td className="product-cell">
-          <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
       </Table.Tr>
     );
@@ -159,9 +170,12 @@ function ProductosBajosModal({ productos, opened, onClose }) {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>PRODUCTO</Table.Th>
+                  <Table.Th>PRESENTACIÓN</Table.Th>
+                  <Table.Th>LOTE</Table.Th>
+                  <Table.Th>MEDIDA</Table.Th>
+                  <Table.Th>LABORATORIO</Table.Th>
                   <Table.Th>STOCK</Table.Th>
                   <Table.Th>ESTADO</Table.Th>
-                  <Table.Th>LABORATORIO</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>

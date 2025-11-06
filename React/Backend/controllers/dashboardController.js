@@ -41,6 +41,9 @@ const dashboardController = {
         p.id_producto as id,
         p.nombre_prod as nombre,
         p.stock,
+        p.lote,
+        p.medida,
+        p.presentacion,
         COALESCE(l.nombre_labo, 'Sin laboratorio') as laboratorio,
         CASE 
           WHEN p.stock <= 3 THEN 'Crítico'
@@ -70,6 +73,9 @@ const dashboardController = {
       SELECT 
         p.id_producto as id,
         p.nombre_prod as nombre,
+        p.lote,
+        p.medida,
+        p.presentacion,
         COALESCE(l.nombre_labo, 'Sin laboratorio') as laboratorio,
         p.fecha_exp as fechaVencimiento,
         JULIANDAY(p.fecha_exp) - JULIANDAY(?) as diasRestantes

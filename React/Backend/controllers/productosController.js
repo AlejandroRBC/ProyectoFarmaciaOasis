@@ -149,7 +149,6 @@ const productosController = {
     });
   },
 
-  // Nuevo endpoint para buscar productos por nombre (útil para ventas)
   search: (req, res) => {
     const { query } = req.query;
     

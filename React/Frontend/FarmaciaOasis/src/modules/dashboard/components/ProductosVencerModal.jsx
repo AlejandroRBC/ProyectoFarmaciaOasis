@@ -88,6 +88,17 @@ function ProductosVencerModal({ productos, opened, onClose }) {
           </Group>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
+          <Text size="sm" c="dark.6">{producto.presentacion || 'N/A'}</Text>
+        </Table.Td>
+        <Table.Td className="vencer-product-cell">
+          <Text size="sm" c="dark.6">{producto.lote || 'N/A'}</Text>
+        </Table.Td>
+        <Table.Td className="vencer-product-cell">
+          <Badge variant="outline" color="blue" size="sm">
+            {producto.medida || 'unidades'}
+          </Badge>
+        </Table.Td>
+        <Table.Td className="vencer-product-cell">
           <Text fw={500} size="sm" c="dark.7">{producto.laboratorio}</Text>
         </Table.Td>
         <Table.Td className="vencer-product-cell">
@@ -190,6 +201,9 @@ function ProductosVencerModal({ productos, opened, onClose }) {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>PRODUCTO</Table.Th>
+                  <Table.Th>PRESENTACIÓN</Table.Th>
+                  <Table.Th>LOTE</Table.Th>
+                  <Table.Th>MEDIDA</Table.Th>
                   <Table.Th>LABORATORIO</Table.Th>
                   <Table.Th>FECHA VENCIMIENTO</Table.Th>
                   <Table.Th>ESTADO</Table.Th>

@@ -1,7 +1,6 @@
 const db = require("../config/database");
 
 const ventasController = {
-  // Obtener todas las ventas con detalles
   getAllWithDetails: (req, res) => {
     const sql = `
       SELECT 
@@ -32,7 +31,6 @@ const ventasController = {
     });
   },
 
-  // Obtener detalles específicos de una venta
   getVentaDetails: (req, res) => {
     const { id } = req.params;
     
@@ -83,14 +81,12 @@ const ventasController = {
   create: (req, res) => {
     const { cliente, metodo_pago, productos } = req.body;
     
-    // Calcular total sin descuento
     const totalSinDescuento = productos.reduce((sum, producto) => {
       return sum + (producto.precio * producto.cantidad);
     }, 0);
     
-    // Iniciar transacción
     db.serialize(() => {
-      // Primero obtener el descuento del cliente si existe
+
       const obtenerDescuentoCliente = (callback) => {
         if (!cliente) {
           callback(null, 0);
@@ -113,11 +109,9 @@ const ventasController = {
           return;
         }
         
-        // Calcular descuento y total final
         const descuentoAplicado = totalSinDescuento * (descuentoCliente / 100);
         const totalFinal = totalSinDescuento - descuentoAplicado;
         
-        // Insertar venta con descuento
         const sqlVenta = `
           INSERT INTO venta (total, metodo_pago, id_cliente, descuento)
           VALUES (?, ?, ?, ?)
@@ -132,7 +126,6 @@ const ventasController = {
           const ventaId = this.lastID;
           const detalles = [];
           
-          // ✅ FUNCIÓN PARA ACTUALIZAR STOCK
           const actualizarStockProducto = (productoId, cantidad, callback) => {
             const sqlActualizarStock = `
               UPDATE producto 
@@ -155,21 +148,18 @@ const ventasController = {
             });
           };
           
-          // Insertar cada detalle de venta y actualizar stock
           let productosProcesados = 0;
           let errorOcurrido = null;
           
           productos.forEach((producto) => {
             const subtotal = producto.precio * producto.cantidad;
             
-            // ✅ PRIMERO: Actualizar el stock del producto
             actualizarStockProducto(producto.id, producto.cantidad, (err) => {
               if (err) {
                 errorOcurrido = err;
                 return;
               }
               
-              // ✅ SEGUNDO: Insertar el detalle de venta
               const sqlDetalle = `
                 INSERT INTO detalle_venta (id_venta, id_producto, cantidad, subtotal)
                 VALUES (?, ?, ?, ?)
@@ -190,7 +180,6 @@ const ventasController = {
                 
                 productosProcesados++;
                 
-                // Cuando todos los productos han sido procesados
                 if (productosProcesados === productos.length) {
                   if (errorOcurrido) {
                     res.status(400).json({ error: errorOcurrido.message });

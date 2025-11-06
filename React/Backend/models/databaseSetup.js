@@ -87,16 +87,9 @@ const createTables = () => {
   )`);
 
   // TRIGGERS
-  // TRIGGERS
   db.serialize(() => {
-    // Eliminar triggers antiguos
-    db.run(`DROP TRIGGER IF EXISTS registrar_movimiento_venta`);
-    db.run(`DROP TRIGGER IF EXISTS registrar_egreso_stock`);
-    db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_producto_nuevo`);
-    db.run(`DROP TRIGGER IF EXISTS registrar_ingreso_actualizacion_stock`);
 
-    // ✅ TRIGGER PARA VENTAS - SOLO REGISTRA, NO ACTUALIZA STOCK
-    // El controlador ya actualiza el stock manualmente
+    // TRIGGER PARA VENTAS - SOLO REGISTRA
     db.run(`CREATE TRIGGER IF NOT EXISTS registrar_movimiento_venta
       AFTER INSERT ON detalle_venta
       FOR EACH ROW
@@ -134,25 +127,25 @@ const createTables = () => {
        
       END;
     `);
-    // 🔹 Trigger para eliminar duplicado reciente de egreso (venta)
-db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_venta
-  AFTER INSERT ON Historial_Ingresos_Egresos
-  FOR EACH ROW
-  WHEN NEW.stock_nuevo < NEW.stock_antiguo  -- Solo egresos (ventas)
-  BEGIN
-    DELETE FROM Historial_Ingresos_Egresos
-    WHERE id_hie < NEW.id_hie
-      AND id_producto = NEW.id_producto
-      AND stock_antiguo = NEW.stock_antiguo
-      AND stock_nuevo = NEW.stock_nuevo
-      AND ABS(strftime('%s', datetime(fecha || ' ' || hora)) - strftime('%s', datetime('now','localtime'))) <= 2;
-  END;
-`);
+    //  Trigger para eliminar duplicado reciente de egreso (venta)
+    db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_venta
+      AFTER INSERT ON Historial_Ingresos_Egresos
+      FOR EACH ROW
+      WHEN NEW.stock_nuevo < NEW.stock_antiguo  -- Solo egresos (ventas)
+      BEGIN
+        DELETE FROM Historial_Ingresos_Egresos
+        WHERE id_hie < NEW.id_hie
+          AND id_producto = NEW.id_producto
+          AND stock_antiguo = NEW.stock_antiguo
+          AND stock_nuevo = NEW.stock_nuevo
+          AND ABS(strftime('%s', datetime(fecha || ' ' || hora)) - strftime('%s', datetime('now','localtime'))) <= 2;
+      END;
+    `);
 
     
 
-    // ✅ TRIGGER PARA NUEVO PRODUCTO (INGRESO)
-    db.run(`CREATE TRIGGER registrar_ingreso_producto_nuevo
+    // TRIGGER PARA NUEVO PRODUCTO (INGRESO)
+    db.run(`CREATE TRIGGER IF NOT EXISTS registrar_ingreso_producto_nuevo
       AFTER INSERT ON producto
       FOR EACH ROW
       BEGIN
@@ -182,8 +175,7 @@ db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_venta
       END;
     `);
 
-    // ✅ TRIGGER PARA MODIFICACIONES DE STOCK (INGRESOS Y EGRESOS MANUALES)
-    // Este se ejecuta cuando se modifica el stock desde el inventario
+    //  TRIGGER PARA MODIFICACIONES DE STOCK (INGRESOS Y EGRESOS MANUALES)
     db.run(`CREATE TRIGGER IF NOT EXISTS registrar_cambio_stock
       AFTER UPDATE ON producto
       FOR EACH ROW
@@ -214,28 +206,10 @@ db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_venta
         WHERE l.id_lab = NEW.id_lab;
       END;
     `);
-    // ✅ TRIGGER 4: LIMPIAR DUPLICADOS DE VENTAS (NUEVO)
-    // Este trigger elimina el último registro duplicado cuando se hace una venta
-    // db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_hist
-    //   AFTER INSERT ON Historial_Ingresos_Egresos
-    //   FOR EACH ROW
-    //   BEGIN
-    //     DELETE FROM Historial_Ingresos_Egresos
-    //     WHERE id_hie NOT IN (
-    //       SELECT MAX(id_hie)
-    //       FROM Historial_Ingresos_Egresos
-    //       WHERE id_producto = NEW.id_producto
-    //         AND datetime(fecha || ' ' || hora) > datetime('now', '-2 seconds')
-    //         AND stock_nuevo < stock_antiguo
-    //     )
-    //     AND id_producto = NEW.id_producto
-    //     AND datetime(fecha || ' ' || hora) > datetime('now', '-2 seconds')
-    //     AND stock_nuevo < stock_antiguo;
-    //   END;
-    // `);
+
     
 
-    // ✅ TRIGGER PARA DESACTIVAR PRODUCTO CUANDO STOCK = 0
+    //  TRIGGER PARA DESACTIVAR PRODUCTO CUANDO STOCK = 0
     db.run(`CREATE TRIGGER IF NOT EXISTS desactivar_producto_stock_cero
       AFTER UPDATE ON producto
       FOR EACH ROW
@@ -248,6 +222,8 @@ db.run(`CREATE TRIGGER IF NOT EXISTS limpiar_duplicado_venta
     `);
   });
 };
+
+//FUNCIONES
 
 const verificarProductosAlIniciar = () => {
   console.log('🔍 Verificando productos al iniciar servidor...');
