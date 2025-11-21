@@ -1,7 +1,10 @@
-//Frontend/FarmaciaOasis/src/ingresos-egresos/hooks/useMovimientos.js
 import { useState, useEffect } from 'react';
 import IngresosEgresosService from '../services/ingresos-egresosService';
 
+/**
+ * Hook personalizado para gestionar movimientos de stock
+ * Proporciona funcionalidades de carga, búsqueda y estado de movimientos
+ */
 export const useMovimientos = () => {
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +18,6 @@ export const useMovimientos = () => {
 
       const datos = await IngresosEgresosService.obtenerHistorialCompleto();
       
-      // Los datos ya vienen con el tipo desde el backend
       setMovimientos(datos);
       
     } catch (err) {
@@ -30,7 +32,10 @@ export const useMovimientos = () => {
     cargarMovimientos();
   }, []);
 
-  // Buscar en los movimientos cargados
+  /**
+   * Filtra movimientos por término de búsqueda
+   * Busca en nombre, lote y laboratorio
+   */
   const buscarMovimientos = (terminoBusqueda) => {
     if (!terminoBusqueda) return movimientos;
     
@@ -41,7 +46,6 @@ export const useMovimientos = () => {
       (movimiento.laboratorio && movimiento.laboratorio.toLowerCase().includes(termino))
     );
   };
-
 
   return {
     movimientos,

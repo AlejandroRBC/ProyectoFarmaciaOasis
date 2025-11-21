@@ -1,4 +1,10 @@
+/* ============================================= */
+/* INGRESOS Y EGRESOS STYLES */
+/* ============================================= */
+
+
 /* Título con gradiente */
+
 .gradient-title {
   display: flex;
   align-items: center;
@@ -111,10 +117,6 @@
   margin-left: auto;
 }
 
-/* Botón limpiar específico */
-/*.btn-limpiarIE {*/
-
-  /* Estilos específicos para el botón limpiar de ingresos-egresos */
 
 
 /* Contenedor de estadísticas */

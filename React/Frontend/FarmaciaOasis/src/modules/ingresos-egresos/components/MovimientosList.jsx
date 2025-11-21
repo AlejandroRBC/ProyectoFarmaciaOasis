@@ -1,11 +1,21 @@
 import { Table, Badge, Paper, ScrollArea, Box } from '@mantine/core';
 import { useState } from 'react';
 
+/**
+ * Componente para mostrar lista de movimientos de stock
+ * Muestra cambios en inventario con indicadores visuales de ingreso/egreso
+ */
 function MovimientosList({ movimientos }) {
+  /**
+   * Calcula la diferencia entre stock nuevo y antiguo
+   */
   const calcularMovimiento = (stockAntiguo, stockNuevo) => {
     return stockNuevo - stockAntiguo;
   };
 
+  /**
+   * Determina el tipo de movimiento (ingreso, egreso o sin cambio)
+   */
   const getTipoMovimiento = (stockAntiguo, stockNuevo) => {
     const movimiento = stockNuevo - stockAntiguo;
     if (movimiento > 0) return 'ingreso';
@@ -13,6 +23,9 @@ function MovimientosList({ movimientos }) {
     return 'sin-cambio';
   };
 
+  /**
+   * Asigna colores a los badges según el tipo de movimiento
+   */
   const getBadgeColor = (tipo) => {
     const colores = {
       'ingreso': 'green',
@@ -22,6 +35,9 @@ function MovimientosList({ movimientos }) {
     return colores[tipo] || 'gray';
   };
 
+  /**
+   * Retorna iconos para representar visualmente el movimiento
+   */
   const getIconoMovimiento = (tipo) => {
     const iconos = {
       'ingreso': '↑',
@@ -31,6 +47,7 @@ function MovimientosList({ movimientos }) {
     return iconos[tipo];
   };
 
+  // Estado vacío - sin movimientos
   if (movimientos.length === 0) {
     return (
       <Paper p="lg" withBorder radius="lg" shadow="md">
@@ -46,6 +63,9 @@ function MovimientosList({ movimientos }) {
     );
   }
 
+  /**
+   * Genera las filas de la tabla con datos de movimientos
+   */
   const filas = movimientos.map((movimiento) => {
     const tipo = getTipoMovimiento(movimiento.stock_antiguo, movimiento.stock_nuevo);
     const cantidadMovimiento = calcularMovimiento(movimiento.stock_antiguo, movimiento.stock_nuevo);
@@ -61,6 +81,7 @@ function MovimientosList({ movimientos }) {
         <Table.Td>{movimiento.stock_antiguo}</Table.Td>
         <Table.Td>{movimiento.stock_nuevo}</Table.Td>
         <Table.Td>
+          {/* Badge con color e icono según tipo de movimiento */}
           <Badge 
             color={getBadgeColor(tipo)} 
             variant="light" 
@@ -71,14 +92,12 @@ function MovimientosList({ movimientos }) {
           </Badge>
         </Table.Td>
         <Table.Td>
-
+          {/* Ajuste de fecha sumando 1 día */}
           {(() => {
             const fecha = new Date(movimiento.fecha);
-            fecha.setDate(fecha.getDate() + 1); // sumamos 1 día
+            fecha.setDate(fecha.getDate() + 1);
             return fecha.toLocaleDateString('es-ES');
           })()}
-        
-
         </Table.Td>
         <Table.Td>{movimiento.hora}</Table.Td>
         <Table.Td>{movimiento.laboratorio}</Table.Td>
@@ -88,9 +107,11 @@ function MovimientosList({ movimientos }) {
 
   return (
     <Paper withBorder radius="lg" shadow="sm">
+      {/* Contenedor scrollable para la tabla */}
       <Box style={{ height: '200px' }}>
         <ScrollArea h={200} scrollbarSize={6}>
           <Table verticalSpacing="sm" striped highlightOnHover>
+            {/* Encabezados de la tabla */}
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>ID Producto</Table.Th>
@@ -107,6 +128,8 @@ function MovimientosList({ movimientos }) {
                 <Table.Th>Laboratorio</Table.Th>
               </Table.Tr>
             </Table.Thead>
+            
+            {/* Cuerpo de la tabla con filas de movimientos */}
             <Table.Tbody>{filas}</Table.Tbody>
           </Table>
         </ScrollArea>

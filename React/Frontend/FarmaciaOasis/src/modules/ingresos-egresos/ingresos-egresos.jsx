@@ -11,6 +11,10 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import './ingresos-egresos.css';
 
+/**
+ * Componente principal para la gestión y visualización de ingresos y egresos de productos
+ * Incluye funcionalidades de filtrado, búsqueda, estadísticas y exportación a Excel
+ */
 function IngresosEgresos() {
   const { movimientos, loading, error, buscarMovimientos } = useMovimientos();
   const [filtroTipo, setFiltroTipo] = useState('todos');
@@ -19,20 +23,19 @@ function IngresosEgresos() {
   const [filtroRapido, setFiltroRapido] = useState('general');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-  // Media queries para responsive
+  // Media queries para diseño responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   const isDesktop = useMediaQuery({ minWidth: 1025 });
 
-  // Opciones para el select de filtro
+  // Opciones para el select de filtro por tipo de movimiento
   const opcionesFiltro = [
     { value: 'todos', label: 'Todos los movimientos' },
     { value: 'ingreso', label: 'Solo ingresos' },
     { value: 'egreso', label: 'Solo egresos' },
   ];
 
-  // Opciones para filtros rápidos de fecha
+  // Opciones para filtros rápidos de fecha predefinidos
   const opcionesFiltroRapido = [
     { value: 'general', label: 'General' },
     { value: 'hoy', label: 'Hoy'},
@@ -41,19 +44,20 @@ function IngresosEgresos() {
     { value: 'año', label: 'Año Actual' },
   ];
 
-  // Función para aplicar filtros rápidos de fecha
+  /**
+   * Aplica filtros rápidos de fecha según la opción seleccionada
+   */
   const aplicarFiltroRapido = (filtro) => {
     const hoy = new Date();
     setFiltroRapido(filtro);
     
     switch (filtro) {
       case 'hoy': 
-      const today = new Date();
-      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      setDateRange({ start, end });
-      break;
-    
+        const today = new Date();
+        const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const end = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        setDateRange({ start, end });
+        break;
       case 'semana':
         const inicioSemana = new Date(hoy);
         inicioSemana.setDate(hoy.getDate() - hoy.getDay());
@@ -75,6 +79,9 @@ function IngresosEgresos() {
     }
   };
 
+  /**
+   * Renderiza cada resultado individual en el buscador
+   */
   const renderizarResultado = (resultado) => {
     const precio = typeof resultado.precio_venta === 'number' 
       ? resultado.precio_venta.toFixed(2) 
@@ -97,11 +104,13 @@ function IngresosEgresos() {
     );
   };
 
-  // Función para filtrar por fecha - CORREGIDA
+  /**
+   * Filtra movimientos por rango de fechas
+   */
   const filtrarPorFecha = (movimiento) => {
     if (!dateRange.start || !dateRange.end) return true;
 
-    // Convertir todo a YYYY-MM-DD
+    // Convertir todo a formato YYYY-MM-DD para comparación
     const fechaMov = movimiento.fecha.slice(0, 10); 
     const start = dateRange.start.toISOString().slice(0, 10);
     const end = dateRange.end.toISOString().slice(0, 10);
@@ -109,8 +118,10 @@ function IngresosEgresos() {
     return fechaMov >= start && fechaMov <= end;
   };
 
-
-  // Filtrar movimientos
+  /**
+   * Aplica todos los filtros combinados a los movimientos
+   * Combina búsqueda por texto, filtro por tipo y filtro por fecha
+   */
   const movimientosFiltrados = buscarMovimientos(busqueda)
     .filter(mov => {
       const coincideTipo = 
@@ -122,21 +133,24 @@ function IngresosEgresos() {
     })
     .filter(filtrarPorFecha);
 
+  // Prepara datos para mostrar en resultados de búsqueda
   const resultadosBusquedaA = movimientosFiltrados.map(m => ({
     nombre: m.nombre,
     laboratorio: m.laboratorio,
     precio_venta: m.precio_venta,
-    lote:m.lote,
+    lote: m.lote,
     tipo: m.tipo,
-    
   }));
 
-  // Estadísticas
+  // Calcula estadísticas de movimientos
   const totalIngresos = movimientosFiltrados.filter(m => m.stock_nuevo > m.stock_antiguo).length;
   const totalEgresos = movimientosFiltrados.filter(m => m.stock_nuevo < m.stock_antiguo).length;
   const totalMovimientos = movimientosFiltrados.length;
 
-  // Función para generar reporte Excel
+  /**
+   * Genera y descarga un reporte en formato Excel con los movimientos filtrados
+   * Incluye formato condicional y estilos para mejor presentación
+   */
   const generarReporteExcel = async () => {
     if (!movimientosFiltrados || movimientosFiltrados.length === 0) {
       alert("No hay datos para generar el reporte.");
@@ -146,14 +160,14 @@ function IngresosEgresos() {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Movimientos");
 
-    // Título
+    // Configuración del título del reporte
     worksheet.mergeCells("A1:J1");
     const titulo = worksheet.getCell("A1");
     titulo.value = "Reporte de Ingresos - Egresos";
     titulo.font = { bold: true, size: 16 };
     titulo.alignment = { horizontal: "center" };
 
-    // Encabezados
+    // Encabezados de columnas
     worksheet.addRow([]);
     const encabezados = [
       "N°",
@@ -169,6 +183,7 @@ function IngresosEgresos() {
     ];
     const headerRow = worksheet.addRow(encabezados);
 
+    // Aplicar estilos a los encabezados
     headerRow.eachCell((cell) => {
       cell.fill = {
         type: "pattern",
@@ -185,7 +200,7 @@ function IngresosEgresos() {
       };
     });
 
-    // Filas de datos
+    // Llenar filas con datos de movimientos
     movimientosFiltrados.forEach((m, i) => {
       const row = worksheet.addRow([
         i + 1,
@@ -200,6 +215,7 @@ function IngresosEgresos() {
         m.fecha
       ]);
 
+      // Aplicar bordes a todas las celdas de la fila
       row.eachCell((cell) => {
         cell.border = {
           top: { style: "thin" },
@@ -210,7 +226,7 @@ function IngresosEgresos() {
         cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
       });
 
-      // Colorear columna tipo según ingreso/egreso
+      // Colorear celda de tipo según ingreso/egreso
       const tipoCell = row.getCell(9);
       tipoCell.fill = {
         type: "pattern",
@@ -219,17 +235,20 @@ function IngresosEgresos() {
       };
     });
 
-    // Ajustar anchos de columna
+    // Ajustar anchos de columnas para mejor visualización
     const widths = [5, 20, 20, 20, 10, 15, 15, 15, 15, 15];
     widths.forEach((w, i) => worksheet.getColumn(i + 1).width = w);
 
-    // Guardar archivo
+    // Generar y descargar archivo
     const buffer = await workbook.xlsx.writeBuffer();
     const fechaActual = new Date().toISOString().split("T")[0];
     saveAs(new Blob([buffer]), `reporte-ingresos-egresos-${fechaActual}.xlsx`);
   };
 
-  // Función para aplicar intervalo desde el modal - CORREGIDA
+  /**
+   * Aplica intervalo de fechas personalizado desde el modal
+
+   */
   const handleAplicarIntervalo = (fechaInicio, fechaFin) => {
     const start = fechaInicio ? new Date(fechaInicio) : null;
     const end = fechaFin ? new Date(fechaFin) : null;
@@ -237,12 +256,15 @@ function IngresosEgresos() {
     setIsModalOpen(false);
   };
 
-  // Función para limpiar intervalo
+  /**
+   * Limpia todos los filtros de fecha aplicados
+   */
   const handleLimpiarIntervalo = () => {
     setDateRange({ start: null, end: null });
     setFiltroRapido('general');
   };
 
+  // Estados de carga y error
   if (loading) {
     return <div className="cargando">Cargando movimientos...</div>;
   }
@@ -253,7 +275,7 @@ function IngresosEgresos() {
 
   return (
     <div className="ingresos-egresos-container">
-      {/* Header Responsive */}
+      {/* Header con diseño responsive */}
       <div className={`ingresos-egresos-header ${isMobile ? 'mobile' : ''}`}>
         <div className="ingresos-egresos-icon-container">
           <IconChartBar size={isMobile ? 24 : 30} /> 
@@ -263,12 +285,12 @@ function IngresosEgresos() {
         </span>
       </div>
       
-      {/* Controles Responsive */}
+      {/* Controles de filtros y búsqueda con diseño responsive */}
       <div className="ingresos-egresos-controles-container">
         {isMobile ? (
-          // Vista Mobile - Todo en columna
+          // Vista Mobile - Diseño en columna vertical
           <Stack gap="md" w="100%">
-            {/* Buscador */}
+            {/* Buscador de movimientos */}
             <Buscador
               placeholder="Buscar por Lote o Nombre..."
               value={busqueda}
@@ -278,7 +300,7 @@ function IngresosEgresos() {
               style={{ width: '100%' }}
             />
             
-            {/* Filtros en columna */}
+            {/* Selectores de filtro en columna */}
             <Select
               label="Filtrar por tipo"
               value={filtroTipo}
@@ -301,6 +323,7 @@ function IngresosEgresos() {
               icon={<IconCalendar size={16} />}
             />
 
+            {/* Botones de acción para mobile */}
             <Group gap="sm" grow>
               <Button
                 variant={dateRange.start ? "filled" : "outline"}
@@ -322,6 +345,7 @@ function IngresosEgresos() {
               </Button>
             </Group>
 
+            {/* Botón para limpiar filtros cuando están activos */}
             {dateRange.start && (
               <Button
                 className='btn-limpiarIE'
@@ -336,9 +360,9 @@ function IngresosEgresos() {
             )}
           </Stack>
         ) : (
-          // Vista Desktop/Tablet - Todo en línea
+          // Vista Desktop/Tablet - Diseño en línea horizontal
           <Group gap="md" align="flex-end" style={{ width: '100%' }}>
-            {/* Buscador a la izquierda */}
+            {/* Buscador ubicado a la izquierda */}
             <div className="ingresos-egresos-busqueda-container" style={{ alignSelf: 'flex-end' }}>
               <Buscador
                 placeholder="Buscar por Lote o Nombre..."
@@ -350,7 +374,7 @@ function IngresosEgresos() {
               />
             </div>
             
-            {/* Filtros y botones a la derecha */}
+            {/* Filtros y botones ubicados a la derecha */}
             <Group gap="md" align="flex-end" style={{ marginLeft: 'auto' }}>
               <Select
                 label="Filtrar por tipo"
@@ -384,6 +408,7 @@ function IngresosEgresos() {
               </Button>
             </Group>
 
+            {/* Contenedor para botones de limpiar y exportar */}
             <div style={{ position: 'relative' }}>
               <Stack gap="xs" align="center">
                 {dateRange.start && (
@@ -417,7 +442,7 @@ function IngresosEgresos() {
         )}
       </div>
 
-      {/* Estadísticas Responsive */}
+      {/* Sección de estadísticas con diseño responsive */}
       <div className={`stats-container ${isMobile ? 'mobile' : ''}`}>
         <Paper className="stat-card" shadow="sm" p={isMobile ? "sm" : "md"}>
           <div className="stat-icon-total"><IconArrowsExchange size={isMobile ? 20 : 24} /></div>
@@ -444,10 +469,10 @@ function IngresosEgresos() {
         </Paper>
       </div>
 
-      {/* Lista de Movimientos */}
+      {/* Componente de lista de movimientos */}
       <MovimientosList movimientos={movimientosFiltrados} />
 
-      {/* Modal Responsive */}
+      {/* Modal para selección de rango de fechas personalizado */}
       <Modal
         titulo="Seleccionar Intervalo de Fechas"
         onClose={() => setIsModalOpen(false)}
@@ -464,17 +489,24 @@ function IngresosEgresos() {
   );
 }
 
-// Modal Responsive
+/**
+ * Componente modal para selección personalizada de rango de fechas
+
+ */
 function DateRangeModal({ onApply, onCancel, isMobile }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  /**
+   * Maneja la aplicación del rango de fechas seleccionado
+   */
   const handleApply = () => {
     if (startDate && endDate) {
       onApply(startDate, endDate);
     }
   };
 
+  // Valida que las fechas sean válidas y estén en orden correcto
   const isDateValid = startDate && endDate && new Date(startDate) <= new Date(endDate);
 
   return (
@@ -502,12 +534,14 @@ function DateRangeModal({ onApply, onCancel, isMobile }) {
         </div>
       </div>
       
+      {/* Mensaje de error para fechas inválidas */}
       {startDate && endDate && new Date(startDate) > new Date(endDate) && (
         <Text size="sm" c="red">
           La fecha de inicio no puede ser mayor a la fecha fin
         </Text>
       )}
       
+      {/* Botones de acción del modal */}
       <Group justify="center" gap="sm" grow={isMobile}>
         <Button variant="outline" onClick={onCancel} fullWidth={isMobile}>
           Cancelar
