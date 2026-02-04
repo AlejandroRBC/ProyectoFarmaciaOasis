@@ -1,4 +1,4 @@
-import { useState, useEffect,useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import InventarioService from '../services/InventarioService';
 
 export const useProductos = () => {
@@ -7,11 +7,13 @@ export const useProductos = () => {
   const [laboratorios, setLaboratorios] = useState([]);
   const [cargando, setCargando] = useState(false);
   
+  /**
+   * Carga todos los productos del inventario
+   */
   const cargarProductos = useCallback(async () => {
     setCargando(true);
     try {
       const datos = await InventarioService.obtenerProductos();
-      // Mapear los datos de la base de datos al formato esperado por el frontend
       const productosMapeados = datos.map(producto => ({
         id: producto.id_producto,
         codigo: producto.codigo || `PROD${String(producto.id_producto).padStart(3, '0')}`,
@@ -37,6 +39,9 @@ export const useProductos = () => {
     }
   }, [])
 
+  /**
+   * Carga todos los laboratorios disponibles
+   */
   const cargarLaboratorios = async () => {
     try {
       const datos = await InventarioService.obtenerLaboratorios();
@@ -46,14 +51,17 @@ export const useProductos = () => {
       setLaboratorios([]);
     }
   };
+  
   useEffect(() => {
     cargarProductos();
     cargarLaboratorios();
   }, [cargarProductos]);
 
+  /**
+   * Agrega un nuevo producto al inventario
+   */
   const agregarProducto = async (nuevoProducto) => {
     try {
-      // El precio_venta ahora viene calculado desde el formulario
       const productoData = {
         nombre_prod: nuevoProducto.nombre,
         lote: nuevoProducto.lote,
@@ -61,11 +69,10 @@ export const useProductos = () => {
         porcentaje_g: nuevoProducto.porcentaje_g,
         stock: parseInt(nuevoProducto.stock),
         presentacion: nuevoProducto.presentacion,
-        precio_venta: parseFloat(nuevoProducto.precio_venta), // Usar el precio calculado
+        precio_venta: parseFloat(nuevoProducto.precio_venta),
         precio_compra: parseFloat(nuevoProducto.precio_compra),
         medida: nuevoProducto.medida,
         id_lab: obtenerIdLaboratorio(nuevoProducto.laboratorio),
-        
       };
   
       const productoGuardado = await InventarioService.crearProducto(productoData);
@@ -76,11 +83,11 @@ export const useProductos = () => {
         lote: productoGuardado.lote,
         nombre: productoGuardado.nombre_prod,
         presentacion: productoGuardado.presentacion,
-        precio_base: productoGuardado.precio_compra, // Mostrar precio_compra como precio_base
+        precio_base: productoGuardado.precio_compra,
         precio_venta: productoGuardado.precio_venta,
         stock: productoGuardado.stock,
         fecha_expiracion: productoGuardado.fecha_exp,
-        medida:productoGuardado.medida,
+        medida: productoGuardado.medida,
         laboratorio: nuevoProducto.laboratorio,
         porcentaje_g: productoGuardado.porcentaje_g,
         estado: 'activado'
@@ -94,6 +101,9 @@ export const useProductos = () => {
     }
   };
   
+  /**
+   * Actualiza los datos de un producto existente
+   */
   const actualizarProducto = async (id, datosActualizados) => {
     try {
       const productoData = {
@@ -129,6 +139,9 @@ export const useProductos = () => {
     }
   };
 
+  /**
+   * Desactiva un producto mediante eliminación suave
+   */
   const desactivarProducto = async (id) => {
     try {
       await InventarioService.eliminarProducto(id);
@@ -141,12 +154,18 @@ export const useProductos = () => {
     }
   };
   
+  /**
+   * Actualiza el stock de un producto localmente
+   */
   const actualizarStockProducto = (id, nuevoStock) => {
     setProductos(prev => prev.map(p => 
       p.id === id ? { ...p, stock: nuevoStock } : p
     ));
   };
 
+  /**
+   * Reactiva un producto previamente desactivado
+   */
   const reactivarProducto = async (id) => {
     try {
       const producto = productos.find(p => p.id === id);
@@ -161,7 +180,6 @@ export const useProductos = () => {
           precio_venta: producto.precio_venta,
           precio_compra: producto.precio_base,
           medida: producto.medida,
-    
           id_lab: producto.id_lab,
           id_proveedor: producto.id_proveedor
         });
@@ -176,6 +194,9 @@ export const useProductos = () => {
     }
   };
 
+  /**
+   * Agrega un nuevo laboratorio al sistema
+   */
   const agregarLaboratorio = async (nuevoLab) => {
     try {
       const laboratorioGuardado = await InventarioService.crearLaboratorio(nuevoLab);
@@ -187,10 +208,12 @@ export const useProductos = () => {
     }
   };
 
-  // Función auxiliar para obtener ID del laboratorio por nombre
+  /**
+   * Obtiene el ID de un laboratorio por su nombre
+   */
   const obtenerIdLaboratorio = (nombreLaboratorio) => {
     const laboratorio = laboratorios.find(lab => lab.nombre === nombreLaboratorio);
-    return laboratorio ? laboratorio.id : 1; // Default al primer laboratorio
+    return laboratorio ? laboratorio.id : 1;
   };
 
   return {

@@ -17,7 +17,9 @@ import VentaForm from './components/VentaForm';
 import Modal from '../global/components/modal/Modal.jsx';
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-
+/**
+ * Componente principal de inventario con gestión de productos, carrito y ventas
+ */
 function Inventario() {
   const {
     productos,
@@ -34,16 +36,16 @@ function Inventario() {
 
   const {
     carrito,
-    descuentoCliente,        // ✅ NUEVO
+    descuentoCliente,        
     agregarAlCarrito,
     modificarCantidad,
     eliminarDelCarrito,
     vaciarCarrito,
     realizarVenta,
-    actualizarDescuento,     // ✅ NUEVO
+    actualizarDescuento,     
     totalVenta,
-    totalSinDescuento,       // ✅ NUEVO
-    montoDescuento,          // ✅ NUEVO
+    totalSinDescuento,       
+    montoDescuento,          
     hayStockDisponible,
     obtenerStockDisponible
   } = useCarrito(
@@ -70,18 +72,21 @@ function Inventario() {
     producto: null
   });
 
-  // Media queries para responsive
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const isTablet = useMediaQuery({ minWidth: 769, maxWidth: 1024 });
   
-
+/**
+   * Abre modal de confirmación para desactivar producto
+   */
   const abrirModalConfirmacionDesactivar = (producto) => {
     setModalConfirmacionDesactivar({
       abierto: true,
       producto
     });
   };
-
+  /**
+   * Confirma y ejecuta la desactivación del producto
+   */
   const confirmarDesactivarProducto = () => {
     if (modalConfirmacionDesactivar.producto) {
       desactivarProducto(modalConfirmacionDesactivar.producto.id);
@@ -91,7 +96,9 @@ function Inventario() {
       });
     }
   };
-
+  /**
+   * Cierra el modal de confirmación de desactivación
+   */
   const cerrarModalConfirmacionDesactivar = () => {
     setModalConfirmacionDesactivar({
       abierto: false,
@@ -99,18 +106,22 @@ function Inventario() {
     });
   };
 
-
+  /**
+   * Procesa la venta completa del carrito
+   */
 const handleRealizarVenta = async (datosCliente) => {
   try {   
-    // ✅ LLAMAR A LA FUNCIÓN DEL HOOK QUE CONECTA CON EL BACKEND
+    
     const resultado = await realizarVenta(datosCliente);
-    return resultado; // ✅ IMPORTANTE: Retornar el resultado
+    return resultado; 
   } catch (error) {
     console.error('Error en handleRealizarVenta:', error);
-    throw error; // ✅ Propagar el error
+    throw error; 
   }
 };
-
+  /**
+   * Envía datos del formulario de producto para crear o actualizar
+   */
   const handleSubmitProducto = (datos) => {
     if (modalProducto.producto) {
       actualizarProducto(modalProducto.producto.id, datos);
@@ -121,7 +132,9 @@ const handleRealizarVenta = async (datosCliente) => {
   };
 
   const [busqueda, setBusqueda] = useState('');
-  
+  /**
+   * Filtra productos según búsqueda y estado (activo/desactivado)
+   */
   const productosFiltrados = productos.filter(p => {
     const coincideBusqueda = 
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) || 
@@ -133,8 +146,7 @@ const handleRealizarVenta = async (datosCliente) => {
     
     return coincideBusqueda && p.estado === 'activado';
   });
-  
-  // 1. En la transformación de resultados, agrega los campos que necesita la estructura:
+
 const resultadosParaBuscador = productosFiltrados.map(p => ({
   id: p.id,
   label: p.nombre,                    
@@ -148,7 +160,9 @@ const resultadosParaBuscador = productosFiltrados.map(p => ({
   data: p                             
 }));
 
-// 2. La función renderizarResultado (igual a la de clientes):
+/**
+   * Renderiza cada resultado del buscador
+   */
 const renderizarResultado = (resultado) => {
   return (
     <Group justify="space-between" w="100%">
@@ -174,7 +188,9 @@ const renderizarResultado = (resultado) => {
   };
   
   const cantidadCarrito = carrito.reduce((total, item) => total + item.cantidad, 0);
-
+ /**
+   * Genera y descarga reporte de inventario en formato Excel
+   */
   const generarReporteExcel = async () => {
     const productosConStock = productosFiltrados;
 
@@ -193,7 +209,7 @@ const renderizarResultado = (resultado) => {
     titulo.font = { bold: true, size: 16 };
     titulo.alignment = { horizontal: "center" };
 
-    // Encabezadosz 
+    // Encabezados
     worksheet.addRow([]);
     const encabezados = [
       "Nº",
@@ -266,7 +282,7 @@ const renderizarResultado = (resultado) => {
   return (
     <>
       <Container size="100%" py={isMobile ? "md" : "xl"} px={isMobile ? "xs" : "md"}>
-        {/* Header responsive */}
+       
         <Flex
           justify="space-between"
           align="center"
@@ -274,14 +290,14 @@ const renderizarResultado = (resultado) => {
           gap="md"
           direction={isMobile ? "column" : "row"}
         >
-          {/* En móvil, el título va arriba */}
+          
           {isMobile && (
             <Text className="dashboard-title" size="xl" ta="center" w="100%">
               INVENTARIO
             </Text>
           )}
           
-          {/* En desktop/tablet, el título centrado */}
+          
           {!isMobile && (
             <Text 
               className="dashboard-title" 
@@ -301,7 +317,6 @@ const renderizarResultado = (resultado) => {
         <br />
 
 
-        {/* Barra de búsqueda centrada */}
         <Flex
           justify="center"
           mb="xl"
@@ -311,7 +326,7 @@ const renderizarResultado = (resultado) => {
 
         {/* Switch para mostrar productos sin stock */}
           <Flex justify="space-between" align="center" gap="md" mb="xl" wrap="wrap">
-            {/* Switch a la izquierda */}
+           
             <Switch
               checked={mostrarDesactivados}
               onChange={(event) => setMostrarDesactivados(event.currentTarget.checked)}
@@ -331,8 +346,7 @@ const renderizarResultado = (resultado) => {
                 </Text>
               }
             />
-            
-            {/* Buscador en el centro */}
+
             <Buscador
               placeholder="Buscar por nombre o código..."
               value={busqueda}
@@ -342,8 +356,7 @@ const renderizarResultado = (resultado) => {
               onResultSelect={handleResultSelect}
               style={{ width: '500px', marginLeft: '-80px' }}
             />
-            
-            {/* Carrito alineado a la derecha */}
+
             <ActionIcon 
               variant="subtle" 
               color="blue" 
@@ -537,14 +550,14 @@ const renderizarResultado = (resultado) => {
         <VentaForm
           carrito={carrito}
           totalVenta={totalVenta}
-          totalSinDescuento={totalSinDescuento}    // ✅ NUEVO
-          montoDescuento={montoDescuento}          // ✅ NUEVO
-          descuentoCliente={descuentoCliente}      // ✅ NUEVO
+          totalSinDescuento={totalSinDescuento}    
+          montoDescuento={montoDescuento}          
+          descuentoCliente={descuentoCliente}      
           onModificarCantidad={modificarCantidad}
           onEliminarItem={eliminarDelCarrito}
           onVaciarCarrito={vaciarCarrito}
           onRealizarVenta={handleRealizarVenta}
-          onActualizarDescuento={actualizarDescuento} // ✅ NUEVO
+          onActualizarDescuento={actualizarDescuento} 
           onCancel={() => setSidebarAbierto(false)}
           isMobile={isMobile}
         />

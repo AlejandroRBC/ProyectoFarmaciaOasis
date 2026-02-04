@@ -3,11 +3,13 @@ import ventasService from '../services/VentasServices';
 import clienteService from '../services/clienteService';
 import { saleSound } from '../utils/sounds'; 
 
-
 export const useCarrito = (productos, actualizarStockProducto, recargarProductos) => {
   const [carrito, setCarrito] = useState([]);
   const [descuentoCliente, setDescuentoCliente] = useState(0);
 
+  /**
+   * Verifica si hay stock disponible para un producto
+   */
   const hayStockDisponible = (producto, cantidadDeseada = 1) => {
     const productoEnInventario = productos.find(p => p.id === producto.id);
     const cantidadEnCarrito = carrito.find(item => item.id === producto.id)?.cantidad || 0;
@@ -15,17 +17,22 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     return stockDisponible >= cantidadDeseada;
   };
 
+  /**
+   * Obtiene el stock disponible considerando el carrito actual
+   */
   const obtenerStockDisponible = (productoId) => {
     const productoEnInventario = productos.find(p => p.id === productoId);
     const cantidadEnCarrito = carrito.find(item => item.id === productoId)?.cantidad || 0;
     return (productoEnInventario?.stock || 0) - cantidadEnCarrito;
   };
  
+  /**
+   * Agrega un producto al carrito con validación de stock
+   */
   const agregarAlCarrito = (producto) => {
     const stockDisponible = obtenerStockDisponible(producto.id);
     
     if (stockDisponible < 1) {
-      
       return;
     }
 
@@ -34,7 +41,6 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
       if (existe) {
         const nuevoStockDisponible = obtenerStockDisponible(producto.id);
         if (nuevoStockDisponible < 1) {
-      
           return prev;
         }
         return prev.map(item =>
@@ -47,6 +53,9 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     });
   };
 
+  /**
+   * Modifica la cantidad de un producto en el carrito
+   */
   const modificarCantidad = (id, cambio) => {
     setCarrito(prev =>
       prev.map(item => {
@@ -59,7 +68,6 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
           const producto = productos.find(p => p.id === id);
           
           if (nuevaCantidad > (item.cantidad) && stockDisponible < 1) {
-            
             return item;
           }
           
@@ -70,29 +78,38 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     );
   };
 
+  /**
+   * Elimina un producto específico del carrito
+   */
   const eliminarDelCarrito = (id) => {
     setCarrito(prev => prev.filter(item => item.id !== id));
   };
 
+  /**
+   * Vacía completamente el carrito
+   */
   const vaciarCarrito = () => {
     setCarrito([]);
     setDescuentoCliente(0);
   };
 
-  // ✅ NUEVO: Función para actualizar el descuento
+  /**
+   * Actualiza el porcentaje de descuento aplicado
+   */
   const actualizarDescuento = (porcentajeDescuento) => {
     setDescuentoCliente(parseFloat(porcentajeDescuento) || 0);
   };
 
+  /**
+   * Procesa la venta completa del carrito
+   */
   const realizarVenta = async (datosCliente) => {
     try {
-      // ✅ BUSCAR O CREAR CLIENTE (automáticamente reactiva si está inactivo)
       let idCliente = null;
       let clienteReactivado = false;
       let porcentajeDescuento = 0;
       
       if (datosCliente.ci_nit && datosCliente.ci_nit !== '00000') {
-        // ✅ Verificar si el cliente existe y está inactivo
         const clienteExistente = await clienteService.obtenerClientePorCI(datosCliente.ci_nit);
         if (clienteExistente) {
           porcentajeDescuento = clienteExistente.descuento || 0;
@@ -109,7 +126,6 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
         );
       }
 
-      // Preparar datos para el backend
       const ventaData = {
         cliente: idCliente,
         metodo_pago: datosCliente.metodo_pago,
@@ -120,11 +136,9 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
         }))
       };
 
-      // Llamar al servicio
       const resultado = await ventasService.crearVenta(ventaData);
-          saleSound.play();
+      saleSound.play();
 
-      
       const ventaCompleta = {
         ...resultado,
         datosCliente: datosCliente,
@@ -139,12 +153,10 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
         porcentaje_descuento: resultado.porcentaje_descuento
       };
       
-      // Recargar productos desde la base de datos
       if (recargarProductos) {
         await recargarProductos();
       }
       
-      // Vaciar carrito después de venta exitosa
       vaciarCarrito();
       
       return ventaCompleta;
@@ -160,7 +172,6 @@ export const useCarrito = (productos, actualizarStockProducto, recargarProductos
     }
   };
 
-  // ✅ ACTUALIZADO: Calcular totales con descuento
   const totalSinDescuento = carrito.reduce((total, item) => total + (item.precio_venta * item.cantidad), 0);
   const montoDescuento = totalSinDescuento * (descuentoCliente / 100);
   const totalConDescuento = totalSinDescuento - montoDescuento;

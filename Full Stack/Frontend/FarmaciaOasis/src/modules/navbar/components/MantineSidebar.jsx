@@ -65,7 +65,7 @@ export function MantineSidebar({ onClose }) {
       <div className={classes.header}>
         <Group justify="space-between">
           <div className={classes.logoContainer}>
-            <img src="/img/logo.png" alt="Farmacia Oasis" className={classes.logo} />
+            <img src="/src/assets/logo.png" alt="Farmacia Oasis" className={classes.logo} />
             <Text size="sm" c="white" fw={600}>Farmacia Oasis</Text>
           </div>
           {/* Botón cerrar solo visible cuando hay función onClose (móvil) */}

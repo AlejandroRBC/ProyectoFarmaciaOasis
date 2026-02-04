@@ -2,6 +2,9 @@ import { Button, Alert } from '@mantine/core';
 import { useState } from 'react';
 import { IconAlertCircle, IconLock } from '@tabler/icons-react';
 
+/**
+ * Formulario para crear nuevos laboratorios con validación
+ */
 function LaboratorioForm({ onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     nombre: '',
@@ -11,21 +14,20 @@ function LaboratorioForm({ onSubmit, onCancel }) {
   const [errores, setErrores] = useState({});
   const [tocado, setTocado] = useState({});
 
-  // Función para verificar si el formulario es válido
+  /**
+   * Verifica si el formulario completo es válido
+   */
   const esFormularioValido = () => {
     const { nombre, direccion } = formData;
     
-    // Campos obligatorios no vacíos
     if (!nombre.trim() || !direccion.trim()) {
       return false;
     }
     
-    // Sin errores de validación
     if (Object.keys(errores).length > 0) {
       return false;
     }
     
-    // Longitudes mínimas
     if (nombre.length < 2 || direccion.length < 5) {
       return false;
     }
@@ -33,7 +35,9 @@ function LaboratorioForm({ onSubmit, onCancel }) {
     return true;
   };
 
-  // Función de validación
+  /**
+   * Valida un campo específico y actualiza errores
+   */
   const validarCampo = (nombre, valor) => {
     const nuevosErrores = { ...errores };
     
@@ -87,6 +91,9 @@ function LaboratorioForm({ onSubmit, onCancel }) {
     validarCampo(name, value);
   };
 
+  /**
+   * Valida todo el formulario antes de enviar
+   */
   const validarFormulario = () => {
     const nuevosTocados = {};
     Object.keys(formData).forEach(key => {

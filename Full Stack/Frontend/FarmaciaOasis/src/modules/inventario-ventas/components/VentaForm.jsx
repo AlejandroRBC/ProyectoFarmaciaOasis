@@ -8,7 +8,9 @@ import {
 import { generarPDFVenta,
   imprimirComprobante } from '../utils/generarPDF';
 import clienteService from '../services/clienteService';
-
+/**
+ * Formulario de venta completo con modal de cliente, venta rápida y confirmación
+ */
 function VentaForm({ 
   carrito, 
   totalVenta, 
@@ -32,7 +34,7 @@ function VentaForm({
   const [metodoPagoRapido, setMetodoPagoRapido] = useState('efectivo');
   const [buscandoCliente, setBuscandoCliente] = useState(false);
   
-  // ✅ NUEVO: Estado para manejar errores y campos tocados
+
   const [errores, setErrores] = useState({});
   const [tocado, setTocado] = useState({});
   
@@ -41,22 +43,20 @@ function VentaForm({
     ci_nit: '',
     metodo_pago: 'efectivo'
   });
-
-  // ✅ NUEVO: Función para verificar si el formulario es válido
+/**
+   * Verifica si el formulario completo es válido
+   */
   const esFormularioValido = () => {
     const { nombre, ci_nit, metodo_pago } = datosCliente;
-    
-    // Campos obligatorios no vacíos
+
     if (!nombre.trim() || !ci_nit.trim() || !metodo_pago) {
       return false;
     }
-    
-    // Sin errores de validación
+
     if (Object.keys(errores).length > 0) {
       return false;
     }
-    
-    // Validaciones específicas
+
     if (nombre.length < 2 || ci_nit.length < 3) {
       return false;
     }
@@ -64,7 +64,7 @@ function VentaForm({
     return true;
   };
 
-  // ✅ NUEVO: Función de validación
+ 
   const validarCampo = (nombre, valor) => {
     const nuevosErrores = { ...errores };
     
@@ -112,26 +112,27 @@ function VentaForm({
     setErrores(nuevosErrores);
   };
 
-  // ✅ NUEVO: Función para manejar cambios en los campos
+ 
   const handleChange = (name, value) => {
     setDatosCliente(prev => ({
       ...prev,
       [name]: value
     }));
 
-    // Validar en tiempo real si el campo ya fue tocado
     if (tocado[name]) {
       validarCampo(name, value);
     }
   };
 
-  // ✅ NUEVO: Función para manejar blur de los campos
+  
   const handleBlur = (name, value) => {
     setTocado(prev => ({ ...prev, [name]: true }));
     validarCampo(name, value);
   };
 
-  // ✅ NUEVO: Función para validar todo el formulario
+  /**
+   * Valida todo el formulario antes de enviar
+   */
   const validarFormulario = () => {
     const nuevosTocados = {};
     Object.keys(datosCliente).forEach(key => {
@@ -146,7 +147,9 @@ function VentaForm({
     return Object.keys(errores).length === 0 && esFormularioValido();
   };
 
-  // ✅ NUEVO: Función para buscar cliente automáticamente
+  /**
+   * Busca cliente automáticamente por CI/NIT
+   */
   const buscarClientePorCI = async (ci_nit) => {
     if (!ci_nit || ci_nit.length < 3) {
       return;
@@ -156,21 +159,21 @@ function VentaForm({
     try {
       const cliente = await clienteService.buscarClientePorCIExacto(ci_nit);
       if (cliente) {
-        // ✅ Autocompletar datos del cliente encontrado
+        
         setDatosCliente(prev => ({
           ...prev,
           nombre: cliente.nombre,
           ci_nit: cliente.ci_nit
         }));
         
-        // ✅ Actualizar el descuento en el carrito
+        
         if (onActualizarDescuento) {
           onActualizarDescuento(cliente.descuento || 0);
         }
         
         console.log('Cliente encontrado:', cliente.nombre, 'Descuento:', cliente.descuento + '%');
       } else {
-        // ✅ Si no se encuentra cliente, resetear descuento
+        
         if (onActualizarDescuento) {
           onActualizarDescuento(0);
         }
@@ -182,7 +185,7 @@ function VentaForm({
     }
   };
 
-  // ✅ NUEVO: useEffect para buscar automáticamente cuando cambia el CI
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       if (datosCliente.ci_nit && datosCliente.ci_nit.length >= 3) {
@@ -193,7 +196,10 @@ function VentaForm({
     return () => clearTimeout(timer);
   }, [datosCliente.ci_nit]);
 
-  // En handleSubmit:
+  
+  /**
+   * Procesa el envío del formulario de venta
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (carrito.length === 0) {
@@ -201,7 +207,7 @@ function VentaForm({
       return;
     }
     
-    // ✅ NUEVO: Validar formulario antes de enviar
+    
     if (!validarFormulario()) {
       return;
     }
@@ -241,7 +247,9 @@ function VentaForm({
     }
   };
 
-  // ✅ NUEVA FUNCIÓN MEJORADA PARA VENTA RÁPIDA
+  /**
+   * Inicia el proceso de venta rápida
+   */
   const handleVentaRapida = async () => {
     if (carrito.length === 0) {
       alert('El carrito está vacío');
@@ -251,7 +259,9 @@ function VentaForm({
     setModalPagoRapidoAbierto(true);
   };
 
-  // ✅ NUEVA FUNCIÓN PARA CONFIRMAR VENTA RÁPIDA CON MÉTODO DE PAGO
+  /**
+   * Confirma la venta rápida con método de pago seleccionado
+   */
   const confirmarVentaRapida = async () => {
     try {
       const datosVentaRapida = {
@@ -296,7 +306,9 @@ function VentaForm({
     onCancel();
   };
 
-  // ✅ FUNCIÓN MEJORADA PARA GENERAR PDF CON DATOS REALES
+  /**
+   * Genera PDF con los datos reales de la venta
+   */
   const generarPDFConDatosReales = () => {
     if (!detallesVentaReal) {
       console.error('No hay detalles de venta disponibles');
@@ -316,7 +328,9 @@ function VentaForm({
     );
   };
 
-  // ✅ FUNCIÓN MEJORADA PARA IMPRIMIR CON DATOS REALES
+  /**
+   * Imprime comprobante con los datos reales de la venta
+   */
   const imprimirConDatosReales = () => {
     if (!detallesVentaReal) {
       console.error('No hay detalles de venta disponibles');
@@ -490,7 +504,7 @@ function VentaForm({
         </Stack>
       </Box>
 
-      {/* Modal Datos del Cliente (ACTUALIZADO CON NUEVA VALIDACIÓN) */}
+
       <Modal
         opened={modalClienteAbierto}
         onClose={() => {
@@ -628,7 +642,7 @@ function VentaForm({
         </Box>
       </Modal>
 
-      {/* Resto del código permanece igual (Modal Venta Rápida y Modal Éxito) */}
+
       <Modal
         opened={modalPagoRapidoAbierto}
         onClose={() => setModalPagoRapidoAbierto(false)}

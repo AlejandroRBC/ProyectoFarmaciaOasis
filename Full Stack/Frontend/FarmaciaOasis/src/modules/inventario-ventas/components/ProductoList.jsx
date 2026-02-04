@@ -15,7 +15,9 @@ Alert,
 ScrollArea, 
 Box, 
 ActionIcon } from '@mantine/core';
-
+/**
+ * Componente que muestra lista de productos en tabla con acciones
+ */
 function ProductoList({ 
 productos,
 onAgregarCarrito, 
@@ -26,15 +28,19 @@ mostrarDesactivados = false,
 obtenerStockDisponible,
 hayStockDisponible 
 }) {
-    //  Función mejorada para determinar si mostrar botón deshabilitado
+    /**
+     * Determina si un producto puede ser agregado al carrito
+     */
     const puedeAgregarAlCarrito = (producto) => {
         if (mostrarDesactivados) return false;
         if (producto.estado !== 'activado') return false;
-        
-        // ✅ SOLO impedir cuando el stock disponible sea 0
+
         const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
         return stockDisponible > 0;
       };
+      /**
+     * Obtiene el mensaje de tooltip según estado del producto
+     */
     const getTooltipMessage = (producto) => {
         if (mostrarDesactivados) return "Producto desactivado";
         if (producto.estado !== 'activado') return "Producto inactivo";
@@ -46,7 +52,9 @@ hayStockDisponible
       };
 
 
-
+       /**
+     * Obtiene el color del badge según nivel de stock
+     */
       
       const getBadgeColor = (producto) => {
         const stockDisponible = obtenerStockDisponible ? obtenerStockDisponible(producto.id) : producto.stock;
@@ -124,7 +132,7 @@ const filas = productos.map((producto) => {
             </Table.Td>
             <Table.Td>{producto.porcentaje_g}%</Table.Td>
             <Table.Td >
-            {/* Mostrar botón de agregar al carrito solo si NO estamos en modo "sin stock" */}
+    
                 {!mostrarDesactivados && (
                 <ActionIcon 
                 variant={puedeAgregar ? "subtle" : "light"}
@@ -132,13 +140,12 @@ const filas = productos.map((producto) => {
                 size="xl" 
                 onClick={() => puedeAgregar && onAgregarCarrito(producto)}
                 disabled={!puedeAgregar}
-                title={getTooltipMessage(producto)} // ✅ Tooltip informativo
+                title={getTooltipMessage(producto)} 
                 >
                 <IconShoppingCartPlus size={20} />
                 </ActionIcon>
             )}
             
-            {/* Mostrar botón de reactivar cuando estamos en modo desactivados */}
             {mostrarDesactivados && (
                 <ActionIcon 
                 variant="subtle" 
@@ -152,7 +159,7 @@ const filas = productos.map((producto) => {
                 </ActionIcon>
             )}
             
-            {/* Botón de editar - siempre visible */}
+            
             {!mostrarDesactivados && (
                 <ActionIcon 
                 variant="subtle" 
@@ -163,13 +170,13 @@ const filas = productos.map((producto) => {
                 <IconEdit size={20}/>
             </ActionIcon>
             )}
-            {/* Mostrar botón de desactivar solo en modo activado */}
+           
             {!mostrarDesactivados && (
                 <ActionIcon 
                 variant="subtle" 
                 color="red" 
                 size="xl" 
-                onClick={() => onDesactivar(producto)} // ← Cambiar a llamar al modal
+                onClick={() => onDesactivar(producto)} 
                 >
                 <IconTrash size={20}/>
                 </ActionIcon>

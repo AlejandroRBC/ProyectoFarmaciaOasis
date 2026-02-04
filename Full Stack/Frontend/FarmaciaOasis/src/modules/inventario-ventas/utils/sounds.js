@@ -1,16 +1,23 @@
-// Sonido realista de cajero abriendo y cerrando la caja registradora
+/**
+ * Sonido de cajero para confirmar ventas
+ * Usa Web Audio API para efectos realistas
+ */
 export const saleSound = {
+  /**
+   * Reproduce sonido de venta completa
+   * Maneja errores con sistema de respaldo
+   */
   play: () => {
     try {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       
-      // // Sonido 1: "Clack" de apertura (agudo y corto)
+      // Sonido 1: "Clack" de apertura
       // playOpenSound(audioContext, 0);
       
-      // Sonido 2: "Cha-ching" de monedas (0.2 segundos después)
+      // Sonido 2: "Cha-ching" de monedas (principal)
       playCoinSound(audioContext, 0.2);
       
-      // // Sonido 3: "Clack" de cierre (0.6 segundos después)
+      // Sonido 3: "Clack" de cierre
       // playCloseSound(audioContext, 0.6);
       
     } catch (error) {
@@ -20,7 +27,9 @@ export const saleSound = {
   }
 };
 
-// Sonido de apertura - "CLACK" agudo
+/**
+ * Sonido agudo de apertura de caja
+ */
 const playOpenSound = (audioContext, startTime) => {
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
@@ -32,7 +41,6 @@ const playOpenSound = (audioContext, startTime) => {
   oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + startTime + 0.1);
   oscillator.type = 'sine';
   
-  // Envolvente rápida y aguda
   gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
   gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + startTime + 0.02);
   gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + 0.1);
@@ -41,9 +49,11 @@ const playOpenSound = (audioContext, startTime) => {
   oscillator.stop(audioContext.currentTime + startTime + 0.1);
 };
 
-// Sonido de monedas - "CHA-CHING"
+/**
+ * Sonido de monedas característico "cha-ching"
+ * Usa 4 osciladores simultáneos
+ */
 const playCoinSound = (audioContext, startTime) => {
-  // Múltiples osciladores para simular monedas
   const frequencies = [800, 1000, 600, 1200];
   const times = [0, 0.05, 0.1, 0.15];
   
@@ -55,9 +65,8 @@ const playCoinSound = (audioContext, startTime) => {
     gainNode.connect(audioContext.destination);
     
     oscillator.frequency.setValueAtTime(frequencies[index], audioContext.currentTime + startTime + timeOffset);
-    oscillator.type = 'triangle'; // Tipo más suave para monedas
+    oscillator.type = 'triangle';
     
-    // Envolvente para cada "moneda"
     gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime + timeOffset);
     gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + startTime + timeOffset + 0.02);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + timeOffset + 0.3);
@@ -67,7 +76,9 @@ const playCoinSound = (audioContext, startTime) => {
   });
 };
 
-// Sonido de cierre - "CLACK" más grave
+/**
+ * Sonido grave de cierre de caja
+ */
 const playCloseSound = (audioContext, startTime) => {
   const oscillator = audioContext.createOscillator();
   const gainNode = audioContext.createGain();
@@ -79,7 +90,6 @@ const playCloseSound = (audioContext, startTime) => {
   oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + startTime + 0.15);
   oscillator.type = 'sine';
   
-  // Envolvente más lenta para el cierre
   gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
   gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + startTime + 0.05);
   gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + 0.15);
@@ -88,7 +98,9 @@ const playCloseSound = (audioContext, startTime) => {
   oscillator.stop(audioContext.currentTime + startTime + 0.15);
 };
 
-// Sonido de fallback simple
+/**
+ * Sonido simple de respaldo cuando falla la API
+ */
 const playFallbackSound = () => {
   try {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -98,7 +110,6 @@ const playFallbackSound = () => {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
-    // Sonido simple de "ding"
     oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
     oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.3);
     oscillator.type = 'sine';

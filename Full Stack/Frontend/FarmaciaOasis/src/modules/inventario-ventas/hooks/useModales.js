@@ -8,6 +8,9 @@ export const useModales = () => {
   
   const [modalLaboratorio, setModalLaboratorio] = useState(false);
 
+  /**
+   * Abre el modal de producto para crear o editar
+   */
   const abrirModalProducto = (producto = null) => {
     setModalProducto({ 
       abierto: true,
@@ -15,6 +18,9 @@ export const useModales = () => {
     });
   };
 
+  /**
+   * Cierra el modal de producto y limpia los datos
+   */
   const cerrarModalProducto = () => {
     setModalProducto({ 
       abierto: false,
@@ -22,7 +28,14 @@ export const useModales = () => {
     });
   };
 
+  /**
+   * Abre el modal de laboratorio
+   */
   const abrirModalLaboratorio = () => setModalLaboratorio(true);
+
+  /**
+   * Cierra el modal de laboratorio
+   */
   const cerrarModalLaboratorio = () => setModalLaboratorio(false);
 
   return {

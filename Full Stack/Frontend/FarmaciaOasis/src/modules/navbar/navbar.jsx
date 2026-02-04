@@ -47,7 +47,7 @@ function Navbar({ children }) {
             <Group gap={isMobile ? "xs" : "sm"} className="logo-container">
               <div className="logo-wrapper">
                 <img
-                  src="/img/logo.png"
+                  src="/src/assets/logo.png"
                   alt="Farmacia Oasis"
                   className="navbar-logo"
                 />

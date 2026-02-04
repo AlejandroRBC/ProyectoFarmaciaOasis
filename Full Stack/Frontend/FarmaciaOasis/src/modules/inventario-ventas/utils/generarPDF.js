@@ -2,7 +2,7 @@ import html2pdf from 'html2pdf.js';
 import dayjs from 'dayjs';
 
 export function generarPDFVenta(datosVenta, carrito, totalVenta, numeroVenta, datosConDescuento = {}) {
-    // ✅ EXTRAER DATOS DE DESCUENTO
+    // EXTRAER DATOS DE DESCUENTO
     const {
         totalSinDescuento = totalVenta,
         montoDescuento = 0,

@@ -3,8 +3,9 @@ import axios from 'axios';
 const API_URL = 'http://localhost:4000/api';
 
 const ventasService = {
-  // Crear nueva venta
-  
+  /**
+   * Crea una nueva venta en el sistema
+   */
   crearVenta: async (ventaData) => {
     try {
       const response = await axios.post(`${API_URL}/ventas`, ventaData);
@@ -12,7 +13,6 @@ const ventasService = {
     } catch (error) {
       console.error('Error al crear venta:', error);
       
-      // ✅ Mejor manejo de errores
       if (error.response && error.response.data && error.response.data.error) {
         throw new Error(error.response.data.error);
       } else {
@@ -21,7 +21,9 @@ const ventasService = {
     }
   },
 
-  // Obtener todas las ventas
+  /**
+   * Obtiene todas las ventas registradas
+   */
   obtenerVentas: async () => {
     try {
       const response = await axios.get(`${API_URL}/ventas`);
@@ -32,7 +34,9 @@ const ventasService = {
     }
   },  
 
-  // Obtener detalles de una venta específica
+  /**
+   * Obtiene los detalles de una venta específica por ID
+   */
   obtenerVenta: async (id) => {
     try {
       const response = await axios.get(`${API_URL}/ventas/${id}`);

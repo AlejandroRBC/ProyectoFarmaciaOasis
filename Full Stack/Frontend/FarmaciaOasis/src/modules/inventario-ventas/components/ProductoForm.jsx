@@ -1,7 +1,9 @@
 import { Button, NumberInput, Text, Group, Alert } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import { IconCalculator, IconAlertCircle, IconLock } from '@tabler/icons-react';
-
+/**
+ * Formulario para crear o editar productos con cálculo automático de precio de venta
+ */
 function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     codigo: '',
@@ -20,38 +22,43 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
   const [errores, setErrores] = useState({});
   const [tocado, setTocado] = useState({});
 
-  // Función para verificar si el formulario es válido
+  /**
+   * Verifica si el formulario completo es válido
+   */
   const esFormularioValido = () => {
     const { lote, nombre, presentacion, medida, precio_compra, porcentaje_g, stock, fecha_expiracion, laboratorio } = formData;
     
-    // Campos obligatorios no vacíos - INCLUIR presentacion y medida
+  
     if (!lote.trim() || !nombre.trim() || !presentacion.trim() || !medida.trim() || !precio_compra || !porcentaje_g || !stock || !fecha_expiracion || !laboratorio) {
       return false;
     }
     
-    // Sin errores de validación
+    
     if (Object.keys(errores).length > 0) {
       return false;
     }
     
-    // Precio de venta debe ser mayor a 0
+    
     if (precioVentaCalculado <= 0) {
       return false;
     }
     
-    // Validaciones numéricas básicas
     if (parseFloat(precio_compra) <= 0 || parseFloat(porcentaje_g) < 0 || parseInt(stock) < 0) {
       return false;
     }
     
     return true;
   };
-  // Calcular precio de venta cuando cambien precio_compra o porcentaje_g
+  /**
+   * Calcula el precio de venta cuando cambia precio_compra o porcentaje_g
+   */
   useEffect(() => {
     calcularPrecioVenta();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   }, [formData.precio_compra, formData.porcentaje_g]);
-
+  /**
+   * Carga datos del producto cuando se edita
+   */
   useEffect(() => {
     if (producto) {
       setFormData({
@@ -69,6 +76,9 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     }
   }, [producto]);
 
+    /**
+   * Calcula el precio de venta basado en precio compra y porcentaje de ganancia
+   */
   const calcularPrecioVenta = () => {
     const precioCompra = parseFloat(formData.precio_compra) || 0;
     const porcentajeGanancia = parseFloat(formData.porcentaje_g) || 0;
@@ -82,7 +92,9 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     }
   };
 
-  // Función de validación
+  /**
+   * Valida un campo específico y actualiza errores
+   */
   const validarCampo = (nombre, valor) => {
     const nuevosErrores = { ...errores };
     
@@ -203,7 +215,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
       [name]: value
     }));
 
-    // Validar en tiempo real si el campo ya fue tocado
+   
     if (tocado[name]) {
       validarCampo(name, value);
     }
@@ -214,6 +226,10 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     validarCampo(name, value);
   };
 
+  /**
+   * Valida todo el formulario antes de enviar
+   */
+
   const validarFormulario = () => {
     const nuevosTocados = {};
     const camposRequeridos = ['codigo', 'lote', 'nombre', 'precio_compra', 'porcentaje_g', 'stock', 'fecha_expiracion', 'laboratorio','presentacion','medida'];
@@ -223,7 +239,7 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
     });
     setTocado(nuevosTocados);
 
-    // Validar todos los campos requeridos
+    
     camposRequeridos.forEach(key => {
       validarCampo(key, formData[key]);
     });
@@ -238,7 +254,6 @@ function ProductoForm({ producto, laboratorios, onSubmit, onCancel }) {
       return;
     }
 
-    // Incluir el precio de venta calculado en los datos a enviar
     const datosCompletos = {
       ...formData,
       precio_venta: precioVentaCalculado,
